@@ -54,7 +54,6 @@ declare module 'vue' {
     MyTinymceEditor: typeof import('./components/my-tinymce-editor/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TinymceEditor: typeof import('./components/tinymce-editor/index.vue')['default']
     ToggleMenuBar: typeof import('./components/my-layout/toggle-menu-bar.vue')['default']
   }
   export interface ComponentCustomProperties {
