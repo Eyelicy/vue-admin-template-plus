@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+}
+
+body {
+    font-size: 16px;
+}
+
+.box-title {
+    position: relative;
+    @apply pl-4 mb-12;
+
+    &::before {
+        content: '';
+        width: 4px;
+        height: 100%;
+        background-color: #569ded;
+        position: absolute;
+        left: 0;
+    }
+}
+
+.layout-container {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    display: flex;
+
+    &-form {
+        display: flex;
+        justify-content: space-between;
+
+        &-handle {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        &-search {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            .search-input {
+                flex: 1;
+            }
+
+            .search-label {
+                font-size: 14px;
+                color: #606266;
+                margin-left: 15px;
+            }
+
+            .search-btn {
+                margin: 0 15px;
+            }
+
+            .search-select {
+                flex: 1;
+                margin-right: 15px;
+            }
+        }
+
+        .el-form-item {
+            margin-bottom: 0;
+        }
+    }
+
+    &-table {
+        flex: 1;
+        overflow: auto;
+    }
+}
+
+.table-header {
+    @apply flex items-center flex flex-row text-gray-600;
+
+    &-lab {
+        width: 130px;
+        @apply flex-shrink-0 text-right  mr-8;
+    }
+
+    .el-input {
+        width: 200px;
+    }
+}
+
+.details-card {
+    display: flex;
+    flex-direction: column;
+
+    .details-card-grid-4 {
+        @apply w-full grid grid-cols-4 gap-4;
+    }
+}
+
+.el-button {
+    // 防止被tailwindcss默认样式覆盖
+    background-color: var(--el-button-bg-color, var(--el-color-white));
+
+    //覆盖el-button的点击样式
+    &:focus {
+        border-color: var(--el-button-border-color);
+        background-color: var(--el-button-bg-color);
+    }
+    &:hover {
+        color: var(--el-button-hover-text-color);
+        border-color: var(--el-button-hover-border-color);
+        background-color: var(--el-button-hover-bg-color);
+    }
+}
