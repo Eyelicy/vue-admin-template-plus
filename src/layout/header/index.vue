@@ -1,7 +1,8 @@
 <template>
     <div class="w-full h-full flex justify-between bg-blue text-white items-center px-12">
-        <div>
-            <p class="text-4xl">{{ config.layoutHeaderName }}</p>
+        <div class="flex items-center bg-white rounded-[0.8rem] overflow-hidden">
+            <img width="100" class="p-2" src="@/assets/img/title.png" alt="" srcset="" />
+            <p class="text-4xl text-black pl-6 pr-8 font-bold">{{ config.layoutHeaderName }}</p>
         </div>
         <div class="flex items-center text-xl h-full">
             <div
@@ -37,13 +38,7 @@
         </div>
     </div>
     <el-dialog v-model="showChangeOrganization" title="切换机构" width="30%">
-        <el-form
-            :model="form"
-            ref="formRef"
-            :rules="rules"
-            label-width="120px"
-            style="width: 100%;"
-        >
+        <el-form :model="form" ref="formRef" :rules="rules" label-width="120px" style="width: 100%">
             <el-form-item label="机构名称" prop="corporation_guid">
                 <el-select v-model="form.corporation_guid" style="width: 100%">
                     <el-option
@@ -121,7 +116,7 @@ import { ArrowDownBold, SwitchButton } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { config } from '/config'
+import { config } from '/config.js'
 
 const router = useRouter(),
     route = useRoute()
