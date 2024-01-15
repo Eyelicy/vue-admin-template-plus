@@ -5,7 +5,6 @@
             v-bind="$attrs"
             class="system-table"
             :border="border"
-            height="100%"
             :data="data"
             @select="selectChange"
             @select-all="selectChange"

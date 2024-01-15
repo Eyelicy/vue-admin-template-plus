@@ -108,6 +108,142 @@ export const routes = [
                     },
                 ],
             },
+            // 签收异常统计
+            {
+                path: '/abnormal-receipt-statistics',
+                name: 'AbnormalReceiptStatistics',
+                redirect: '/abnormal-receipt-statistics/abnormal-receipt-customer',
+                meta: {
+                    title: '异常监控管理',
+                },
+                children: [
+                    {
+                        path: 'abnormal-receipt-customer',
+                        name: 'AbnormalReceiptCustomer',
+                        meta: {
+                            title: '异常签收客户',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AbnormalReceiptStatistics/AbnormalReceiptCustomer/index.vue'
+                            ),
+                    },
+                    {
+                        path: 'abnormal-receipt-customer/edit/:id',
+                        name: 'AbnormalReceiptCustomerEdit',
+                        meta: {
+                            title: '异常签收客户详情',
+                            hideMenu: true,
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AbnormalReceiptStatistics/AbnormalReceiptCustomer/edit.vue'
+                            ),
+                    },
+                    {
+                        path: 'abnormal-receipt-order',
+                        name: 'AbnormalReceiptOrder',
+                        meta: {
+                            title: '异常签收订单',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AbnormalReceiptStatistics/AbnormalReceiptOrder/index.vue'
+                            ),
+                    },
+                ],
+            },
+            // 异常监测配置
+            {
+                path: '/anomaly-detection-configuration',
+                name: 'AnomalyDetectionConfiguration',
+                redirect: '/anomaly-detection-configuration/delivery-location-deviation',
+                meta: {
+                    title: '异常监测配置',
+                },
+                children: [
+                    {
+                        path: 'delivery-location-deviation',
+                        name: 'DeliveryLocationDeviation',
+                        meta: {
+                            title: '签收地偏离',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/DeliveryLocationDeviation/index.vue'
+                            ),
+                    },
+                    {
+                        path: 'delivery-location-deviation/edit/:id',
+                        name: 'DeliveryLocationDeviationEdit',
+                        meta: {
+                            title: '编辑签收地偏离',
+                            hideMenu: true,
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/DeliveryLocationDeviation/edit.vue'
+                            ),
+                    },
+                    {
+                        path: 'same-face-different-places',
+                        name: 'SameFaceDifferentPlaces',
+                        meta: {
+                            title: '同脸异地',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/SameFaceDifferentPlaces/index.vue'
+                            ),
+                    },
+                    {
+                        path: 'same-face-different-places/edit/:id',
+                        name: 'SameFaceDifferentPlacesEdit',
+                        meta: {
+                            title: '同脸异地详情',
+                            hideMenu: true,
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/SameFaceDifferentPlaces/edit.vue'
+                            ),
+                    },
+                    {
+                        path: 'same-store-different-faces',
+                        name: 'SameStoreDifferentFaces',
+                        meta: {
+                            title: '同店异脸',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/SameStoreDifferentFaces/index.vue'
+                            ),
+                    },
+                    {
+                        path: 'same-store-different-faces/edit/:id',
+                        name: 'SameStoreDifferentFacesEdit',
+                        meta: {
+                            title: '同店异脸详情',
+                            hideMenu: true,
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/SameStoreDifferentFaces/edit.vue'
+                            ),
+                    },
+                    {
+                        path: 'customer-warning-level',
+                        name: 'CustomerWarningLevel',
+                        meta: {
+                            title: '客户预警等级',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AnomalyDetectionConfiguration/CustomerWarningLevel.vue'
+                            ),
+                    },
+                ],
+            },
             // 机构管理
             {
                 path: '/Organization',

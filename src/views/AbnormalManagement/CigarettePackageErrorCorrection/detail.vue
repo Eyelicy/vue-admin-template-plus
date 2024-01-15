@@ -8,7 +8,7 @@
 
 <template>
     <div class="w-full h-full flex flex-col p-12">
-        <div class="flex items-center mb-16">
+        <div class="flex items-center mb-[5.6rem]">
             <div class="w-[160px] flex items-center">
                 <p class="text-title">烟包纠错数</p>
                 <span class="ml-auto text-primary text-2xl font-bold">4</span>
@@ -59,26 +59,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="flex">
-                <Table :data="tableData" :showPage="false" border style="width: 100%">
-                    <el-table-column prop="id" label="店名" width="180" />
-                    <el-table-column prop="name" label="时间" />
-                    <el-table-column prop="amount1" label="订单号" />
-                    <el-table-column prop="amount2" label="购方姓名" />
-                    <el-table-column prop="amount3" label="订单盒数" />
-                    <el-table-column prop="amount3" label="订单金额" />
-                    <el-table-column label="图片">
-                        <template #default="{ row }">
-                            <el-image
-                                style="width: 50px; height: 50px"
-                                :src="getImageUrl('avatar.png')"
-                                fit="cover"
-                                :preview-src-list="[getImageUrl('avatar.png')]"
-                            />
-                        </template>
-                    </el-table-column>
-                </Table>
-            </div> -->
         </div>
         <el-divider />
         <div class="w-full px-16">
@@ -90,7 +70,7 @@
                 <descriptions-item label="签收地址">321,321</descriptions-item>
                 <descriptions-item label="品种数">24</descriptions-item>
                 <descriptions-item label="总盒数">124</descriptions-item>
-                <descriptions-item label="总金额（元）">24800￥</descriptions-item>
+                <descriptions-item label="总金额（元）">￥24800</descriptions-item>
             </div>
         </div>
         <el-divider />

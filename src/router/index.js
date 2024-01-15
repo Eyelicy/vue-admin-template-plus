@@ -2,6 +2,7 @@ import { routes } from '@/router/routes'
 import { useUserStore } from '@/store/user'
 import NProgress from '@/utils/nprogress'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { config } from '/config.js'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -13,7 +14,7 @@ const whiteList = ['/login']
 router.beforeEach((to, from, next) => {
     NProgress.start()
     const userStore = useUserStore()
-    document.title = to.meta.title ? `智能计尿管理系统-${to.meta.title}` : '智能计尿管理系统'
+    document.title = to.meta.title ? `${config.title}-${to.meta.title}` : `${config.title}`
     if (userStore.token || whiteList.indexOf(to.path) !== -1) {
         next()
     } else {

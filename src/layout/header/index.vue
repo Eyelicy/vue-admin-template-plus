@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-full flex justify-between bg-blue text-white items-center px-12">
         <div>
-            <p class="text-4xl">{{config.layoutHeaderName}}</p>
+            <p class="text-4xl">{{ config.layoutHeaderName }}</p>
         </div>
         <div class="flex items-center text-xl h-full">
             <div
@@ -42,10 +42,10 @@
             ref="formRef"
             :rules="rules"
             label-width="120px"
-            style="max-width: 460px"
+            style="width: 100%;"
         >
             <el-form-item label="机构名称" prop="corporation_guid">
-                <el-select v-model="form.corporation_guid">
+                <el-select v-model="form.corporation_guid" style="width: 100%">
                     <el-option
                         v-for="item in corporations"
                         :key="item.guid"

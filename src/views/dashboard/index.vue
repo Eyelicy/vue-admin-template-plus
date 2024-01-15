@@ -33,17 +33,20 @@
 </style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-8">
-        <p class="text-title font-bold text-3xl mb-12">{{ state.currentTime }}</p>
-        <div class="box-title text-title text-3xl">异常监控实时消息</div>
+    <div class="w-full h-full flex flex-col p-[3.2rem]">
+        <p class="text-title font-bold text-[24px] mb-12">{{ state.currentTime }}</p>
+        <div class="box-title text-primary text-[18px]">异常监控实时消息</div>
         <div class="grid grid-cols-2 gap-8 text-test-black">
-            <div class="shadow-lg bg-white rounded-md p-4">
-                <div class="flex justify-between mb-4">
-                    <span class="text-2xl">签收地偏离</span>
-                    <span>全部</span>
+            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl">签收地偏离</span>
+                    <span class="text-[1.4rem] text-primary">全部</span>
                 </div>
                 <template v-for="(item, index) in 5">
-                    <div class="flex py-2 mb-4 items-center bg-sky-100/50">
+                    <div
+                        class="flex py-2 items-center bg-sky-100/50"
+                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
+                    >
                         <span class="text-blue-400">【xx区】</span>
                         <span>【xx店名】</span>
                         <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
@@ -52,13 +55,16 @@
                     </div>
                 </template>
             </div>
-            <div class="shadow-lg bg-white rounded-md p-4">
-                <div class="flex justify-between mb-4">
-                    <span class="text-2xl">同脸异地</span>
-                    <span>全部</span>
+            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+                <div class="mb-4 flex justify-between items-center">
+                    <span class="text-xl">同脸异地</span>
+                    <span class="text-[1.4rem] text-primary">全部</span>
                 </div>
                 <template v-for="(item, index) in 5">
-                    <div class="flex py-2 mb-4 items-center bg-sky-100/50">
+                    <div
+                        class="flex py-2 items-center bg-sky-100/50"
+                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
+                    >
                         <span class="text-blue-400">【xx区】</span>
                         <span>【xx店名】</span>
                         <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
@@ -67,13 +73,16 @@
                     </div>
                 </template>
             </div>
-            <div class="shadow-lg bg-white rounded-md p-4">
-                <div class="flex justify-between mb-4">
-                    <span class="text-2xl">同店异脸</span>
-                    <span>全部</span>
+            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+                <div class="mb-4 flex justify-between items-center">
+                    <span class="text-xl">同店异脸</span>
+                    <span class="text-[1.4rem] text-primary">全部</span>
                 </div>
                 <template v-for="(item, index) in 5">
-                    <div class="flex py-2 mb-4 items-center bg-sky-100/50">
+                    <div
+                        class="flex py-2 items-center bg-sky-100/50"
+                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
+                    >
                         <span class="text-blue-400">【xx区】</span>
                         <span>【xx店名】</span>
                         <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
@@ -82,13 +91,16 @@
                     </div>
                 </template>
             </div>
-            <div class="shadow-lg bg-white rounded-md p-4">
-                <div class="flex justify-between mb-4">
-                    <span class="text-2xl">烟包纠错</span>
-                    <span>全部</span>
+            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+                <div class="mb-4 flex justify-between items-center">
+                    <span class="text-xl">烟包纠错</span>
+                    <span class="text-[1.4rem] text-primary">全部</span>
                 </div>
                 <template v-for="(item, index) in 5">
-                    <div class="flex py-2 mb-4 items-center bg-sky-100/50">
+                    <div
+                        class="flex py-2 items-center bg-sky-100/50"
+                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
+                    >
                         <span class="text-blue-400">【xx区】</span>
                         <span>【xx店名】</span>
                         <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
@@ -98,7 +110,7 @@
                 </template>
             </div>
         </div>
-        <div class="box-title text-title text-3xl mt-12">统计摘要</div>
+        <div class="box-title text-primary text-[18px] mt-12">统计摘要</div>
         <div class="abnormal-content">
             <div class="card">
                 <p>今日异常上报</p>
@@ -129,7 +141,7 @@
                 <p class="text-[#303133]">12</p>
             </div>
         </div>
-        <div class="box-title text-title text-3xl mt-12">异常上报趋势统计</div>
+        <div class="box-title text-primary text-[18px] mt-12">异常上报趋势统计</div>
         <div class="chart-box">
             <div class="chart-box-header">
                 <div class="mr-4">起止日期范围</div>
@@ -176,7 +188,7 @@
                 class="w-full h-[500px]"
             ></div>
         </div>
-        <div class="box-title text-title text-3xl mt-12">异常签收客户统计</div>
+        <div class="box-title text-primary text-[18px] mt-12">异常签收客户统计</div>
         <div class="chart-box">
             <div class="chart-box-header">
                 <div class="mr-4">起止日期范围</div>
@@ -351,7 +363,7 @@ const initExceptionReportingChart = () => {
 }
 
 // 初始化异常签收客户图表
-const initExceptionalDeliveryChart = () =>{
+const initExceptionalDeliveryChart = () => {
     exceptionalDelivery.chart = echarts.init(exceptionalDeliveryChart.value)
     const lineOption = {
         grid: {

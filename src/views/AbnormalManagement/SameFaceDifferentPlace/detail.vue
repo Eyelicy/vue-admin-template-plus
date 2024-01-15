@@ -2,7 +2,7 @@
 
 <template>
     <div class="w-full h-full flex flex-col p-12">
-        <div class="flex items-center mb-16">
+        <div class="flex items-center mb-[5.6rem]">
             <div class="w-[160px] flex items-center">
                 <p class="text-title">同脸出现地总数</p>
                 <span class="ml-auto text-primary text-2xl font-bold">4</span>
@@ -47,6 +47,8 @@
                             :src="getImageUrl('avatar.png')"
                             fit="cover"
                             :preview-src-list="[getImageUrl('avatar.png')]"
+                            :append-to-body="true"
+                            :preview-teleported="true"
                     /></descriptions-item>
                     <descriptions-item label="系统登记人名"> 炒饭 </descriptions-item>
                 </div>
@@ -66,6 +68,8 @@
                                 :src="getImageUrl('avatar.png')"
                                 fit="cover"
                                 :preview-src-list="[getImageUrl('avatar.png')]"
+                            :append-to-body="true"
+                            :preview-teleported="true"
                             />
                         </template>
                     </el-table-column>
@@ -82,7 +86,7 @@
                 <descriptions-item label="签收地址">321,321</descriptions-item>
                 <descriptions-item label="品种数">24</descriptions-item>
                 <descriptions-item label="总盒数">124</descriptions-item>
-                <descriptions-item label="总金额（元）">24800￥</descriptions-item>
+                <descriptions-item label="总金额（元）">￥24800</descriptions-item>
             </div>
         </div>
         <el-divider />
@@ -117,7 +121,7 @@
                 <label>处理内容：</label>
                 <span>-</span>
             </div>
-            <div >
+            <div>
                 <label>操作人：</label>
                 <span>-</span>
             </div>

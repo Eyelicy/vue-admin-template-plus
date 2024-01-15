@@ -1,11 +1,11 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
-        <div class="flex items-center mb-16">
+    <div class="w-full h-full flex flex-col p-12 detail">
+        <div class="flex items-center mb-[5.6rem]">
             <div class="w-[120px] flex flex-col">
                 <div class="flex mb-4">
-                    <p class="text-title">偏离差距</p>
+                    <p class="text-title">偏差距离</p>
                     <span class="ml-auto text-primary text-2xl font-bold">22</span>
                     <p class="text-title">米</p>
                 </div>
@@ -52,7 +52,7 @@
                 <descriptions-item label="签收地址">321,321</descriptions-item>
                 <descriptions-item label="品种数">24</descriptions-item>
                 <descriptions-item label="总盒数">124</descriptions-item>
-                <descriptions-item label="总金额（元）">24800￥</descriptions-item>
+                <descriptions-item label="总金额（元）">￥24800</descriptions-item>
             </div>
         </div>
         <el-divider />
@@ -297,9 +297,9 @@ const initMap = async () => {
             isOutline: false,
             strokeColor: '#303133',
             strokeOpacity: 1,
-            strokeWeight: 1,
+            strokeWeight: 2,
             strokeStyle: 'dashed',
-            strokeDasharray: [10, 5],
+            strokeDasharray: [5, 3],
             lineJoin: 'round',
             lineCap: 'round',
             zIndex: 50,

@@ -15,7 +15,7 @@
                 <el-main class="flex flex-col">
                     <el-breadcrumb
                         separator="/"
-                        class="pb-8 text-2xl flex-initial shrink-0"
+                        class="pb-8 text-xl flex-initial shrink-0"
                         style="flex: 0 1 auto"
                     >
                         <template v-for="(item, index) in breadcrumb" :key="index">
@@ -71,7 +71,6 @@ watch(route, (value) => {
         obj[next.path] ? '' : (obj[next.path] = true && cur.push(next))
         return cur
     }, [])
-    console.log(breadcrumb.value);
 })
 </script>
 
