@@ -1,6 +1,9 @@
 import { useUserStore } from '@/store/user'
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { config } from '/config'
+
+const { appGuid } = config
 
 // 环境的切换
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
@@ -18,7 +21,7 @@ axios.interceptors.request.use(
         const token = userStore.token
         const app_guid = userStore.app_guid
         const corporation_guid = userStore.userInfo?.extinfo?.Organization?.GUID
-        config.headers.Authorization = `app_guid=${app_guid};${
+        config.headers.Authorization = `app_guid=${appGuid};${
             corporation_guid ? 'corporation_guid=' + corporation_guid : ''
         }`
         token && (config.headers.token = token)

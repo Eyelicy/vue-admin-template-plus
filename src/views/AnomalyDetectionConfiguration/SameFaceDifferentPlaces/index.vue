@@ -1,4 +1,3 @@
-import { pushScopeId } from 'vue'; import { routerKey } from 'vue-router';
 <style lang="scss" scoped></style>
 
 <template>
@@ -6,26 +5,32 @@ import { pushScopeId } from 'vue'; import { routerKey } from 'vue-router';
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">送货路线</div>
-                <el-select v-model="query.status" placeholder="请选择状态" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
+                <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
             </div>
             <div class="table-header">
                 <div class="table-header-lab">包含客户</div>
-                <el-input v-model="query.register_name" clearable> </el-input>
+                <client-select
+                    v-model="query.customerName"
+                    placeholder="请选择包含客户"
+                    clearable
+                />
             </div>
             <div class="table-header">
                 <div class="table-header-lab">包含集中签收点</div>
-                <el-input v-model="query.error_num" clearable> </el-input>
+                <centralized-signing-point-select
+                    v-model="query.unifiedSigningPointName"
+                    placeholder="请选择包含集中签收点"
+                    clearable
+                />
             </div>
         </TableHead>
         <div class="flex-auto flex flex-col">
-            <el-button class="mb-8" type="primary" style="width: 100px" :icon="Plus"
+            <el-button
+                class="mb-8"
+                type="primary"
+                style="width: 100px"
+                :icon="Plus"
+                @click="state.addConfigurationDialogVisible = true"
                 >新增配置
             </el-button>
             <Table
@@ -36,23 +41,38 @@ import { pushScopeId } from 'vue'; import { routerKey } from 'vue-router';
                 :data="state.tableData"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="abnormal_code" label="送货路线编号"> </el-table-column>
-                <el-table-column prop="status" label="送货路线名称"> </el-table-column>
-                <el-table-column prop="register_name" label="同脸异地告警数值（大于等于）" />
-                <el-table-column prop="order_code" label="订单统计周期（小于等于/天）" />
-                <el-table-column prop="order_code" label="更新时间" />
-                <el-table-column prop="order_code" label="更新者" />
-                <el-table-column prop="order_code" label="启用状态">
+                <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
+                <el-table-column prop="deliveryRoute.routeName" label="送货路线名称">
+                </el-table-column>
+                <el-table-column prop="threshold" label="同脸异地告警数值（大于等于）" />
+                <el-table-column prop="period" label="订单统计周期（小于等于/天）" />
+                <el-table-column
+                    prop="updateTime"
+                    label="更新时间"
+                    :formatter="
+                        (row) => {
+                            return row.updateTime ?? row.createTime
+                        }
+                    "
+                />
+                <el-table-column prop="updateBy" label="更新者" />
+                <el-table-column prop="status" label="启用状态">
                     <template #default="{ row }">
-                        <el-switch v-model="row.status" />
+                        <el-switch
+                            v-model="row.status"
+                            active-value="A"
+                            inactive-value="D"
+                            :loading="state.statusLoading"
+                            @change="handleStatus(row)"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="280px">
-                    <template #default="scope">
+                    <template #default="{row}">
                         <el-button
                             @click="
                                 router.push({
-                                    path: `/anomaly-detection-configuration/same-face-different-places/edit/${1}`,
+                                    path: `/anomaly-detection-configuration/same-face-different-places/edit/${row.id}`,
                                 })
                             "
                             >编辑</el-button
@@ -60,7 +80,7 @@ import { pushScopeId } from 'vue'; import { routerKey } from 'vue-router';
                         <el-button @click="state.logDialogVisible = true">日志</el-button>
                         <el-popconfirm
                             title="请确认是否删除该条数据？"
-                            @confirm="handleDelete(scope.row)"
+                            @confirm="handleDelete(row)"
                         >
                             <template #reference>
                                 <el-button>删除 </el-button>
@@ -91,36 +111,98 @@ import { pushScopeId } from 'vue'; import { routerKey } from 'vue-router';
             </div>
         </div>
     </Dialog>
+    <Dialog
+        width="600px"
+        v-model="state.addConfigurationDialogVisible"
+        title="新增同脸异地配置"
+        center
+    >
+        <el-form
+            style="width: 500px"
+            :model="addConfiguration"
+            label-width="260px"
+            ref="addConfigurationRef"
+            :rules="rules"
+        >
+            <el-form-item label="送货路线" prop="routeCode">
+                <line-select
+                    v-model="addConfiguration.routeCode"
+                    placeholder="请选择送货路线"
+                    class="w-full"
+                />
+            </el-form-item>
+            <el-form-item label="同脸异地告警数值（大于等于）" prop="threshold">
+                <el-input-number
+                    v-model="addConfiguration.threshold"
+                    placeholder="请输入同脸异地告警数值"
+                    class="w-full"
+                    :min="0"
+                    :max="999999999"
+                />
+            </el-form-item>
+            <el-form-item label="订单统计周期（小于等于/天）" prop="period">
+                <el-input-number
+                    v-model="addConfiguration.period"
+                    placeholder="请输入订单统计周期"
+                    class="w-full"
+                    :min="0"
+                    :max="999999999"
+                />
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-switch v-model="addConfiguration.status" active-value="A" inactive-value="D" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button class="w-[100px]" @click="state.addConfigurationDialogVisible = false"
+                >取消</el-button
+            >
+            <el-button
+                type="primary"
+                class="w-[100px]"
+                @click="handleAddConfiguration(addConfigurationRef)"
+                >确定
+            </el-button>
+        </template>
+    </Dialog>
 </template>
 
 <script setup>
-import { MoreFilled, Plus } from '@element-plus/icons-vue'
 import Dialog from '@/components/dialog/index.vue'
+import centralizedSigningPointSelect from '@/components/select/centralized-signing-point-select.vue'
+import clientSelect from '@/components/select/client-select.vue'
+import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
-import { onMounted, reactive } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import qs from 'qs'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter(),
     state = reactive({
         loading: false,
         logDialogVisible: false,
-        tableData: [
-            {
-                abnormal_code: '123',
-                status: 1,
-                register_name: '张三',
-                order_code: '123',
-            },
-        ],
-        statusList: [
-            { label: '正常', value: 1 },
-            { label: '异常', value: 2 },
-        ],
+        addConfigurationDialogVisible: false, // 新增同脸异地配置弹窗
+        statusLoading: false, // 启用状态loading
+        tableData: [],
+    }),
+    addConfigurationRef = ref(null), // 新增签收地偏离配置弹窗ref
+    addConfiguration = reactive({
+        routeCode: '',
+        threshold: '',
+        period: '',
+        status: 'A',
+    }),
+    rules = reactive({
+        routeCode: [{ required: true, message: '请选择送货路线', trigger: 'change' }],
+        threshold: [{ required: true, message: '请输入同脸异地告警数值', trigger: 'blur' }],
+        period: [{ required: true, message: '请输入订单统计周期', trigger: 'blur' }],
     }),
     query = reactive({
-        abnormal_code: '',
+        routeCode: '',
     }),
     page = reactive({
         index: 1,
@@ -129,13 +211,60 @@ const router = useRouter(),
     })
 
 onMounted(async () => {
-    // await getTableData(true)
+    await getTableData(true)
 })
 
-const handleDelete = (row) => {
-    state.tableData.splice(state.tableData.indexOf(row), 1)
+// 新增签收地偏离配置
+const handleAddConfiguration = async (formEl) => {
+    if (!formEl) return
+    try {
+        await formEl.validate()
+        const {
+            data: { data },
+            code,
+        } = await tobaccoApi(
+            'post',
+            '/api/v1/tobacco/signingMultiLocationsConfig',
+            addConfiguration
+        )
+        if (code === 200) {
+            formEl.resetFields()
+            getTableData(true)
+            state.addConfigurationDialogVisible = false
+        }
+    } catch (error) {
+        console.log(error)
+    }
 }
 
+// 删除
+const handleDelete = async(row) => {
+    const { code, data } = await tobaccoApi(
+        'delete',
+        `/api/v1/tobacco/signingMultiLocationsConfig/${row.id}`
+    )
+    if (code === 200) {
+        ElMessage.success('删除成功')
+        getTableData()
+    }
+}
+
+// 启用状态
+const handleStatus = async (row) => {
+    state.statusLoading = true
+    try {
+        const { code } = await tobaccoApi('put', '/api/v1/tobacco/signingMultiLocationsConfig', row)
+        if (code === 200) {
+            await getTableData()
+        }
+    } catch (error) {
+        console.log(error)
+    } finally {
+        state.statusLoading = false
+    }
+}
+
+// 获取表格数据
 const getTableData = async (init) => {
     state.loading = true
     if (init) {
@@ -143,15 +272,18 @@ const getTableData = async (init) => {
     }
 
     let params = {
-        page: page.index,
-        limit: page.size,
+        pageNum: page.index,
+        pageSize: page.size,
         ...query,
     }
     try {
         const {
-            data: { data, total },
-        } = await tobaccoApi('', params)
-        state.tableData = data
+            data: { rows, total },
+        } = await tobaccoApi(
+            'get',
+            `/api/v1/tobacco/signingMultiLocationsConfig/list?${qs.stringify(params)}`
+        )
+        state.tableData = rows
         page.total = Number(total)
     } catch (error) {
         state.tableData = []

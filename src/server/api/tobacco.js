@@ -1,14 +1,15 @@
 import { useUserStore } from '@/store/user'
 import axios from 'axios'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { config } from '/config'
 
 const {
-    baseUrl: { tobacco: commerceUrl },
+    baseUrl: { tobaccoUrl },
     appGuid,
 } = config
 
 const tobacco = axios.create({
-    baseURL: commerceUrl,
+    baseURL: tobaccoUrl,
     timeout: 1000 * 10,
 })
 
@@ -20,7 +21,6 @@ tobacco.interceptors.request.use(
             userInfo: { guid },
             storeId,
         } = useUserStore()
-        // guid = userStore.userInfo.guid
         config.headers.Authorization = `app_guid=${appGuid};`
         token && (config.headers.token = token)
         guid && (config.headers.UserGuid = guid)
@@ -51,6 +51,7 @@ export const tobaccoApi = async (method, url, info) => {
             })
         }
     } catch (err) {
+        console.log(err);
         if (err.response.status == '401')
             ElMessage.error('当前请求需要用户验证，刷新当前页面或重新登录！')
         else if (err.response.status == '403') ElMessage.error('您没有权限访问！')
@@ -77,7 +78,6 @@ export const exportFileApi = async (method, url, info) => {
             method: method,
             responseType: 'blob',
         })
-        console.log(response)
         if (response.status === 200) {
             return response.data
         } else {
@@ -111,4 +111,3 @@ export const exportFileApi = async (method, url, info) => {
         }
     }
 }
-

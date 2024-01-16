@@ -4,31 +4,32 @@
     <div class="w-full flex flex-col p-12 detail">
         <div class="flex items-center mb-[5.6rem]">
             <div class="flex mr-12">
-                <p class="text-title">创建时间:</p>
-                <p>20210809123456789</p>
+                <p class="text-title">创建时间：</p>
+                <p>{{ configuration.createTime ?? '--' }}</p>
             </div>
             <div class="flex mr-12">
-                <p class="text-title">更新时间:</p>
-                <p>20210809123456789</p>
+                <p class="text-title">更新时间：</p>
+                <p>{{ configuration.updateTime ?? '--' }}</p>
             </div>
             <div class="flex">
-                <p class="text-title">更新者:</p>
-                <p>20210809123456789</p>
+                <p class="text-title">更新者：</p>
+                <p>{{ configuration.updateBy ?? '--' }}</p>
             </div>
             <el-button round class="ml-auto" @click="state.logDialogVisible = true"
                 >查看日志
             </el-button>
-            <el-button round type="danger">删除 </el-button>
+            <el-button round type="danger" @click="handleDelete">删除 </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-4 gap-4 mb-[5.6rem]">
             <descriptions-item label="送货路线编号 - 送货路线名称"
-                >123213123 - 新百地下500米</descriptions-item
+                >{{ configuration?.deliveryRoute?.routeCode }} -
+                {{ configuration?.deliveryRoute?.routeName }}</descriptions-item
             >
             <descriptions-item label="同脸异地告警数值（大于等于）">
-                <el-input v-model="detail.input" class="w-[120px]" />
+                <el-input-number v-model="configuration.threshold" class="w-[120px]" />
             </descriptions-item>
             <descriptions-item label="订单统计周期（小于等于/天）">
-                <el-input v-model="detail.input" class="w-[120px]" />
+                <el-input-number v-model="configuration.period" class="w-[120px]" />
             </descriptions-item>
         </div>
         <div class="w-full flex justify-center">
@@ -59,13 +60,15 @@
 </template>
 
 <script setup>
-import Table from '@/components/table/index.vue'
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { tobaccoApi } from '@/server/api/tobacco.js'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { onMounted, reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const router = useRouter()
+const route = useRoute(),
+    router = useRouter()
 
 const state = reactive({
         map: null,
@@ -73,12 +76,56 @@ const state = reactive({
         logDialogVisible: false, // 处理日志弹窗
         tableData: [],
     }),
-    detail = reactive({
-        input: 15,
+    configuration = reactive({
+        id: '',
     })
 
-const handleSave = () => {
-    console.log('保存')
-    router.back()
+const handleSave = async () => {
+    const { code } = await tobaccoApi(
+        'put',
+        `/api/v1/tobacco/signingMultiLocationsConfig`,
+        configuration
+    )
+    if (code === 200) {
+        ElMessage.success('修改成功')
+        router.back()
+    }
+}
+
+onMounted(async () => {
+    configuration.id = route.params.id // 获取同脸异地配置id
+    await getConfigurationDetail() // 获取同脸异地配置详情
+})
+
+// 删除签收地偏离配置
+const handleDelete = async () => {
+    try {
+        await ElMessageBox.confirm('请确认是否删除该条数据？', 'Warning', {
+            confirmButtonText: '删除',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+        const { code } = await tobaccoApi(
+            'delete',
+            `/api/v1/tobacco/signingMultiLocationsConfig/${configuration.id}`
+        )
+        if (code === 200) {
+            ElMessage.success('删除成功')
+            router.back()
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// 获取同脸异地配置详情
+const getConfigurationDetail = async () => {
+    const { data, code } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingMultiLocationsConfig/${configuration.id}`
+    )
+    if (code === 200) {
+        Object.assign(configuration, data)
+    }
 }
 </script>

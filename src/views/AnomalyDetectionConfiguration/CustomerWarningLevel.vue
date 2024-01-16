@@ -5,29 +5,27 @@
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">异常签收预警配置</div>
             <div class="grid grid-cols-4 gap-4 gap-y-8">
-                <descriptions-item label="黄标客户（三级预警）">
-                    <el-input v-model="state.value" class="w-[220px]"></el-input>
+                <descriptions-item :label="item.name" v-for="item in state.defaultWarningLevelData">
+                    <el-input-number v-model="item.threshold" class="w-[220px]" />
                 </descriptions-item>
-                <descriptions-item label="黑标客户（二级预警）">
-                    <el-input v-model="state.value1" class="w-[220px]"></el-input>
-                </descriptions-item>
-                <descriptions-item label="红标客户（一级预警）">
-                    <el-input v-model="state.value2" class="w-[220px]"></el-input
-                ></descriptions-item>
             </div>
+            <el-button type="primary" class="w-[100px] mt-8" @click="handleSaveDefaultWarningLevel"
+                >保存
+            </el-button>
         </div>
         <el-divider />
         <div class="w-full px-16">
-            <div class="box-title text-title text-2xl">自定义分类</div>
+            <div class="box-title text-title text-2xl">异常客户自定义分类管理</div>
             <div class="grid grid-cols-12 gap-4 gap-y-8 items-center">
                 <el-tag
-                    v-for="tag in classification.dynamicTags"
+                    v-for="tag in state.warningLevelData"
+                    :key="tag.id"
                     type="success"
                     class="mr-12"
                     effect="dark"
                     closable
-                    @close="handleCloseTag(tag)"
-                    >{{ tag }}
+                    @close="handleDeleteWarningLevel(tag)"
+                    >{{ tag.name }}
                 </el-tag>
                 <el-button
                     type="primary"
@@ -45,7 +43,9 @@
             <el-button class="w-[100px]" @click="classification.dialogVisible = false"
                 >取消</el-button
             >
-            <el-button type="primary" class="w-[100px]" @click="handleAddTag">确定</el-button>
+            <el-button type="primary" class="w-[100px]" @click="handleAddWarningLevel"
+                >确定</el-button
+            >
         </template>
     </Dialog>
 </template>
@@ -53,22 +53,15 @@
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
-import Table from '@/components/table/index.vue'
+import { tobaccoApi } from '@/server/api/tobacco.js'
 import { Plus } from '@element-plus/icons-vue'
-import { reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import qs from 'qs'
+import { onMounted, reactive } from 'vue'
 
 const state = reactive({
-        tableData: [
-            {
-                abnormal_code: '2021-08-12 12:00:00',
-            },
-            {
-                abnormal_code: '2021-08-12 12:00:00',
-            },
-            {
-                abnormal_code: '2021-08-12 12:00:00',
-            },
-        ],
+        defaultWarningLevelData: [],
+        warningLevelData: [],
     }),
     classification = reactive({
         dynamicTags: ['标签一', '标签二', '标签三'],
@@ -76,13 +69,79 @@ const state = reactive({
         inputValue: '',
     })
 
-const handleCloseTag = (tag) => {
-    classification.dynamicTags.splice(classification.dynamicTags.indexOf(tag), 1)
+onMounted(async () => {
+    await getDefaultWarningLevel()
+    await getWarningLevel()
+})
+
+const handleAddWarningLevel = async () => {
+    if (!classification.inputValue) {
+        ElMessage.error('请输入分类名称')
+        return
+    }
+    const { code } = await tobaccoApi('post', `/api/v1/tobacco/customerAlertLevel`, {
+        name: classification.inputValue,
+        isDefault: false,
+        sort: 0,
+    })
+    if (code === 200) {
+        classification.inputValue = ''
+        ElMessage.success('新增成功')
+        await getWarningLevel()
+    }
+    classification.dialogVisible = false
 }
 
-const handleAddTag = () => {
-    classification.dynamicTags.push(classification.inputValue)
-    classification.inputValue = ''
-    classification.dialogVisible = false
+const handleDeleteWarningLevel = async(tag) => {
+    const {code} = await tobaccoApi('delete', `/api/v1/tobacco/customerAlertLevel/${tag.id}`)
+    if (code === 200) {
+        ElMessage.success('删除成功')
+        await getWarningLevel()
+    }
+}
+
+const handleSaveDefaultWarningLevel = async () => {
+    let totalIndex = 0
+    for (let index = 0; index < state.defaultWarningLevelData.length; index++) {
+        const element = state.defaultWarningLevelData[index]
+        const { code } = await tobaccoApi('put', `/api/v1/tobacco/customerAlertLevel`, element)
+        if (code === 200) {
+            totalIndex++
+        }
+    }
+    if (totalIndex === state.defaultWarningLevelData.length) {
+        ElMessage.success('保存成功')
+    }
+    totalIndex = 0
+}
+
+const getDefaultWarningLevel = async () => {
+    const params = {
+        isDefault: true,
+        orderByColumn: 'sort',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/customerAlertLevel/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        state.defaultWarningLevelData = rows
+    }
+}
+
+const getWarningLevel = async () => {
+    const params = {
+        isDefault: false,
+        orderByColumn: 'sort',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/customerAlertLevel/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        state.warningLevelData = rows
+    }
 }
 </script>

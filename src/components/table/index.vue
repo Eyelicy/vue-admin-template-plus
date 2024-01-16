@@ -125,7 +125,7 @@ export default defineComponent({
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    height: 100%;
+    // height: 100%;
 
     .system-table {
         flex: 1;

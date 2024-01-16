@@ -114,7 +114,7 @@ export const routes = [
                 name: 'AbnormalReceiptStatistics',
                 redirect: '/abnormal-receipt-statistics/abnormal-receipt-customer',
                 meta: {
-                    title: '异常监控管理',
+                    title: '签收异常统计',
                 },
                 children: [
                     {
