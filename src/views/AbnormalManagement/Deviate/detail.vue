@@ -1,24 +1,28 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12 detail">
+    <div class="w-full h-full flex flex-col p-12 detail" v-loading="state.loading">
         <div class="flex items-center mb-[5.6rem]">
             <div class="w-[120px] flex flex-col">
                 <div class="flex mb-4">
                     <p class="text-title">偏差距离</p>
-                    <span class="ml-auto text-primary text-2xl font-bold">22</span>
+                    <span class="ml-auto text-primary text-2xl font-bold">{{
+                        details?.details?.deviation ?? '--'
+                    }}</span>
                     <p class="text-title">米</p>
                 </div>
                 <el-button @click="handleMapDialogVisible">地图模式</el-button>
             </div>
-            <el-button round class="mx-8">处理中</el-button>
+            <el-button round class="mx-8">{{
+                abnormalOrderStatus[details?.status] ?? '--'
+            }}</el-button>
             <div class="flex mr-8">
                 <p class="text-title">异常上报编号:</p>
-                <p>20210809123456789</p>
+                <p>{{ details.code ?? '--' }}</p>
             </div>
             <div class="flex">
                 <p class="text-title">上报时间:</p>
-                <p>20210809123456789</p>
+                <p>{{ details.createTime ?? '--' }}</p>
             </div>
             <el-button round class="ml-auto" @click="state.logDialogVisible = true"
                 >处理日志
@@ -35,61 +39,99 @@
             <el-button round type="danger">撤销本上报 </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-6 gap-4">
-            <descriptions-item label="订单签收地">新百地下500米</descriptions-item>
-            <descriptions-item label="订单地址坐标">123,123</descriptions-item>
-            <descriptions-item label="实际签收地">新百地上500米</descriptions-item>
-            <descriptions-item label="实际地址坐标">321m,321</descriptions-item>
-            <descriptions-item label="签收店名">小武不抽烟店</descriptions-item>
-            <descriptions-item label="注册人名">要甜菜一碗</descriptions-item>
+            <descriptions-item label="订单签收地">{{ details.orderAddress }}</descriptions-item>
+            <descriptions-item label="订单地址坐标">
+                {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
+            </descriptions-item>
+            <descriptions-item label="实际签收地">{{
+                details?.details?.address ?? '--'
+            }}</descriptions-item>
+            <descriptions-item label="实际地址坐标">
+                {{ `${details?.details?.longitude},${details?.details?.latitude}` ?? '--' }}
+            </descriptions-item>
+            <descriptions-item label="签收店名">
+                {{ details?.order?.customer?.customerName ?? '--' }}
+            </descriptions-item>
+            <descriptions-item label="注册人名">
+                {{ details?.order?.customer?.contactPerson ?? '--' }}
+            </descriptions-item>
         </div>
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">订单信息</div>
             <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="订单编号">123</descriptions-item>
-                <descriptions-item label="购方姓名">要咸鱼一条</descriptions-item>
-                <descriptions-item label="店名">著行为只抽烟店</descriptions-item>
-                <descriptions-item label="签收地址">321,321</descriptions-item>
-                <descriptions-item label="品种数">24</descriptions-item>
-                <descriptions-item label="总盒数">124</descriptions-item>
-                <descriptions-item label="总金额（元）">￥24800</descriptions-item>
+                <descriptions-item label="订单编号">{{
+                    details?.order?.orderSn ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="购方姓名">{{
+                    details?.order?.customer?.contactPerson ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="店名">{{
+                    details?.order?.customer?.customerName ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="签收地址">{{
+                    details?.orderAddress ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="品种数">{{
+                    details?.order?.skuCount ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="总盒数">{{
+                    details?.order?.quantity ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="总金额（元）"
+                    >￥{{ details?.order?.amount ?? '--' }}</descriptions-item
+                >
             </div>
         </div>
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">运输信息</div>
             <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="运输单号">123</descriptions-item>
-                <descriptions-item label="运输日期">10.24</descriptions-item>
-                <descriptions-item label="车辆牌照">苏A·123121</descriptions-item>
-                <descriptions-item label="运输人">要酸菜一坛</descriptions-item>
-                <descriptions-item label="驾驶证号">1231231</descriptions-item>
-                <descriptions-item label="配送人">要榨菜一包</descriptions-item>
-                <descriptions-item label="身份证号">321183199805041414 </descriptions-item>
+                <descriptions-item label="运输单号">{{
+                    details?.shippingOrder?.shippingSn ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="运输日期">{{
+                    details?.shippingOrder?.shippingDate ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="车辆牌照">{{
+                    details?.shippingOrder?.vehicleCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="运输人">{{
+                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="驾驶证号">{{
+                    details?.shippingOrder?.driver?.driverLicense ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="配送人">{{
+                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="身份证号"
+                    >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
+                </descriptions-item>
             </div>
         </div>
     </div>
     <Dialog width="600px" v-model="state.logDialogVisible" title="处理日志" center>
         <div
             class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in 3"
+            v-for="(item, index) in details.exceptionHandlingList"
             :key="index"
         >
             <div class="mb-[1.6rem]">
                 <label>日期时间：</label>
-                <span>2021-08-09 12:00:00</span>
+                <span>{{ item.createTime }}</span>
             </div>
             <div class="mb-[1.6rem]">
                 <label>处理操作：</label>
-                <span>转发下一级</span>
+                <span>{{ item.type }}</span>
             </div>
             <div class="mb-[1.6rem]">
                 <label>处理内容：</label>
-                <span>-</span>
+                <span>{{ item.remark }}</span>
             </div>
             <div>
                 <label>操作人：</label>
-                <span>-</span>
+                <span>{{ item.handler }}</span>
             </div>
         </div>
     </Dialog>
@@ -98,17 +140,15 @@
     </Dialog>
     <Dialog v-model="state.remarkDialogVisible" title="编辑备注" center :showButton="true">
         <el-input
-            v-model="state.remark"
+            v-model="details.remark"
             :autosize="{ minRows: 4, maxRows: 4 }"
             type="textarea"
-            placeholder="Please input"
+            placeholder="请输入备注"
         />
 
         <template #footer>
             <el-button class="w-[100px]" @click="state.remarkDialogVisible = false">取消</el-button>
-            <el-button type="primary" class="w-[100px]" @click="state.remarkDialogVisible = false"
-                >确定
-            </el-button>
+            <el-button type="primary" class="w-[100px]" @click="handleRemark()">确定 </el-button>
         </template>
     </Dialog>
     <!-- 处理结果填报 -->
@@ -177,12 +217,20 @@
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
+import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
+import { tobaccoApi } from '@/server/api/tobacco'
+import { abnormalOrderStatus } from '@/utils/enum'
 import { getImageUrl } from '@/utils/index'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { QuestionFilled, Search } from '@element-plus/icons-vue'
-import { nextTick, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
+const { remark } = useExceptionMonitoringManagement()
+const route = useRoute()
 const state = reactive({
+        loading: false,
+        code: '', // 异常上报编号
         map: null,
         remark: '测试备注',
         logDialogVisible: false, // 处理日志弹窗
@@ -191,6 +239,7 @@ const state = reactive({
         forwardDialogVisible: false, // 转发弹窗
         resultDialogVisible: false, // 处理结果弹窗
     }),
+    details = reactive({}),
     mapRef = ref(null) // 地图容器
 
 const defaultProps = {
@@ -248,6 +297,24 @@ const data = [
     },
 ]
 
+onMounted(async () => {
+    state.loading = true
+    state.code = route.params.id
+    await getDetails()
+    state.loading = false
+})
+
+const handleRemark = async () => {
+    state.remarkDialogVisible = await remark(details)
+}
+
+const getDetails = async () => {
+    const { data } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/${state.code}`)
+    data.details = JSON.parse(data.details)
+    Object.assign(details, data)
+    console.log('details:', details)
+}
+
 const handleMapDialogVisible = async () => {
     state.mapDialogVisible = true
     await initMap()
@@ -266,8 +333,8 @@ const initMap = async () => {
             zoom: 12,
         })
         const path = [
-            [116.362209, 39.887487],
-            [116.422897, 39.878002],
+            [details.details.longitude, details.details.latitude],
+            [details.orderLongitude, details.orderLatitude],
         ]
         const startIcon = new AMap.Icon({
             size: new AMap.Size(136, 24),
@@ -326,14 +393,14 @@ const initMap = async () => {
             var p1 = m1.getPosition()
             var p2 = m2.getPosition()
             var textPos = p1.divideBy(2).add(p2.divideBy(2))
-            var distance = Math.round(p1.distance(p2))
+            // var distance = Math.round(p1.distance(p2))
             var path = [p1, p2]
             // line.setPath(path)
-            text.setText('偏差距离' + distance + '米')
+            text.setText('偏差距离' + details?.details?.deviation + '米')
             text.setPosition(textPos)
         }
         computeDis(startMarker, endMarker)
-        // state.map.setFitView()
+        state.map.setFitView()
     } catch (error) {
         console.log('map', error)
     }

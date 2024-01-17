@@ -22,7 +22,7 @@
                 <el-icon class="ml-4" v-if="departments.length > 1"><ArrowDownBold /></el-icon>
             </div>
             <div class="flex mr-12">
-                <p>护士/工作人员：</p>
+                <p>工作人员：</p>
                 <p>{{ userInfo?.nickname }}</p>
             </div>
             <el-button class="mr-12" color="#fff" @click="userCenter">{{

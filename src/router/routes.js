@@ -19,25 +19,24 @@ export const routes = [
             },
             // 异常监控管理
             {
-                path: '/abnormal',
-                name: 'abnormal',
-                redirect: '/abnormal/Deviate',
+                path: '/exception-monitoring-management',
+                name: 'ExceptionMonitoringManagement',
+                redirect: '/exception-monitoring-management/delivery-location-deviation',
                 meta: {
                     title: '异常监控管理',
-                    // icon: 'chunf-jigouguanli',
                 },
                 children: [
                     {
-                        path: 'Deviate',
-                        name: 'Deviate',
+                        path: 'delivery-location-deviation',
+                        name: 'DeliveryLocationDeviation1',
                         meta: {
                             title: '签收地偏离',
                         },
                         component: () => import('@/views/AbnormalManagement/Deviate/index.vue'),
                     },
                     {
-                        path: 'Deviate/Detail/:id',
-                        name: 'DeviateDetail',
+                        path: 'delivery-location-deviation/detail/:id',
+                        name: 'DeliveryLocationDeviationDetail',
                         meta: {
                             title: '签收地偏离异常详情',
                             hideMenu: true,

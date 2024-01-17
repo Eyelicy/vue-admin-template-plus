@@ -13,20 +13,11 @@ export const staffStatusText = {
     5: '返聘',
 }
 
-// 设备工作模式
-export const jnqMode = {
-    1: '分时计尿模式',
-    2: '膀胱训练',
-    3: '尿潴留',
-    4: '膀胱冲洗',
-}
-
-// 预警类型
-export const jnqFunc = {
-    1: '多尿预警（每小时）',
-    2: '多尿预警（N小时）',
-    3: '少尿预警（每小时）',
-    4: '少尿预警（N小时）',
+export const abnormalOrderStatus = {
+    WAITING: '待处理',
+    PROCESSING: '处理中',
+    COMPLETED: '已处理',
+    CANCELLED: '已取消',
 }
 
 export const shortcuts = [
