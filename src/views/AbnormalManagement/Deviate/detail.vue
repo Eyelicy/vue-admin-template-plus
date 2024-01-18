@@ -36,7 +36,9 @@
             <el-button round type="success" @click="state.resultDialogVisible = true"
                 >填写处理结果
             </el-button>
-            <el-button round type="danger">撤销本上报 </el-button>
+            <el-button round type="danger" @click="handleRevoke(state.code, getDetails)"
+                >撤销本上报
+            </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-6 gap-4">
             <descriptions-item label="订单签收地">{{ details.orderAddress }}</descriptions-item>
@@ -111,48 +113,26 @@
             </div>
         </div>
     </div>
-    <Dialog width="600px" v-model="state.logDialogVisible" title="处理日志" center>
-        <div
-            class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in details.exceptionHandlingList"
-            :key="index"
-        >
-            <div class="mb-[1.6rem]">
-                <label>日期时间：</label>
-                <span>{{ item.createTime }}</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理操作：</label>
-                <span>{{ item.type }}</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理内容：</label>
-                <span>{{ item.remark }}</span>
-            </div>
-            <div>
-                <label>操作人：</label>
-                <span>{{ item.handler }}</span>
-            </div>
-        </div>
-    </Dialog>
+    <!-- 签收地偏差查看 -->
     <Dialog v-model="state.mapDialogVisible" title="签收地偏差查看">
         <div class="w-full h-[600px]" ref="mapRef"></div>
     </Dialog>
-    <Dialog v-model="state.remarkDialogVisible" title="编辑备注" center :showButton="true">
-        <el-input
-            v-model="details.remark"
-            :autosize="{ minRows: 4, maxRows: 4 }"
-            type="textarea"
-            placeholder="请输入备注"
-        />
-
-        <template #footer>
-            <el-button class="w-[100px]" @click="state.remarkDialogVisible = false">取消</el-button>
-            <el-button type="primary" class="w-[100px]" @click="handleRemark()">确定 </el-button>
-        </template>
-    </Dialog>
+    <!-- 处理日志dialog -->
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="details.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
+    <!-- 编辑备注dialog -->
+    <remark-dialog
+        v-model="state.remarkDialogVisible"
+        :exceptionCode="state.code"
+        @confirm="getDetails"
+    ></remark-dialog>
     <!-- 处理结果填报 -->
-    <Dialog v-model="state.resultDialogVisible" title="处理结果填报" center>
+    <!-- <Dialog v-model="state.resultDialogVisible" title="处理结果填报" center>
         <el-input
             v-model="state.remark"
             :autosize="{ minRows: 4, maxRows: 4 }"
@@ -165,8 +145,9 @@
                 >确定
             </el-button>
         </template>
-    </Dialog>
-    <Dialog center v-model="state.forwardDialogVisible" title="转发下一级" width="600px">
+    </Dialog> -->
+    <!-- 转发下一级 -->
+    <!-- <Dialog center v-model="state.forwardDialogVisible" title="转发下一级" width="600px">
         <div class="px-4">
             <el-input class="mb-6" v-model="input2" :suffix-icon="Search" />
             <div class="flex mb-6">
@@ -211,7 +192,7 @@
                 >确定
             </el-button>
         </template>
-    </Dialog>
+    </Dialog> -->
 </template>
 
 <script setup>
@@ -222,22 +203,19 @@ import { tobaccoApi } from '@/server/api/tobacco'
 import { abnormalOrderStatus } from '@/utils/enum'
 import { getImageUrl } from '@/utils/index'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import { QuestionFilled, Search } from '@element-plus/icons-vue'
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-const { remark } = useExceptionMonitoringManagement()
+// const { logDialogVisible, remarkDialogVisible, remark } = useExceptionMonitoringManagement()
+const { handleRevoke } = useExceptionMonitoringManagement()
 const route = useRoute()
 const state = reactive({
         loading: false,
         code: '', // 异常上报编号
         map: null,
-        remark: '测试备注',
-        logDialogVisible: false, // 处理日志弹窗
         mapDialogVisible: false, // 地图弹窗
+        logDialogVisible: false, // 处理日志弹窗
         remarkDialogVisible: false, // 备注弹窗
-        forwardDialogVisible: false, // 转发弹窗
-        resultDialogVisible: false, // 处理结果弹窗
     }),
     details = reactive({}),
     mapRef = ref(null) // 地图容器
@@ -304,15 +282,14 @@ onMounted(async () => {
     state.loading = false
 })
 
-const handleRemark = async () => {
-    state.remarkDialogVisible = await remark(details)
-}
+// const handleRemark = async () => {
+//     state.remarkDialogVisible = await remark(details)
+// }
 
 const getDetails = async () => {
     const { data } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/${state.code}`)
     data.details = JSON.parse(data.details)
     Object.assign(details, data)
-    console.log('details:', details)
 }
 
 const handleMapDialogVisible = async () => {

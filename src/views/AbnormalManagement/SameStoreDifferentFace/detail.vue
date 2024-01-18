@@ -5,17 +5,21 @@
         <div class="flex items-center mb-[5.6rem]">
             <div class="w-[160px] flex items-center">
                 <p class="text-title">同店异脸总数</p>
-                <span class="ml-auto text-primary text-2xl font-bold">4</span>
+                <span class="ml-auto text-primary text-2xl font-bold">{{
+                    details?.details?.multiFaceInfo?.length ?? 0
+                }}</span>
                 <p class="text-title">个</p>
             </div>
-            <el-button round class="mx-8">处理中</el-button>
+            <el-button round class="mx-8">{{
+                abnormalOrderStatus[details?.status] ?? '--'
+            }}</el-button>
             <div class="flex mr-8">
                 <p class="text-title">异常上报编号:</p>
-                <p>20210809123456789</p>
+                <p>{{ details.code ?? '--' }}</p>
             </div>
             <div class="flex">
                 <p class="text-title">上报时间:</p>
-                <p>20210809123456789</p>
+                <p>{{ details.createTime ?? '--' }}</p>
             </div>
             <el-button round class="ml-auto" @click="state.logDialogVisible = true"
                 >处理日志
@@ -31,58 +35,94 @@
             </el-button>
             <el-button round type="danger">撤销本上报</el-button>
         </div>
-        <div class="w-full px-16 grid grid-cols-6 gap-4 mb-12">
-            <descriptions-item label="订单签收地">新百地下500米</descriptions-item>
-            <descriptions-item label="订单地址坐标">123,123</descriptions-item>
-            <descriptions-item label="签收店名">小武不抽烟店</descriptions-item>
-            <descriptions-item label="注册人名">要甜菜一碗</descriptions-item>
+        <div class="w-full px-16 grid grid-cols-6 gap-4 mb-[2.4rem]">
+            <descriptions-item label="订单签收地">{{ details.orderAddress }}</descriptions-item>
+            <descriptions-item label="订单地址坐标">
+                {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
+            </descriptions-item>
+            <descriptions-item label="签收店名">
+                {{ details?.order?.customer?.customerName ?? '--' }}
+            </descriptions-item>
+            <descriptions-item label="注册人名">
+                {{ details?.order?.customer?.contactPerson ?? '--' }}
+            </descriptions-item>
         </div>
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">同店多脸信息</div>
             <div class="flex">
-                <Table :data="tableData" :showPage="false" border style="width: 100%">
+                <Table :data=" details?.details?.multiFaceInfo" :showPage="false" border style="width: 100%">
                     <el-table-column label="人脸">
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="getImageUrl('avatar.png')"
+                                :src="row.image"
                                 fit="cover"
-                                :preview-src-list="[getImageUrl('avatar.png')]"
-                            :append-to-body="true"
-                            :preview-teleported="true"
+                                :preview-src-list="[row.image]"
+                                :append-to-body="true"
+                                :preview-teleported="true"
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column prop="id" label="人名" />
-                    <el-table-column prop="name" label="概率" />
-                    <el-table-column prop="amount1" label="备注" />
+                    <el-table-column prop="name" label="人名" />
+                    <el-table-column prop="probability" label="概率" />
+                    <el-table-column prop="label" label="备注" />
                 </Table>
             </div>
         </div>
         <el-divider />
+        <!-- 订单信息 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">订单信息</div>
             <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="订单编号">123</descriptions-item>
-                <descriptions-item label="购方姓名">要咸鱼一条</descriptions-item>
-                <descriptions-item label="店名">著行为只抽烟店</descriptions-item>
-                <descriptions-item label="签收地址">321,321</descriptions-item>
-                <descriptions-item label="品种数">24</descriptions-item>
-                <descriptions-item label="总盒数">124</descriptions-item>
-                <descriptions-item label="总金额（元）">￥24800</descriptions-item>
+                <descriptions-item label="订单编号">{{
+                    details?.order?.orderSn ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="购方姓名">{{
+                    details?.order?.customer?.contactPerson ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="店名">{{
+                    details?.order?.customer?.customerName ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="签收地址">{{
+                    details?.orderAddress ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="品种数">{{
+                    details?.order?.skuCount ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="总盒数">{{
+                    details?.order?.quantity ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="总金额（元）"
+                    >￥{{ details?.order?.amount ?? '--' }}</descriptions-item
+                >
             </div>
         </div>
         <el-divider />
+        <!-- 运输信息 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">运输信息</div>
             <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="运输单号">123</descriptions-item>
-                <descriptions-item label="运输日期">10.24</descriptions-item>
-                <descriptions-item label="车辆牌照">苏A·123121</descriptions-item>
-                <descriptions-item label="运输人">要酸菜一坛</descriptions-item>
-                <descriptions-item label="驾驶证号">1231231</descriptions-item>
-                <descriptions-item label="配送人">要榨菜一包</descriptions-item>
-                <descriptions-item label="身份证号">321183199805041414</descriptions-item>
+                <descriptions-item label="运输单号">{{
+                    details?.shippingOrder?.shippingSn ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="运输日期">{{
+                    details?.shippingOrder?.shippingDate ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="车辆牌照">{{
+                    details?.shippingOrder?.vehicleCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="运输人">{{
+                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="驾驶证号">{{
+                    details?.shippingOrder?.driver?.driverLicense ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="配送人">{{
+                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="身份证号"
+                    >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
+                </descriptions-item>
             </div>
         </div>
     </div>
@@ -195,13 +235,15 @@
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
 import Table from '@/components/table/index.vue'
-import { getImageUrl } from '@/utils/index'
-import AMapLoader from '@amap/amap-jsapi-loader'
+import { tobaccoApi } from '@/server/api/tobacco'
+import { abnormalOrderStatus } from '@/utils/enum'
 import { QuestionFilled, Search } from '@element-plus/icons-vue'
-import { nextTick, reactive, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const state = reactive({
-        map: null,
+        code: '', // 异常上报编号
         remark: '测试备注',
         logDialogVisible: false, // 日志弹窗
         mapDialogVisible: false, // 地图弹窗
@@ -209,12 +251,13 @@ const state = reactive({
         forwardDialogVisible: false, // 转发弹窗
         resultDialogVisible: false, // 处理结果弹窗
     }),
-    mapRef = ref(null) // 地图容器
+    details = reactive({})
 
 const defaultProps = {
     children: 'children',
     label: 'label',
 }
+
 const data = [
     {
         id: 1,
@@ -265,6 +308,7 @@ const data = [
         ],
     },
 ]
+
 const tableData = [
     {
         id: '12987122',
@@ -303,92 +347,16 @@ const tableData = [
     },
 ]
 
-const handleMapDialogVisible = async () => {
-    state.mapDialogVisible = true
-    await initMap()
-}
+onMounted(async () => {
+    state.code = route.params.id
+    await getDetails()
+})
 
-const initMap = async () => {
-    await nextTick()
-    try {
-        const AMap = await AMapLoader.load({
-            key: '536f8f9c0f3cd71f799cba67901c571f',
-            version: '2.0',
-            plugins: ['AMap.Geolocation', 'AMap.Geocoder'],
-        })
-        state.map = new AMap.Map(mapRef.value, {
-            center: [116.395577, 39.892257],
-            zoom: 12,
-        })
-        const path = [
-            [116.362209, 39.887487],
-            [116.422897, 39.878002],
-        ]
-        const startIcon = new AMap.Icon({
-            size: new AMap.Size(136, 24),
-            image: getImageUrl('map-point-left.png'),
-            imageSize: new AMap.Size(136, 24),
-            imageOffset: new AMap.Pixel(0, 0),
-        })
-
-        const startMarker = new AMap.Marker({
-            position: new AMap.LngLat(path[0][0], path[0][1]), //位置
-            icon: startIcon,
-            offset: new AMap.Pixel(-130, -12),
-        })
-        const endIcon = new AMap.Icon({
-            size: new AMap.Size(136, 24),
-            image: getImageUrl('map-point-right.png'),
-            imageSize: new AMap.Size(136, 24),
-            imageOffset: new AMap.Pixel(0, 0),
-        })
-        const endMarker = new AMap.Marker({
-            position: new AMap.LngLat(path[1][0], path[1][1]), //位置
-            icon: endIcon,
-            offset: new AMap.Pixel(0, -12),
-        })
-        const polyline = new AMap.Polyline({
-            path: path,
-            isOutline: false,
-            strokeColor: '#303133',
-            strokeOpacity: 1,
-            strokeWeight: 1,
-            strokeStyle: 'dashed',
-            strokeDasharray: [10, 5],
-            lineJoin: 'round',
-            lineCap: 'round',
-            zIndex: 50,
-        })
-        state.map.add([startMarker, polyline, endMarker])
-        const text = new AMap.Text({
-            text: '',
-            className: 'text',
-            style: {
-                width: '120px',
-                height: '28px',
-                'background-color': 'rgba(0,0,0,0.8)',
-                'font-size': '12px',
-                'border-radius': ' 20px',
-                color: '#fff',
-                display: 'flex',
-                'align-items': 'center',
-                'justify-content': 'center',
-            },
-        })
-        text.setMap(state.map)
-
-        const computeDis = (m1, m2) => {
-            const p1 = m1.getPosition()
-            const p2 = m2.getPosition()
-            const textPos = p1.divideBy(2).add(p2.divideBy(2))
-            const distance = Math.round(p1.distance(p2))
-            text.setText('偏差距离' + distance + '米')
-            text.setPosition(textPos)
-        }
-        
-        computeDis(startMarker, endMarker)
-    } catch (error) {
-        console.log('map', error)
-    }
+// 获取详情
+const getDetails = async () => {
+    const { data } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/${state.code}`)
+    data.details = JSON.parse(data.details)
+    Object.assign(details, data)
+    console.log('details:', details)
 }
 </script>

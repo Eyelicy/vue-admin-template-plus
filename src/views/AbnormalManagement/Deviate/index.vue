@@ -163,17 +163,40 @@
                 </el-table-column>
                 <el-table-column prop="shippingOrderSn" label="运输单号" />
                 <el-table-column label="操作" width="380px">
-                    <template #default="scope">
-                        <el-button @click="handleEdit(scope.row)">备注</el-button>
-                        <el-button @click="handleEdit(scope.row)">转发</el-button>
-                        <el-button @click="handleEdit(scope.row)">结果</el-button>
-                        <el-button @click="handleEdit(scope.row)">撤销</el-button>
-                        <el-button @click="handleEdit(scope.row)">日志</el-button>
+                    <template #default="{ row }">
+                        <el-button @click="handleEditRemark(row.code)">备注</el-button>
+                        <el-button @click="handleEdit(row)">转发</el-button>
+                        <el-button @click="handleEditResult(row)">结果</el-button>
+                        <el-button @click="handleRevoke(row.code, getTableData)">撤销</el-button>
+                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
+                            >日志</el-button
+                        >
                     </template>
                 </el-table-column>
             </Table>
         </div>
     </div>
+    <!-- 日志弹窗 -->
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
+    <!-- 备注弹窗 -->
+    <remark-dialog
+        v-model="state.remarkDialogVisible"
+        :exceptionCode="state.exceptionCode"
+        @confirm="getTableData"
+    ></remark-dialog>
+    <!-- 处理结果弹窗 -->
+    <processing-result-dialog
+        v-model="state.resultDialogVisible"
+        v-model:result="state.result"
+        @confirm="handleResult(state.exceptionCode, state.result, getTableData)"
+    >
+    </processing-result-dialog>
 </template>
 
 <script setup>
@@ -181,20 +204,29 @@ import orderInfoPopover from '@/components/popover/order-info-popover.vue'
 import abnormalOrderStatusSelect from '@/components/select/abnormal-order-status-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
+import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { tobaccoApi } from '@/server/api/tobacco'
 import { abnormalOrderStatus } from '@/utils/enum'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
+const { handleRevoke, handleResult } = useExceptionMonitoringManagement()
+
 const router = useRouter(),
     state = reactive({
         loading: false,
         tableData: [],
+        exceptionHandlingList: [],
         statusList: [
             { label: '正常', value: 1 },
             { label: '异常', value: 2 },
         ],
+        exceptionCode: '', // 异常上报编号
+        logDialogVisible: false, // 日志弹窗
+        remarkDialogVisible: false, // 备注弹窗
+        result: '', // 处理结果
+        resultDialogVisible: false, // 处理结果弹窗
     }),
     query = reactive({
         exceptionType: 'A', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
@@ -208,6 +240,25 @@ const router = useRouter(),
 onMounted(async () => {
     await getTableData(true)
 })
+
+// 备注弹窗
+const handleEditRemark = (code) => {
+    state.remarkDialogVisible = true
+    state.exceptionCode = code
+}
+
+// 处理结果弹窗
+const handleEditResult = (row) => {
+    state.exceptionCode = row.code
+    state.result = row.result
+    state.resultDialogVisible = true
+}
+
+// 日志弹窗
+const handleShowLog = (data) => {
+    state.logDialogVisible = true
+    state.exceptionHandlingList = data
+}
 
 // 获取表格数据
 const getTableData = async (init) => {

@@ -5,24 +5,21 @@
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">异常上报编号</div>
-                <el-input v-model="query.abnormal_code" placeholder="请输入异常上报编号" clearable>
+                <el-input v-model="query.code" placeholder="请输入异常上报编号" clearable>
                 </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">状态</div>
-                <el-select v-model="query.status" placeholder="请选择状态" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
+                <abnormal-order-status-select
+                    v-model="query.status"
+                    placeholder="请选择状态"
+                    clearable
+                />
             </div>
             <div class="table-header">
                 <div class="table-header-lab">异常上报时间</div>
                 <el-date-picker
-                    v-model="query.start_time"
+                    v-model="query.createTimeStart"
                     type="date"
                     placeholder="开始时间"
                     clearable
@@ -36,7 +33,7 @@
                 />
                 <span class="mx-2">至</span>
                 <el-date-picker
-                    v-model="query.end_time"
+                    v-model="query.createTimeEnd"
                     type="date"
                     placeholder="结束时间"
                     clearable
@@ -49,38 +46,36 @@
                     }"
                 />
             </div>
-            <div class="table-header">
-                <div class="table-header-lab">同脸人名</div>
-                <el-input v-model="query.register_name" clearable> </el-input>
-            </div>
-            <div class="table-header">
-                <div class="table-header-lab">同脸出现地数 ≤</div>
+            <!-- 暂无 -->
+            <!-- <div class="table-header">
+                <div class="table-header-lab">偏差距离范围 ≤（暂无）</div>
                 <el-input v-model="query.error_num" clearable> </el-input>
-            </div>
+            </div> -->
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
-                <el-input v-model="query.order_code" clearable> </el-input>
+                <el-input v-model="query.orderSn" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">店名关键词</div>
-                <el-input v-model="query.shop_name" clearable> </el-input>
+                <el-input v-model="query.customerName" clearable> </el-input>
             </div>
+            <!-- 暂无 -->
             <div class="table-header">
                 <div class="table-header-lab">购方关键词</div>
                 <el-input v-model="query.buyer_name" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">订单总金额 ≤</div>
-                <el-input v-model="query.order_amount" clearable> </el-input>
+                <el-input v-model="query.orderTotalAmount" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">运输单号</div>
-                <el-input v-model="query.transport_code" clearable> </el-input>
+                <el-input v-model="query.shippingOrderSn" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">运输日期</div>
                 <el-date-picker
-                    v-model="query.transport_start_time"
+                    v-model="query.shippingDate"
                     type="date"
                     placeholder="开始时间"
                     clearable
@@ -94,15 +89,15 @@
             </div>
             <div class="table-header">
                 <div class="table-header-lab">车辆牌照</div>
-                <el-input v-model="query.license_plate" clearable> </el-input>
+                <el-input v-model="query.licensePlate" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">运输人</div>
-                <el-input v-model="query.transport_name" clearable> </el-input>
+                <el-input v-model="query.driverName" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">配送人</div>
-                <el-input v-model="query.distribution_name" clearable> </el-input>
+                <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
         </TableHead>
         <div class="flex-auto flex flex-col">
@@ -114,31 +109,100 @@
                 :data="state.tableData"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="abnormal_code" label="异常上报编号">
-                    <template #default="scope">
+                <el-table-column prop="code" label="异常上报编号">
+                    <template #default="{ row }">
                         <el-link
                             type="primary"
                             :underline="false"
                             @click="
-                                router.push({ path: `SameFaceDifferentPlace/Detail/${scope.row.abnormal_code}` })
+                                router.push({
+                                    path: `same-face-different-places/detail/${row.code}`,
+                                })
                             "
-                            >{{ scope.row.abnormal_code }}</el-link
-                        >
+                            >{{ row.code }}
+                        </el-link>
                     </template>
                 </el-table-column>
                 <el-table-column prop="status" label="状态">
-                    <template #default="scope">
-                        {{ scope.row.status === 1 ? '正常' : '异常' }}
+                    <template #default="{ row }">
+                        {{ abnormalOrderStatus[row.status] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="register_name" label="异常上报时间" />
-                <el-table-column prop="order_code" label="同脸图像" />
-                <el-table-column prop="order_code" label="系统标记人名" />
-                <el-table-column prop="order_code" label="出现地集合" />
-                <el-table-column prop="order_code" label="订单签收地" />
-                <el-table-column prop="order_code" label="订单地址坐标" />
-                <el-table-column prop="order_code" label="订单编号" />
-                <el-table-column prop="order_code" label="运输单号" />
+                <el-table-column prop="createTime" label="异常上报时间" />
+                <el-table-column prop="order_code" label="同脸图像">
+                    <template #default="{ row }">
+                        <el-image
+                            :append-to-body="true"
+                            :preview-teleported="true"
+                            style="width: 50px; height: 50px"
+                            :src="row.signingInfo.image"
+                            :preview-src-list="[row.signingInfo.image]"
+                            fit="cover"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="order_code" label="系统标记人名">
+                    <template #default="{ row }">
+                        <registrant-info-popover :value="row.details">
+                            {{ row.details.contactPerson }}
+                        </registrant-info-popover>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="order_code" label="出现地集合">
+                    <template #default="{ row }">
+                        <el-popover
+                            width="240"
+                            popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+                        >
+                            <template #reference>
+                                <el-link type="primary" :underline="false">
+                                    {{ row.details.locationSet.length }}
+                                </el-link>
+                            </template>
+                            <template #default>
+                                <div>
+                                    <div
+                                        v-for="(item, index) in row.details.locationSet"
+                                        :key="index"
+                                    >
+                                        <div
+                                            class="bg-[rgba(232,239,247,0.5)] p-2 rounded-md"
+                                            :class="`${
+                                                index === row.details.locationSet.length - 1
+                                                    ? ''
+                                                    : 'mb-8'
+                                            }`"
+                                        >
+                                            <div class="text-xl text-help mb-4">
+                                                {{ item.customerName }}
+                                            </div>
+                                            <div class="text-xl text-help mb-4">
+                                                {{ item.signingTime }}
+                                            </div>
+                                            <div class="text-xl text-help">
+                                                {{ item.orderSn }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-popover>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="orderAddress" label="订单签收地" />
+                <el-table-column prop="order_code" label="订单地址坐标">
+                    <template #default="{ row }">
+                        {{ row.orderLongitude }},{{ row.orderLatitude }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="orderSn" label="订单编号">
+                    <template #default="{ row }">
+                        <order-info-popover :value="row">
+                            {{ row.orderSn }}
+                        </order-info-popover>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="shippingOrderSn" label="运输单号" />
                 <el-table-column label="操作" width="380px">
                     <template #default="scope">
                         <el-button @click="handleEdit(scope.row)">备注</el-button>
@@ -154,30 +218,28 @@
 </template>
 
 <script setup>
+import orderInfoPopover from '@/components/popover/order-info-popover.vue'
+import registrantInfoPopover from '@/components/popover/registrant-info-popover.vue'
+import abnormalOrderStatusSelect from '@/components/select/abnormal-order-status-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
-import { tobaccoApi } from '@/server/api/tobacco.js'
+import { tobaccoApi } from '@/server/api/tobacco'
+import { abnormalOrderStatus } from '@/utils/enum'
+import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter(),
     state = reactive({
         loading: false,
-        tableData: [
-            {
-                abnormal_code: '123',
-                status: 1,
-                register_name: '张三',
-                order_code: '123',
-            },
-        ],
+        tableData: [],
         statusList: [
             { label: '正常', value: 1 },
             { label: '异常', value: 2 },
         ],
     }),
     query = reactive({
-        abnormal_code: '',
+        exceptionType: 'C', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
     }),
     page = reactive({
         index: 1,
@@ -186,9 +248,10 @@ const router = useRouter(),
     })
 
 onMounted(async () => {
-    // await getTableData(true)
+    await getTableData(true)
 })
 
+// 获取表格数据
 const getTableData = async (init) => {
     state.loading = true
     if (init) {
@@ -196,15 +259,19 @@ const getTableData = async (init) => {
     }
 
     let params = {
-        page: page.index,
-        limit: page.size,
+        pageNum: page.index,
+        pageSize: page.size,
         ...query,
     }
     try {
         const {
-            data: { data, total },
-        } = await tobaccoApi('', params)
-        state.tableData = data
+            data: { rows, total },
+        } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+        rows.forEach((item) => {
+            item.details = JSON.parse(item.details)
+        })
+        state.tableData = rows
+        console.log(state.tableData)
         page.total = Number(total)
     } catch (error) {
         state.tableData = []

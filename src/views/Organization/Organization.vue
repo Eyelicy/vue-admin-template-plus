@@ -87,6 +87,25 @@
             <el-form-item label="法人" prop="legal_person_name">
                 <el-input v-model="form.legal_person_name" />
             </el-form-item>
+            <el-form-item label="主体性质" prop="organization_attribute">
+                <el-select v-model="form.organization_attribute" placeholder="请选择主体性质">
+                    <el-option value="1" label="股份有限公司">股份有限公司</el-option>
+                    <el-option value="2" label="有限责任公司">有限责任公司</el-option>
+                    <el-option value="3" label="国有企业">国有企业</el-option>
+                    <el-option value="4" label="集体所有制">集体所有制</el-option>
+                    <el-option value="5" label="私营企业">私营企业</el-option>
+                    <el-option value="6" label="有限合伙企业">有限合伙企业</el-option>
+                    <el-option value="7" label="联营企业">联营企业</el-option>
+                    <el-option value="8" label="外商投资企业">外商投资企业</el-option>
+                    <el-option value="9" label="个人独资企业">个人独资企业</el-option>
+                    <el-option value="10" label="非盈利机构">非盈利机构</el-option>
+                    <el-option value="11" label="政府部门">政府部门</el-option>
+                    <el-option value="12" label="一般性工作机构">一般性工作机构</el-option>
+                    <el-option value="13" label="社会团体">社会团体</el-option>
+                    <el-option value="17" label="农民专业合作社">农民专业合作社</el-option>
+                    <el-option value="18" label="个体工商户">个体工商户</el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="统一社会信用代码" prop="license">
                 <el-input v-model="form.license" />
             </el-form-item>
@@ -98,6 +117,9 @@
             </el-form-item>
             <el-form-item label="地址" prop="address">
                 <el-input v-model="form.address" />
+            </el-form-item>
+            <el-form-item label="企业机构介绍" prop="desc">
+                <el-input v-model="form.desc" type="textarea" :rows="3" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -146,7 +168,7 @@ const loading = ref(null),
         area_id: '',
         area_code: '',
         legal_person_name: '',
-        organization_attribute: 99,
+        organization_attribute: '',
         contact: [],
     }),
     formRef = ref(null),

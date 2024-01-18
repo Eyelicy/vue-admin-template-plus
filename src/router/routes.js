@@ -44,8 +44,8 @@ export const routes = [
                         component: () => import('@/views/AbnormalManagement/Deviate/detail.vue'),
                     },
                     {
-                        path: 'SameFaceDifferentPlace',
-                        name: 'SameFaceDifferentPlace',
+                        path: 'same-face-different-places',
+                        name: 'SameFaceDifferentPlaces1',
                         meta: {
                             title: '同脸异地',
                         },
@@ -53,8 +53,8 @@ export const routes = [
                             import('@/views/AbnormalManagement/SameFaceDifferentPlace/index.vue'),
                     },
                     {
-                        path: 'SameFaceDifferentPlace/Detail/:id',
-                        name: 'SameFaceDifferentPlaceDetail',
+                        path: 'same-face-different-places/detail/:id',
+                        name: 'SameFaceDifferentPlacesDetail',
                         meta: {
                             title: '同脸异地详情',
                             hideMenu: true,
@@ -63,8 +63,8 @@ export const routes = [
                             import('@/views/AbnormalManagement/SameFaceDifferentPlace/detail.vue'),
                     },
                     {
-                        path: 'SameStoreDifferentFace',
-                        name: 'SameStoreDifferentFace',
+                        path: 'same-store-different-faces',
+                        name: 'SameStoreDifferentFaces1',
                         meta: {
                             title: '同店异脸',
                         },
@@ -72,8 +72,8 @@ export const routes = [
                             import('@/views/AbnormalManagement/SameStoreDifferentFace/index.vue'),
                     },
                     {
-                        path: 'SameStoreDifferentFace/Detail/:id',
-                        name: 'SameStoreDifferentFaceDetail',
+                        path: 'same-store-different-faces/Detail/:id',
+                        name: 'SameStoreDifferentFacesDetail',
                         meta: {
                             title: '同店异脸详情',
                             hideMenu: true,
@@ -81,30 +81,31 @@ export const routes = [
                         component: () =>
                             import('@/views/AbnormalManagement/SameStoreDifferentFace/detail.vue'),
                     },
-                    {
-                        path: 'CigarettePackageErrorCorrection',
-                        name: 'CigarettePackageErrorCorrection',
-                        meta: {
-                            title: '烟包纠错',
-                        },
-                        component: () =>
-                            import(
-                                '@/views/AbnormalManagement/CigarettePackageErrorCorrection/index.vue'
-                            ),
-                    },
+                    // 莆田区无烟包纠错模块
+                    // {
+                    //     path: 'CigarettePackageErrorCorrection',
+                    //     name: 'CigarettePackageErrorCorrection',
+                    //     meta: {
+                    //         title: '烟包纠错',
+                    //     },
+                    //     component: () =>
+                    //         import(
+                    //             '@/views/AbnormalManagement/CigarettePackageErrorCorrection/index.vue'
+                    //         ),
+                    // },
 
-                    {
-                        path: 'CigarettePackageErrorCorrection/Detail/:id',
-                        name: 'CigarettePackageErrorCorrectionDetail',
-                        meta: {
-                            title: '烟包纠错详情',
-                            hideMenu: true,
-                        },
-                        component: () =>
-                            import(
-                                '@/views/AbnormalManagement/CigarettePackageErrorCorrection/detail.vue'
-                            ),
-                    },
+                    // {
+                    //     path: 'CigarettePackageErrorCorrection/Detail/:id',
+                    //     name: 'CigarettePackageErrorCorrectionDetail',
+                    //     meta: {
+                    //         title: '烟包纠错详情',
+                    //         hideMenu: true,
+                    //     },
+                    //     component: () =>
+                    //         import(
+                    //             '@/views/AbnormalManagement/CigarettePackageErrorCorrection/detail.vue'
+                    //         ),
+                    // },
                 ],
             },
             // 签收异常统计

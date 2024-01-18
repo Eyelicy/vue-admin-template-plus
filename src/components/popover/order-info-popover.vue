@@ -48,7 +48,7 @@
                     <div class="text-xl text-help mb-4">签收地址</div>
                     <div class="text-xl text-title">{{ value?.signingInfo?.address }}</div>
                 </div>
-                <img :src="value?.signingInfo?.img" class="w-full" />
+                <img :src="value?.signingInfo?.image" class="w-full" />
             </div>
         </template>
     </el-popover>
