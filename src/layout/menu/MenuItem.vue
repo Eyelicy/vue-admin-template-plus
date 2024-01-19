@@ -100,6 +100,7 @@ export default defineComponent({
                 path = menu.path
             }
             path = props.basePath ? props.basePath + '/' + path : path
+            path = path.replace(/\/:customerName\?/g, '')
             return path
         })
         return {

@@ -18,8 +18,9 @@
         popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
     >
         <template #reference>
-            <div class="text-primary cursor-pointer">
-                <slot></slot><el-icon><Pointer /></el-icon>
+            <div class=" cursor-pointer">
+                <slot></slot>
+                <el-icon class="ml-2"><View /></el-icon>
             </div>
         </template>
         <template #default>
@@ -55,7 +56,7 @@
 </template>
 
 <script setup>
-import { Pointer } from '@element-plus/icons-vue';
+import { View } from '@element-plus/icons-vue';
 
 const props = defineProps({
     value: {

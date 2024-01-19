@@ -20,11 +20,11 @@
                 <div class="table-header-lab">异常上报时间</div>
                 <el-date-picker
                     v-model="query.createTimeStart"
-                    type="date"
+                    type="datetime"
                     placeholder="开始时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -34,11 +34,11 @@
                 <span class="mx-2">至</span>
                 <el-date-picker
                     v-model="query.createTimeEnd"
-                    type="date"
+                    type="datetime"
                     placeholder="结束时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -79,7 +79,7 @@
                     type="date"
                     placeholder="开始时间"
                     clearable
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -149,9 +149,10 @@
                             popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
                         >
                             <template #reference>
-                                <el-link type="primary" :underline="false">
+                                <div class="cursor-pointer">
                                     {{ row.details.multiFaceInfo.length }}
-                                </el-link>
+                                    <el-icon class="ml-2"><View /></el-icon>
+                                </div>
                             </template>
                             <template #default>
                                 <div
@@ -204,17 +205,46 @@
                 </el-table-column>
                 <el-table-column prop="shippingOrderSn" label="运输单号" />
                 <el-table-column label="操作" width="380px">
-                    <template #default="scope">
-                        <el-button @click="handleEdit(scope.row)">备注</el-button>
-                        <el-button @click="handleEdit(scope.row)">转发</el-button>
-                        <el-button @click="handleEdit(scope.row)">结果</el-button>
-                        <el-button @click="handleEdit(scope.row)">撤销</el-button>
-                        <el-button @click="handleEdit(scope.row)">日志</el-button>
+                    <template #default="{ row }">
+                        <el-button @click="handleEditRemark(row.code)">备注</el-button>
+                        <el-button @click="handleShowForward(row)">转发</el-button>
+                        <el-button @click="handleEditResult(row)">结果</el-button>
+                        <el-button @click="handleRevoke(row.code, getTableData)">撤销</el-button>
+                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
+                            >日志
+                        </el-button>
                     </template>
                 </el-table-column>
             </Table>
         </div>
     </div>
+    <!-- 日志弹窗 -->
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
+    <!-- 备注弹窗 -->
+    <remark-dialog
+        v-model="state.remarkDialogVisible"
+        :exceptionCode="state.exceptionCode"
+        @confirm="getTableData"
+    ></remark-dialog>
+    <!-- 处理结果弹窗 -->
+    <processing-result-dialog
+        v-model="state.resultDialogVisible"
+        v-model:result="state.result"
+        @confirm="getTableData"
+    >
+    </processing-result-dialog>
+    <!-- 转发弹窗 -->
+    <forward-dialog
+        v-model="state.forwardDialogVisible"
+        :exceptionCode="state.code"
+        @confirm="getTableData"
+    ></forward-dialog>
 </template>
 
 <script setup>
@@ -223,11 +253,15 @@ import registrantInfoPopover from '@/components/popover/registrant-info-popover.
 import abnormalOrderStatusSelect from '@/components/select/abnormal-order-status-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
+import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { tobaccoApi } from '@/server/api/tobacco'
 import { abnormalOrderStatus } from '@/utils/enum'
+import { View } from '@element-plus/icons-vue'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+
+const { handleRevoke } = useExceptionMonitoringManagement()
 
 const router = useRouter(),
     state = reactive({
@@ -238,9 +272,7 @@ const router = useRouter(),
             { label: '异常', value: 2 },
         ],
     }),
-    query = reactive({
-        exceptionType: 'B', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
-    }),
+    query = reactive({}),
     page = reactive({
         index: 1,
         total: 0,
@@ -250,6 +282,31 @@ const router = useRouter(),
 onMounted(async () => {
     await getTableData(true)
 })
+
+// 备注弹窗
+const handleEditRemark = (code) => {
+    state.remarkDialogVisible = true
+    state.exceptionCode = code
+}
+
+// 转发弹窗
+const handleShowForward = (row) => {
+    state.forwardDialogVisible = true
+    state.code = row.code
+}
+
+// 处理结果弹窗
+const handleEditResult = (row) => {
+    state.exceptionCode = row.code
+    state.result = row.result
+    state.resultDialogVisible = true
+}
+
+// 日志弹窗
+const handleShowLog = (data) => {
+    state.logDialogVisible = true
+    state.exceptionHandlingList = data
+}
 
 // 获取表格数据
 const getTableData = async (init) => {
@@ -261,6 +318,7 @@ const getTableData = async (init) => {
     let params = {
         pageNum: page.index,
         pageSize: page.size,
+        exceptionType: 'B', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
         ...query,
     }
     try {

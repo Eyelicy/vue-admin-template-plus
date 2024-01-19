@@ -47,11 +47,14 @@
 </template>
 
 <script setup name="remark-dialog">
+import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { Close } from '@element-plus/icons-vue'
 import { reactive, useAttrs } from 'vue'
 
 const attrs = useAttrs()
 const emits = defineEmits(['update:modelValue', 'update:result', 'confirm'])
+
+const { handleResult } = useExceptionMonitoringManagement()
 
 const props = defineProps({
     data: {
@@ -78,6 +81,7 @@ const close = () => {
 }
 
 const confirm = async () => {
+    await handleResult(props.exceptionCode, state.result)
     emits('update:modelValue', false)
     emits('confirm')
 }

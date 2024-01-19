@@ -75,7 +75,7 @@ const close = () => {
 }
 
 const confirm = async () => {
-    handleRemark(props.exceptionCode, state.remark)
+    await handleRemark(props.exceptionCode, state.remark)
     emits('update:modelValue', false)
     emits('confirm')
 }

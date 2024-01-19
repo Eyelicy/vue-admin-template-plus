@@ -141,7 +141,7 @@ export const routes = [
                             ),
                     },
                     {
-                        path: 'abnormal-receipt-order',
+                        path: 'abnormal-receipt-order/:customerName?',
                         name: 'AbnormalReceiptOrder',
                         meta: {
                             title: '异常签收订单',
@@ -314,30 +314,30 @@ export const routes = [
                         },
                         component: () => import('@/views/system/changePwd.vue'),
                     },
-                    {
-                        path: 'AlertLog',
-                        name: 'AlertLog',
-                        meta: {
-                            title: '预警日志',
-                        },
-                        component: () => import('@/views/system/AlertLog.vue'),
-                    },
-                    {
-                        path: 'OperationLog',
-                        name: 'OperationLog',
-                        meta: {
-                            title: '操作日志',
-                        },
-                        component: () => import('@/views/system/OperationLog.vue'),
-                    },
-                    {
-                        path: 'DeviceLog',
-                        name: 'DeviceLog',
-                        meta: {
-                            title: '设备日志',
-                        },
-                        component: () => import('@/views/system/DeviceLog.vue'),
-                    },
+                    // {
+                    //     path: 'AlertLog',
+                    //     name: 'AlertLog',
+                    //     meta: {
+                    //         title: '预警日志',
+                    //     },
+                    //     component: () => import('@/views/system/AlertLog.vue'),
+                    // },
+                    // {
+                    //     path: 'OperationLog',
+                    //     name: 'OperationLog',
+                    //     meta: {
+                    //         title: '操作日志',
+                    //     },
+                    //     component: () => import('@/views/system/OperationLog.vue'),
+                    // },
+                    // {
+                    //     path: 'DeviceLog',
+                    //     name: 'DeviceLog',
+                    //     meta: {
+                    //         title: '设备日志',
+                    //     },
+                    //     component: () => import('@/views/system/DeviceLog.vue'),
+                    // },
                     {
                         path: 'Version',
                         name: 'Version',

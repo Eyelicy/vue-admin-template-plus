@@ -9,15 +9,15 @@ const [functionRef, callFunc] = useCustomHook()
 export const useExceptionMonitoringManagement = defineStore(
     'useExceptionMonitoringManagement',
     () => {
+        
         /**
          * 编辑备注
          * @param {string} exceptionCode 异常编码
          * @param {string} remark 备注内容
-         * @param {function} fnc 备注成功后的回调函数
          * @description 备注成功后，需要重新请求列表数据
          *
          */
-        const handleRemark = async (exceptionCode, remark, fnc) => {
+        const handleRemark = async (exceptionCode, remark) => {
             if (!remark) {
                 ElMessage.error('备注不能为空')
                 return
@@ -32,10 +32,7 @@ export const useExceptionMonitoringManagement = defineStore(
                     }
                 )
                 if (code === 200) {
-                    functionRef.value = fnc
-                    callFunc()
                     ElMessage.success('备注成功')
-                    remark.value = ''
                 } else {
                     ElMessage.error('备注失败')
                 }
@@ -63,8 +60,10 @@ export const useExceptionMonitoringManagement = defineStore(
                     `/api/v1/tobacco/exceptionHandling/cancel/${exceptionCode}`
                 )
                 if (code === 200) {
-                    functionRef.value = fnc
-                    callFunc()
+                    if (fnc) {
+                        functionRef.value = fnc
+                        callFunc()
+                    }
                     ElMessage.success('撤销成功')
                 } else {
                     ElMessage.error('撤销失败')
@@ -99,8 +98,10 @@ export const useExceptionMonitoringManagement = defineStore(
                     }
                 )
                 if (code === 200) {
-                    functionRef.value = fnc
-                    callFunc()
+                    if (fnc) {
+                        functionRef.value = fnc
+                        callFunc()
+                    }
                     ElMessage.success('处理结果成功')
                 } else {
                     ElMessage.error('处理结果失败')
@@ -110,7 +111,40 @@ export const useExceptionMonitoringManagement = defineStore(
             }
         }
 
-        return { handleRemark, handleRevoke, handleResult }
+        /**
+         *
+         * 转发
+         * @param {string} exceptionCode 异常编码
+         * @param {string} staffGuid 转发人员
+         * @param {string} result 处理结果
+         * @param {function} fnc 处理结果成功后的回调函数
+         *
+         **/
+        const handleForward = async (exceptionCode, staffGuid, fnc) => {
+            try {
+                const { code } = await tobaccoApi(
+                    'post',
+                    '/api/v1/tobacco/exceptionHandling/transfer',
+                    {
+                        exceptionCode,
+                        to: staffGuid,
+                    }
+                )
+                if (code === 200) {
+                    if (fnc) {
+                        functionRef.value = fnc
+                        callFunc()
+                    }
+                    ElMessage.success('转发成功')
+                } else {
+                    ElMessage.error('转发失败')
+                }
+            } catch (error) {
+                ElMessage.error('转发失败')
+            }
+        }
+
+        return { handleRemark, handleRevoke, handleResult, handleForward }
     },
     {
         persist: {

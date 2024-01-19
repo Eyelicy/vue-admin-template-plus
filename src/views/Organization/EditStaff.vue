@@ -107,8 +107,6 @@
         width="30%"
         v-model="showAddStaffCareer"
         title="新增员工岗位"
-        @handleAdd="addStaffCareer"
-        @handleCancel="showAddStaffCareer = false"
     >
         <el-form v-model="addStaffCarerForm">
             <el-form-item label="员工部门" prop="departmentGuid">
@@ -126,6 +124,12 @@
                 </el-select>
             </el-form-item>
         </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="showAddStaffCareer = false">取消</el-button>
+                <el-button type="primary" @click="addStaffCareer"> 确定 </el-button>
+            </span>
+        </template>
     </Dialog>
 </template>
 

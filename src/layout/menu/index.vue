@@ -30,6 +30,7 @@ watch(
 )
 
 menusList.value = getMenuByRouter(routes[0].children, userInfo.user_rule_nodes)
+console.log(menusList.value);
 </script>
 
 <style lang="scss" scoped>

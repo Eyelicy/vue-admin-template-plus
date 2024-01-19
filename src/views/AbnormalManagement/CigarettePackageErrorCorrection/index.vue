@@ -27,7 +27,7 @@
                     placeholder="开始时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -41,7 +41,7 @@
                     placeholder="结束时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -84,7 +84,7 @@
                     type="date"
                     placeholder="开始时间"
                     clearable
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()

@@ -6,12 +6,12 @@
             <div class="table-header">
                 <div class="table-header-lab">异常预警时间</div>
                 <el-date-picker
-                    v-model="query.start_time"
-                    type="date"
+                    v-model="query.createTimeStart"
+                    type="datetime"
                     placeholder="开始时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -20,12 +20,12 @@
                 />
                 <span class="mx-2">至</span>
                 <el-date-picker
-                    v-model="query.end_time"
-                    type="date"
+                    v-model="query.createTimeEnd"
+                    type="datetime"
                     placeholder="结束时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -35,34 +35,34 @@
             </div>
             <div class="table-header">
                 <div class="table-header-lab">异常类型</div>
-                <el-select v-model="query.status" placeholder="请选择状态" clearable>
+                <el-select v-model="query.exceptionType" placeholder="请选择状态" clearable>
                     <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
+                        v-for="(item, key) in exceptionStatus"
+                        :key="item"
+                        :label="item"
+                        :value="key"
                     />
                 </el-select>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">客户名称</div>
-                <el-input v-model="query.register_name" clearable> </el-input>
+                <el-input v-model="query.customerName" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">客户预警等级</div>
-                <el-input v-model="query.error_num" clearable> </el-input>
+                <el-input v-model="query.alertLevel" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
-                <el-input v-model="query.order_code" clearable> </el-input>
+                <el-input v-model="query.orderSn" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">运输编号</div>
-                <el-input v-model="query.shop_name" clearable> </el-input>
+                <el-input v-model="query.shippingOrderSn" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">派送员</div>
-                <el-input v-model="query.buyer_name" clearable> </el-input>
+                <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
         </TableHead>
         <div class="flex-auto flex flex-col">
@@ -74,106 +74,56 @@
                 :data="state.tableData"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="abnormal_code" label="异常预警时间"> </el-table-column>
+                <el-table-column prop="createTime" label="异常预警时间"> </el-table-column>
                 <el-table-column prop="status" label="异常类型">
-                    <template #default="scope">
-                        {{ scope.row.status === 1 ? '正常' : '异常' }}
+                    <template #default="{ row }">
+                        {{ exceptionStatus[row.exceptionType] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="register_name" label="订单编号" />
-                <el-table-column prop="order_code" label="客户名称" />
-                <el-table-column prop="order_code" label="签收地址" />
-                <el-table-column prop="order_code" label="品种数" />
-                <el-table-column prop="order_code" label="总盒数" />
-                <el-table-column prop="order_code" label="总金额（元）" />
+                <el-table-column prop="orderSn" label="订单编号" />
+                <el-table-column prop="order.customer.contactPerson" label="客户名称" />
+                <el-table-column prop="orderAddress" label="签收地址" />
+                <el-table-column prop="order.skuCount" label="品种数" />
+                <el-table-column prop="order.quantity" label="总盒数" />
+                <el-table-column prop="order.amount" label="总金额（元）" />
                 <el-table-column label="操作" width="380px">
-                    <template #default="scope">
-                        <el-button @click="handleLog(scope.row)">处理日志</el-button>
+                    <template #default="{ row }">
+                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
+                            >处理日志</el-button
+                        >
                     </template>
                 </el-table-column>
             </Table>
         </div>
     </div>
-
-    <Dialog width="600px" v-model="state.logDialogVisible" title="风险预警等级变化日志" center>
-        <el-timeline>
-            <el-timeline-item
-                v-for="(activity, index) in state.activities"
-                :key="index"
-                :icon="activity.icon"
-                :type="activity.type"
-                :color="activity.color"
-                :size="activity.size"
-                :hollow="activity.hollow"
-                :timestamp="activity.timestamp"
-            >
-                {{ activity.content }}
-            </el-timeline-item>
-        </el-timeline>
-    </Dialog>
+    <!-- 处理日志dialog -->
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
 </template>
 
 <script setup>
-import { MoreFilled } from '@element-plus/icons-vue'
-import Dialog from '@/components/dialog/index.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exceptionStatus } from '@/utils/enum'
+import qs from 'qs'
 import { onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
-const router = useRouter(),
+const route = useRoute(),
+    router = useRouter(),
     state = reactive({
         loading: false,
         logDialogVisible: false,
-        tableData: [
-            {
-                abnormal_code: '123',
-                status: 1,
-                register_name: '张三',
-                order_code: '123',
-            },
-        ],
-        statusList: [
-            { label: '正常', value: 1 },
-            { label: '异常', value: 2 },
-        ],
-        activities: [
-            {
-                content: 'Custom icon',
-                timestamp: '2018-04-12 20:46',
-                size: 'large',
-                type: 'primary',
-                icon: MoreFilled,
-            },
-            {
-                content: 'Custom color',
-                timestamp: '2018-04-03 20:46',
-                color: '#0bbd87',
-            },
-            {
-                content: 'Custom size',
-                timestamp: '2018-04-03 20:46',
-                size: 'large',
-            },
-            {
-                content: 'Custom hollow',
-                timestamp: '2018-04-03 20:46',
-                type: 'primary',
-                hollow: true,
-            },
-            {
-                content: 'Default node',
-                timestamp: '2018-04-03 20:46',
-            },
-        ],
-    }),
-    query = reactive({
-        abnormal_code: '',
-    }),
-    processLog = reactive({
         tableData: [],
+        exceptionHandlingList: [],
     }),
+    query = reactive({}),
     page = reactive({
         index: 1,
         total: 0,
@@ -181,13 +131,19 @@ const router = useRouter(),
     })
 
 onMounted(async () => {
-    // await getTableData(true)
+    if (route.params.customerName) {
+        query.customerName = route.params.customerName
+    }
+    await getTableData(true)
 })
 
-const handleLog = (row) => {
+// 日志弹窗
+const handleShowLog = (data) => {
     state.logDialogVisible = true
+    state.exceptionHandlingList = data
 }
 
+// 获取表格数据
 const getTableData = async (init) => {
     state.loading = true
     if (init) {
@@ -195,15 +151,19 @@ const getTableData = async (init) => {
     }
 
     let params = {
-        page: page.index,
-        limit: page.size,
+        pageNum: page.index,
+        pageSize: page.size,
         ...query,
     }
     try {
         const {
-            data: { data, total },
-        } = await tobaccoApi('', params)
-        state.tableData = data
+            data: { rows, total },
+        } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+        rows.forEach((item) => {
+            item.details = JSON.parse(item.details)
+        })
+        state.tableData = rows
+        console.log(state.tableData)
         page.total = Number(total)
     } catch (error) {
         state.tableData = []

@@ -20,11 +20,11 @@
                 <div class="table-header-lab">异常上报时间</div>
                 <el-date-picker
                     v-model="query.createTimeStart"
-                    type="date"
+                    type="datetime"
                     placeholder="开始时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -34,11 +34,11 @@
                 <span class="mx-2">至</span>
                 <el-date-picker
                     v-model="query.createTimeEnd"
-                    type="date"
+                    type="datetime"
                     placeholder="结束时间"
                     clearable
                     style="width: 100px"
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -47,10 +47,10 @@
                 />
             </div>
             <!-- 暂无 -->
-            <div class="table-header">
+            <!-- <div class="table-header">
                 <div class="table-header-lab">偏差距离范围 ≤（暂无）</div>
                 <el-input v-model="query.error_num" clearable> </el-input>
-            </div>
+            </div> -->
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
                 <el-input v-model="query.orderSn" clearable> </el-input>
@@ -60,10 +60,10 @@
                 <el-input v-model="query.customerName" clearable> </el-input>
             </div>
             <!-- 暂无 -->
-            <div class="table-header">
+            <!-- <div class="table-header">
                 <div class="table-header-lab">购方关键词</div>
                 <el-input v-model="query.buyer_name" clearable> </el-input>
-            </div>
+            </div> -->
             <div class="table-header">
                 <div class="table-header-lab">订单总金额 ≤</div>
                 <el-input v-model="query.orderTotalAmount" clearable> </el-input>
@@ -79,7 +79,7 @@
                     type="date"
                     placeholder="开始时间"
                     clearable
-                    value-format="yyyy-MM-dd"
+                    value-format="YYYY-MM-DD"
                     :picker-options="{
                         disabledDate: (time) => {
                             return time.getTime() > Date.now()
@@ -165,12 +165,12 @@
                 <el-table-column label="操作" width="380px">
                     <template #default="{ row }">
                         <el-button @click="handleEditRemark(row.code)">备注</el-button>
-                        <el-button @click="handleEdit(row)">转发</el-button>
+                        <el-button @click="handleShowForward(row)">转发</el-button>
                         <el-button @click="handleEditResult(row)">结果</el-button>
                         <el-button @click="handleRevoke(row.code, getTableData)">撤销</el-button>
                         <el-button @click="handleShowLog(row.exceptionHandlingList)"
-                            >日志</el-button
-                        >
+                            >日志
+                        </el-button>
                     </template>
                 </el-table-column>
             </Table>
@@ -194,9 +194,15 @@
     <processing-result-dialog
         v-model="state.resultDialogVisible"
         v-model:result="state.result"
-        @confirm="handleResult(state.exceptionCode, state.result, getTableData)"
+        @confirm="getTableData"
     >
     </processing-result-dialog>
+    <!-- 转发弹窗 -->
+    <forward-dialog
+        v-model="state.forwardDialogVisible"
+        :exceptionCode="state.code"
+        @confirm="getTableData"
+    ></forward-dialog>
 </template>
 
 <script setup>
@@ -211,7 +217,7 @@ import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
-const { handleRevoke, handleResult } = useExceptionMonitoringManagement()
+const { handleRevoke } = useExceptionMonitoringManagement()
 
 const router = useRouter(),
     state = reactive({
@@ -228,9 +234,7 @@ const router = useRouter(),
         result: '', // 处理结果
         resultDialogVisible: false, // 处理结果弹窗
     }),
-    query = reactive({
-        exceptionType: 'A', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
-    }),
+    query = reactive({}),
     page = reactive({
         index: 1,
         total: 0,
@@ -245,6 +249,12 @@ onMounted(async () => {
 const handleEditRemark = (code) => {
     state.remarkDialogVisible = true
     state.exceptionCode = code
+}
+
+// 转发弹窗
+const handleShowForward = (row) => {
+    state.forwardDialogVisible = true
+    state.code = row.code
 }
 
 // 处理结果弹窗
@@ -270,6 +280,7 @@ const getTableData = async (init) => {
     let params = {
         pageNum: page.index,
         pageSize: page.size,
+        exceptionType: 'A',
         ...query,
     }
     try {

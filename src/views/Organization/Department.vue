@@ -46,11 +46,12 @@
     <Dialog
         v-model="dialogVisible"
         :type="type"
-        add-title="新增机构"
+        title="新增机构"
         edit-title="编辑部门"
         @handleCancel="dialogVisible = false"
         @handleAdd="addDepartment"
         @handleEdit="editDepartment"
+        center
     >
         <el-form
             :model="form"
@@ -78,6 +79,50 @@
                 <el-input v-model="form.name" />
             </el-form-item>
         </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="addDepartment"> 确定 </el-button>
+            </span>
+        </template>
+    </Dialog>
+    <Dialog
+        v-model="editDialogVisible"
+        title="编辑部门"
+        center
+    >
+        <el-form
+            :model="form"
+            ref="formRef"
+            :rules="rules"
+            label-width="120px"
+            style="max-width: 460px"
+        >
+            <el-form-item label="上级部门">
+                <el-cascader
+                    style="width: 100%"
+                    v-model="form.pid"
+                    :options="treeData"
+                    :props="{
+                        label: 'name',
+                        value: 'guid',
+                        children: 'childlist',
+                        emitPath: false,
+                        checkStrictly: true,
+                    }"
+                    clearable
+                />
+            </el-form-item>
+            <el-form-item label="部门名称" prop="name">
+                <el-input v-model="form.name" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="editDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="editDepartment"> 确定 </el-button>
+            </span>
+        </template>
     </Dialog>
 </template>
 
@@ -105,6 +150,7 @@ const loading = ref(null),
     }),
     tableData = ref([]),
     dialogVisible = ref(false),
+    editDialogVisible = ref(false),
     form = reactive({}),
     formRef = ref(null),
     rules = reactive({
@@ -205,7 +251,7 @@ const handleEdit = async (index, item) => {
     form.pid = getParentGuid(treeData.value, item.pid)
     form.id = item.guid
     form.name = item.name
-    dialogVisible.value = true
+    editDialogVisible.value = true
 }
 
 // const getParentGuid = async (pid) => {
@@ -233,7 +279,7 @@ const editDepartment = async () => {
         ElMessage.success('编辑成功')
         getTableData(true)
         getTreeDepartment()
-        dialogVisible.value = false
+        editDialogVisible.value = false
     } else {
         ElMessage.error(msg)
     }

@@ -1,20 +1,54 @@
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tag-level-1 {
+    background-color: #f34628;
+    border-color: #f34628;
+    color: #fff;
+}
+
+.tag-level-2 {
+    background-color: #303133;
+    border-color: #303133;
+    color: #fff;
+}
+
+.tag-level-3 {
+    background-color: #feea33;
+    border-color: #feea33;
+    color: #000;
+}
+</style>
 
 <template>
     <div class="w-full flex flex-col p-12 detail">
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">客户基础信息</div>
             <div class="grid grid-cols-4 gap-4 gap-y-8">
-                <descriptions-item label="客户名称">要油条一根</descriptions-item>
+                <descriptions-item label="客户名称">{{
+                    details?.customerName ?? '--'
+                }}</descriptions-item>
                 <descriptions-item label="风险预警等级">
-                    <el-tag type="warning" class="mr-12" effect="dark">高风险</el-tag>
-                    <el-button type="danger" plain>重置</el-button>
+                    <el-tag
+                        class="p-4 rounded-md mr-12"
+                        :class="`tag-level-${details?.alertLevel}`"
+                    >
+                        {{ details?.customerAlertLevel?.name }}
+                    </el-tag>
+                    <el-button type="danger" plain @click="handleResetLevel">重置</el-button>
                 </descriptions-item>
-                <descriptions-item label="签收地址">著行为只抽烟店</descriptions-item>
-                <descriptions-item label="注册人名">要香油一勺</descriptions-item>
-                <descriptions-item label="所属路线编号/路线名">南京南 - 大行宫</descriptions-item>
-                <descriptions-item label="所属服务站点">大行宫从不服务站点</descriptions-item>
-                <descriptions-item label="关联派送员">要键盘一把</descriptions-item>
+                <descriptions-item label="签收地址">{{ details.address }}</descriptions-item>
+                <descriptions-item label="注册人名">{{
+                    details?.realname?.name
+                }}</descriptions-item>
+                <descriptions-item label="所属路线编号/路线名"
+                    >{{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
+                    {{ details?.customerDeliveryInfo?.deliveryRoute?.routeName }}
+                </descriptions-item>
+                <descriptions-item label="所属服务站点">{{
+                    details?.customerDeliveryInfo?.deliveryRoute?.stationCode ?? '--'
+                }}</descriptions-item>
+                <descriptions-item label="关联派送员">{{
+                    details?.deliveryPersonnelNames ?? '--'
+                }}</descriptions-item>
             </div>
         </div>
         <el-divider />
@@ -22,13 +56,13 @@
             <div class="box-title text-title text-2xl">自定义分类</div>
             <div class="grid grid-cols-12 gap-4 gap-y-8 items-center">
                 <el-tag
-                    v-for="tag in classification.dynamicTags"
+                    v-for="tag in details.labelList"
                     type="success"
                     class="mr-12"
                     effect="dark"
                     closable
-                    @close="handleCloseTag(tag)"
-                    >{{ tag }}
+                    @close="handleCloseTag(tag.id)"
+                    >{{ tag.labelName }}
                 </el-tag>
                 <el-button
                     type="primary"
@@ -43,28 +77,54 @@
         <div class="w-full px-16 flex-auto">
             <div class="box-title text-title text-2xl">异常订单信息</div>
             <Table :data="state.tableData" :show-page="false">
-                <el-table-column prop="abnormal_code" label="异常预警时间"> </el-table-column>
+                <el-table-column prop="createTime" label="异常预警时间"> </el-table-column>
                 <el-table-column prop="status" label="异常类型">
-                    <template #default="scope">
-                        {{ scope.row.status === 1 ? '正常' : '异常' }}
+                    <template #default="{ row }">
+                        {{ exceptionStatus[row.exceptionType] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="register_name" label="订单编号" />
-                <el-table-column prop="order_code" label="客户名称" />
-                <el-table-column prop="order_code" label="签收地址" />
-                <el-table-column prop="order_code" label="品种数" />
-                <el-table-column prop="order_code" label="总盒数" />
-                <el-table-column prop="order_code" label="总金额（元）" />
+                <el-table-column prop="orderSn" label="订单编号" />
+                <el-table-column prop="order.customer.customerName" label="客户名称" />
+                <el-table-column prop="orderAddress" label="签收地址" />
+                <el-table-column prop="order.skuCount" label="品种数" />
+                <el-table-column prop="order.quantity" label="总盒数" />
+                <el-table-column prop="order.amount" label="总金额（元）" />
             </Table>
         </div>
     </div>
-    <Dialog width="600px" v-model="classification.dialogVisible" title="新增分类标记" center>
-        <el-input v-model="classification.inputValue" placeholder="请输入分类名称" />
+    <Dialog width="600px" v-model="classification.dialogVisible" title="添加分类标记" center>
+        <el-select
+            filterable
+            remote
+            reserve-keyword
+            remote-show-suffix
+            :remote-method="getWarningLevel"
+            :loading="state.loading"
+            v-model="state.labelId"
+        >
+            <el-option
+                v-for="item in state.warningLevelData"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+            />
+            <template #footer>
+                <div class="flex items-center">
+                    <el-input
+                        v-model="state.typeText"
+                        class="option-input mr-12"
+                        placeholder="请输入分类名称"
+                        size="small"
+                    />
+                    <el-button type="primary" size="small" @click="onConfirm"> 确认 </el-button>
+                </div>
+            </template>
+        </el-select>
         <template #footer>
             <el-button class="w-[100px]" @click="classification.dialogVisible = false"
-                >取消</el-button
-            >
-            <el-button type="primary" class="w-[100px]" @click="handleAddTag">确定</el-button>
+                >取消
+            </el-button>
+            <el-button type="primary" class="w-[100px]" @click="handleAddTag">新增</el-button>
         </template>
     </Dialog>
 </template>
@@ -73,35 +133,147 @@
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
 import Table from '@/components/table/index.vue'
+import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exceptionStatus } from '@/utils/enum'
 import { Plus } from '@element-plus/icons-vue'
-import { reactive } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import qs from 'qs'
+import { onMounted, reactive } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const state = reactive({
-        tableData: [
-            {
-                abnormal_code:'2021-08-12 12:00:00',
-            },
-            {
-                abnormal_code:'2021-08-12 12:00:00',
-            },
-            {
-                abnormal_code:'2021-08-12 12:00:00',
-            },
-        ],
+        labelId: '',
+        customerCode: '',
+        tableData: [],
+        warningLevelData: [],
+        typeText: '', // 新增分类标记文本
+        customerLabelData: [], // 客户自定义分类
     }),
+    details = reactive({}),
     classification = reactive({
         dynamicTags: ['标签一', '标签二', '标签三'],
         dialogVisible: false,
         inputValue: '',
     })
 
-const handleCloseTag = (tag) => {
-    classification.dynamicTags.splice(classification.dynamicTags.indexOf(tag), 1)
+onMounted(async () => {
+    state.customerCode = route.params.id
+    await getDetails()
+    await getOrderList()
+    await getWarningLevel()
+})
+
+// 删除客户自定义分类
+const handleCloseTag = (id) => {
+    ElMessageBox.confirm('是否删除该分类标记？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+    }).then(async () => {
+        const { code } = await tobaccoApi('delete', `/api/v1/tobacco/customerLabel/${id}`)
+        if (code === 200) {
+            ElMessage.success('删除成功')
+            await getDetails()
+        } else {
+            ElMessage.error('删除失败')
+        }
+    })
 }
 
-const handleAddTag = () => {
-    classification.dynamicTags.push(classification.inputValue)
-    classification.inputValue = ''
-    classification.dialogVisible = false
+// 绑定客服自定义分类
+const handleAddTag = async () => {
+    if (!state.labelId) {
+        ElMessage.error('请选择分类标记')
+        return
+    }
+    const { code } = await tobaccoApi('post', `/api/v1/tobacco/customerLabel`, {
+        customerCode: state.customerCode,
+        labelId: state.labelId,
+    })
+    if (code === 200) {
+        ElMessage.success('新增成功')
+        classification.dialogVisible = false
+        await getDetails()
+    } else {
+        ElMessage.error('新增失败')
+    }
+}
+
+// 重置客户预警等级
+const handleResetLevel = async () => {
+    try {
+        await ElMessageBox.confirm('是否重置该客户的预警等级？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+        const { code } = await tobaccoApi(
+            'post',
+            `/api/v1/tobacco/customer/resetAlertLevel/${details?.customerCode}`
+        )
+        if (code === 200) {
+            ElMessage.success('重置成功')
+            router.back()
+        } else {
+            ElMessage.error('重置失败')
+        }
+    } catch (error) {
+        if (error !== 'cancel') {
+            ElMessage.error('重置失败')
+        }
+    }
+}
+
+// 获取详情
+const getDetails = async () => {
+    const { data } = await tobaccoApi('get', `/api/v1/tobacco/customer/${state.customerCode}`)
+    Object.assign(details, data)
+    console.log('details:', details)
+}
+
+// 按客户名称获取异常订单列表
+const getOrderList = async () => {
+    let params = {
+        customerCode: details.customerCode,
+    }
+    const {
+        data: { rows, total },
+    } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+    state.tableData = rows
+}
+
+// 获取预警等级
+const getWarningLevel = async (query) => {
+    const params = {
+        name: query,
+        isDefault: false,
+        orderByColumn: 'sort',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/customerAlertLevel/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        state.warningLevelData = rows
+    }
+}
+
+// 新增预警等级
+const onConfirm = async () => {
+    if (!state.typeText) {
+        ElMessage.error('请输入分类名称')
+        return
+    }
+    const { code } = await tobaccoApi('post', `/api/v1/tobacco/customerAlertLevel`, {
+        name: state.typeText,
+        isDefault: false,
+    })
+    if (code === 200) {
+        state.typeText = ''
+        ElMessage.success('新增成功')
+        await getWarningLevel()
+    }
 }
 </script>

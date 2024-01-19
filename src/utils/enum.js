@@ -20,6 +20,12 @@ export const abnormalOrderStatus = {
     CANCELLED: '已取消',
 }
 
+export const exceptionStatus = {
+    A: '签收地偏离',
+    B: '同店异脸',
+    C: '同脸异地',
+}
+
 export const shortcuts = [
     {
         text: '今天',

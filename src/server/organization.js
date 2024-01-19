@@ -83,6 +83,11 @@ export const getAllStaffListApi = (params) => {
     return get(`/hr/staffs`, params)
 }
 
+// 显示员工列表树状结构 /api/hr/staff_tree
+export const getAllStaffTreeApi = (params) => {
+    return get(`/hr/staff_tree`, params)
+}
+
 // 显示指定的员工 /api/hr/staff/{id}
 export const getStaffApi = (id) => {
     return get(`/hr/staff/${id}`)

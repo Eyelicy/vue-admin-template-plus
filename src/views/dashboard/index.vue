@@ -35,64 +35,137 @@
 <template>
     <div class="w-full h-full flex flex-col p-[3.2rem]">
         <p class="text-title font-bold text-[24px] mb-12">{{ state.currentTime }}</p>
+
+        <!-- 异常监控实时消息 start -->
         <div class="box-title text-primary text-[18px]">异常监控实时消息</div>
         <div class="grid grid-cols-2 gap-8 text-test-black">
+            <!-- 签收地偏离 -->
             <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-xl">签收地偏离</span>
-                    <span class="text-[1.4rem] text-primary">全部</span>
+                    <span
+                        class="text-[1.4rem] text-primary cursor-pointer"
+                        @click="
+                            router.push(
+                                '/exception-monitoring-management/delivery-location-deviation'
+                            )
+                        "
+                        >全部
+                    </span>
                 </div>
-                <template v-for="(item, index) in 5">
+                <template v-for="(item, index) in realTimeNews.deliveryLocationDeviation">
                     <div
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400">【xx区】</span>
-                        <span>【xx店名】</span>
-                        <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
-                        <span class="ml-auto">2023-10-31</span>
-                        <el-button class="mx-4" color="#348DED" plain>详情</el-button>
+                        <span class="text-blue-400">【{{ item?.signingInfo?.address }}】</span>
+                        <span>【{{ item?.order?.customer?.customerName }}】</span>
+                        <span
+                            >{{ item?.order?.customer?.createTime }}签收 偏离签收地
+                            {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米</span
+                        >
+                        <span class="ml-auto">{{item.createTime}}</span>
+                        <el-button
+                            class="mx-4"
+                            color="#348DED"
+                            plain
+                            @click="
+                                router.push({
+                                    path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
+                                })
+                            "
+                            >详情</el-button
+                        >
                     </div>
                 </template>
             </div>
+            <!-- 同脸异地 -->
             <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
                 <div class="mb-4 flex justify-between items-center">
                     <span class="text-xl">同脸异地</span>
-                    <span class="text-[1.4rem] text-primary">全部</span>
+                    <span
+                        class="text-[1.4rem] text-primary cursor-pointer"
+                        @click="
+                            router.push(
+                                '/exception-monitoring-management/same-face-different-places'
+                            )
+                        "
+                        >全部</span
+                    >
                 </div>
-                <template v-for="(item, index) in 5">
+                <template v-for="(item, index) in realTimeNews.sameFaceDifferentPlaces">
                     <div
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400">【xx区】</span>
-                        <span>【xx店名】</span>
-                        <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
-                        <span class="ml-auto">2023-10-31</span>
-                        <el-button class="mx-4" color="#348DED" plain>详情</el-button>
+                        <span class="text-blue-400 flex-shrink-0"
+                            >【{{ item?.signingInfo?.address }}】</span
+                        >
+                        <!-- <span>【{{ item?.order?.customer?.customerName }}】</span> -->
+                        <!-- {{ JSON.parse(item?.details).locationSet }} -->
+                        <div class="flex flex-auto whitespace-nowrap overflow-hidden">
+                            <template
+                                class="h-[24px]"
+                                v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
+                                >{{ item.customerName }} {{ item.signingTime }}签收
+                            </template>
+                        </div>
+                        <span class="ml-auto flex-shrink-0">{{item.createTime}}</span>
+                        <el-button
+                            class="mx-4 flex-shrink-0"
+                            color="#348DED"
+                            plain
+                            @click="
+                                router.push({
+                                    path: `/exception-monitoring-management/same-face-different-places/detail/${item.code}`,
+                                })
+                            "
+                            >详情</el-button
+                        >
                     </div>
                 </template>
             </div>
+            <!-- 同店异脸 -->
             <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
                 <div class="mb-4 flex justify-between items-center">
                     <span class="text-xl">同店异脸</span>
-                    <span class="text-[1.4rem] text-primary">全部</span>
+                    <span
+                        class="text-[1.4rem] text-primary cursor-pointer"
+                        @click="
+                            router.push(
+                                '/exception-monitoring-management/same-store-different-faces'
+                            )
+                        "
+                        >全部</span
+                    >
                 </div>
-                <template v-for="(item, index) in 5">
+                <template v-for="(item, index) in realTimeNews.sameStoreDifferentFaces">
                     <div
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400">【xx区】</span>
-                        <span>【xx店名】</span>
-                        <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
-                        <span class="ml-auto">2023-10-31</span>
-                        <el-button class="mx-4" color="#348DED" plain>详情</el-button>
+                        <span class="text-blue-400">【{{ item?.signingInfo?.address }}】</span>
+                        <span>【{{ item?.order?.customer?.customerName }}】</span>
+                        <span
+                            >{{ item?.order?.customer?.createTime }}签收 </span
+                        >
+                        <span class="ml-auto">{{item.createTime}}</span>
+                        <el-button
+                            class="mx-4"
+                            color="#348DED"
+                            plain
+                            @click="
+                                router.push({
+                                    path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
+                                })
+                            "
+                            >详情</el-button
+                        >
                     </div>
                 </template>
             </div>
-            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
-                <div class="mb-4 flex justify-between items-center">
+            <!-- <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+                <div lass="mb-4 flex justify-between items-center">
                     <span class="text-xl">烟包纠错</span>
                     <span class="text-[1.4rem] text-primary">全部</span>
                 </div>
@@ -104,43 +177,51 @@
                         <span class="text-blue-400">【xx区】</span>
                         <span>【xx店名】</span>
                         <span>{{ '17:42' }}签收 偏离签收地{{ '10' }}米</span>
-                        <span class="ml-auto">2023-10-31</span>
+                        <span class="ml-auto">{{item.createTime}}</span>
                         <el-button class="mx-4" color="#348DED" plain>详情</el-button>
                     </div>
                 </template>
-            </div>
+            </div> -->
         </div>
+        <!-- 异常监控实时消息 end -->
+
+        <!-- 统计摘要 start -->
         <div class="box-title text-primary text-[18px] mt-12">统计摘要</div>
         <div class="abnormal-content">
             <div class="card">
                 <p>今日异常上报</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">{{ state?.summaryData?.today_exception_report }}</p>
             </div>
             <div class="card">
                 <p>昨日异常上报</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">{{ state?.summaryData?.yesterday_exception_report }}</p>
             </div>
             <div class="card">
                 <p>本月异常上报</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">{{ state?.summaryData?.this_month_exception_report }}</p>
             </div>
             <div class="card">
                 <p>今日签收地偏离</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">{{ state?.summaryData?.today_sign_deviation }}</p>
             </div>
             <div class="card">
                 <p>今日同脸异地</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">
+                    {{ state?.summaryData?.today_same_face_diff_location }}
+                </p>
             </div>
             <div class="card">
                 <p>今日同店异脸</p>
-                <p class="text-[#303133]">12</p>
+                <p class="text-[#303133]">{{ state?.summaryData?.today_same_store_diff_face }}</p>
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <p>今日烟包纠错</p>
                 <p class="text-[#303133]">12</p>
-            </div>
+            </div> -->
         </div>
+        <!-- 统计摘要 end -->
+
+        <!-- 异常上报趋势统计 start -->
         <div class="box-title text-primary text-[18px] mt-12">异常上报趋势统计</div>
         <div class="chart-box">
             <div class="chart-box-header">
@@ -188,6 +269,9 @@
                 class="w-full h-[500px]"
             ></div>
         </div>
+        <!-- 异常上报趋势统计 end -->
+
+        <!-- 异常上报趋势统计 start -->
         <div class="box-title text-primary text-[18px] mt-12">异常签收客户统计</div>
         <div class="chart-box">
             <div class="chart-box-header">
@@ -235,19 +319,29 @@
                 class="w-full h-[500px]"
             ></div>
         </div>
+        <!-- 异常上报趋势统计 end -->
     </div>
 </template>
 
 <script setup>
+import { tobaccoApi } from '@/server/api/tobacco';
 import { PieChart, TrendCharts } from '@element-plus/icons-vue';
 import dayjs from 'dayjs'; // 引入中文语言包
 import * as echarts from 'echarts';
+import qs from 'qs';
 import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-dayjs.locale('zh-cn')
+const router = useRouter()
 
 const state = reactive({
+        summaryData: [],
         currentTime: dayjs().format('YYYY年MM月DD日 dddd HH:mm:ss'),
+    }),
+    realTimeNews = reactive({
+        deliveryLocationDeviation: [],
+        sameFaceDifferentPlaces: [],
+        sameStoreDifferentFaces: [],
     }),
     exceptionReporting = reactive({
         chart: null,
@@ -272,6 +366,10 @@ onMounted(async () => {
         timer = state.currentTime = dayjs().format('YYYY年MM月DD日 dddd HH:mm:ss')
     }, 1000)
     await nextTick()
+    await getDeliveryLocationDeviation()
+    await getSameFaceDifferentPlaces()
+    await getSameStoreDifferentFaces()
+    await getSummaryData()
     await initExceptionReportingChart()
     await initExceptionalDeliveryChart()
 })
@@ -280,6 +378,68 @@ onUnmounted(() => {
     // 销毁定时器
     clearInterval(timer)
 })
+
+// 获取签收地偏离数据
+const getDeliveryLocationDeviation = async () => {
+    const params = {
+        pageNum: 1,
+        pageSize: 5,
+        exceptionType: 'A',
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        realTimeNews.deliveryLocationDeviation = rows
+    }
+}
+
+// 获取同脸异地数据
+const getSameFaceDifferentPlaces = async () => {
+    const params = {
+        pageNum: 1,
+        pageSize: 5,
+        exceptionType: 'C',
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        realTimeNews.sameFaceDifferentPlaces = rows
+    }
+}
+
+// 获取同店异脸数据
+const getSameStoreDifferentFaces = async () => {
+    const params = {
+        pageNum: 1,
+        pageSize: 5,
+        exceptionType: 'B',
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+    if (code === 200) {
+        realTimeNews.sameStoreDifferentFaces = rows
+    }
+}
+
+// 获取统计摘要数据
+const getSummaryData = async () => {
+    const { code, data } = await tobaccoApi('get', '/api/v1/tobacco/exceptionInfo/stat/summary')
+    if (code === 200) {
+        state.summaryData = data
+    }
+}
 
 // 初始化异常上报图表
 const initExceptionReportingChart = () => {
