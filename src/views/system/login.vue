@@ -1,6 +1,13 @@
 <template>
     <div class="w-screen h-screen flex justify-center items-center relative">
-        <img class="absolute top-12 left-20" width="160" src="@/assets/icon.png" />
+        <!-- <img class="absolute top-12 left-20" width="160" src="@/assets/icon.png" /> -->
+        <img
+            class="absolute top-12 left-20"
+            width="160"
+            src="@/assets/img/title.png"
+            alt=""
+            srcset=""
+        />
         <div
             class="flex container mx-auto overflow-hidden"
             style="
@@ -164,10 +171,10 @@
 </template>
 
 <script setup>
-import CodeButton from '@/components/codeButton/index.vue';
-import ForgetPassword from '@/components/forgetPassword.vue';
-import { useUserStore } from '@/store/user';
-import { reactive, ref } from 'vue';
+import CodeButton from '@/components/codeButton/index.vue'
+import ForgetPassword from '@/components/forgetPassword.vue'
+import { useUserStore } from '@/store/user'
+import { reactive, ref } from 'vue'
 const { login, loginModel, mobileLoginModel, sendCode, mobileLogin, mobile, captcha } =
         useUserStore(),
     activeName = ref('login'),
@@ -192,8 +199,8 @@ if (!loginModel.rememberAccountName) {
 
 <style lang="scss" scoped>
 .bg {
-    background: url('@/assets/bg.png') no-repeat;
-    background-size: cover;
+    background: url('@/assets/bg-1.png') no-repeat;
+    background-size: contain;
     background-position: center;
 }
 </style>
