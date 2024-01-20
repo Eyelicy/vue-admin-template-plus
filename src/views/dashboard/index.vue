@@ -64,7 +64,7 @@
                             >{{ item?.order?.customer?.createTime }}签收 偏离签收地
                             {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米</span
                         >
-                        <span class="ml-auto">{{item.createTime}}</span>
+                        <span class="ml-auto">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4"
                             color="#348DED"
@@ -110,7 +110,7 @@
                                 >{{ item.customerName }} {{ item.signingTime }}签收
                             </template>
                         </div>
-                        <span class="ml-auto flex-shrink-0">{{item.createTime}}</span>
+                        <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4 flex-shrink-0"
                             color="#348DED"
@@ -146,10 +146,8 @@
                     >
                         <span class="text-blue-400">【{{ item?.signingInfo?.address }}】</span>
                         <span>【{{ item?.order?.customer?.customerName }}】</span>
-                        <span
-                            >{{ item?.order?.customer?.createTime }}签收 </span
-                        >
-                        <span class="ml-auto">{{item.createTime}}</span>
+                        <span>{{ item?.order?.customer?.createTime }}签收 </span>
+                        <span class="ml-auto">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4"
                             color="#348DED"
@@ -231,6 +229,7 @@
                     type="date"
                     unlink-panels
                     style="width: 300px"
+                    value-format="YYYY-MM-DD"
                 />
                 <div class="mx-4">至</div>
                 <el-date-picker
@@ -239,11 +238,27 @@
                     unlink-panels
                     style="width: 300px"
                     class="mr-4"
+                    value-format="YYYY-MM-DD"
                 />
-                <el-button type="primary">查询</el-button>
-                <el-button type="primary" class="mr-auto">重置</el-button>
-                <el-button type="primary" plain round class="w-[120px]">本月</el-button>
-                <el-button type="primary" plain round class="w-[120px]">近30天</el-button>
+                <el-button type="primary" @click="getExceptionReportingTrend">查询</el-button>
+                <el-button type="primary" class="mr-auto" 
+                    @click="setEchartTimeToThisMonth('exceptionReporting')">重置</el-button>
+                <el-button
+                    type="primary"
+                    plain
+                    round
+                    class="w-[120px]"
+                    @click="setEchartTimeToThisMonth('exceptionReporting')"
+                    >本月</el-button
+                >
+                <el-button
+                    type="primary"
+                    plain
+                    round
+                    class="w-[120px]"
+                    @click="setEchartTimeToNearlyThirtyDays('exceptionReporting')"
+                    >近30天</el-button
+                >
                 <el-button
                     v-if="exceptionReporting.type === 'line'"
                     type="primary"
@@ -264,8 +279,8 @@
                 >
             </div>
             <div
-                ref="exceptionReportingChart"
-                id="exceptionReportingChart"
+                ref="exceptionReportingChartRef"
+                id="exceptionReportingChartRef"
                 class="w-full h-[500px]"
             ></div>
         </div>
@@ -281,6 +296,7 @@
                     type="date"
                     unlink-panels
                     style="width: 300px"
+                    value-format="YYYY-MM-DD"
                 />
                 <div class="mx-4">至</div>
                 <el-date-picker
@@ -288,12 +304,27 @@
                     type="date"
                     unlink-panels
                     style="width: 300px"
+                    value-format="YYYY-MM-DD"
                     class="mr-4"
                 />
-                <el-button type="primary">查询</el-button>
-                <el-button type="primary" class="mr-auto">重置</el-button>
-                <el-button type="primary" plain round class="w-[120px]">本月</el-button>
-                <el-button type="primary" plain round class="w-[120px]">近30天</el-button>
+                <el-button type="primary" @click="getExceptionalDelivery">查询</el-button>
+                <el-button type="primary" class="mr-auto" @click="setEchartTimeToThisMonth('exceptionalDelivery')">重置</el-button>
+                <el-button
+                    type="primary"
+                    plain
+                    round
+                    class="w-[120px]"
+                    @click="setEchartTimeToThisMonth('exceptionalDelivery')"
+                    >本月</el-button
+                >
+                <el-button
+                    type="primary"
+                    plain
+                    round
+                    class="w-[120px]"
+                    @click="setEchartTimeToNearlyThirtyDays('exceptionalDelivery')"
+                    >近30天</el-button
+                >
                 <el-button
                     v-if="exceptionalDelivery.type === 'line'"
                     type="primary"
@@ -314,8 +345,8 @@
                 >
             </div>
             <div
-                ref="exceptionalDeliveryChart"
-                id="exceptionalDeliveryChart"
+                ref="exceptionalDeliveryChartRef"
+                id="exceptionalDeliveryChartRef"
                 class="w-full h-[500px]"
             ></div>
         </div>
@@ -346,19 +377,23 @@ const state = reactive({
     exceptionReporting = reactive({
         chart: null,
         type: 'line',
-        startDate: '',
-        endDate: '',
+        startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+        endDate: dayjs().format('YYYY-MM-DD'),
+        data: [],
     }),
-    exceptionReportingChart = ref(null), // 异常上报图表实例
+    exceptionReportingChartRef = ref(null), // 异常上报图表实例
     exceptionalDelivery = reactive({
         chart: null,
         type: 'line',
-        startDate: '',
-        endDate: '',
+        startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+        endDate: dayjs().format('YYYY-MM-DD'),
+        data: [],
     }),
-    exceptionalDeliveryChart = ref(null) // 异常签收客户图表实例
+    exceptionalDeliveryChartRef = ref(null) // 异常签收客户图表实例
 
 let timer // 定时器变量
+let exceptionReportingChart = null, // 异常上报图表实例
+    exceptionalDeliveryChart = null // 异常签收客户图表实例
 
 onMounted(async () => {
     // 每秒更新时间
@@ -366,12 +401,12 @@ onMounted(async () => {
         timer = state.currentTime = dayjs().format('YYYY年MM月DD日 dddd HH:mm:ss')
     }, 1000)
     await nextTick()
-    await getDeliveryLocationDeviation()
-    await getSameFaceDifferentPlaces()
-    await getSameStoreDifferentFaces()
-    await getSummaryData()
-    await initExceptionReportingChart()
-    await initExceptionalDeliveryChart()
+    getDeliveryLocationDeviation()
+    getSameFaceDifferentPlaces()
+    getSameStoreDifferentFaces()
+    getSummaryData()
+    getExceptionReportingTrend()
+    getExceptionalDelivery()
 })
 
 onUnmounted(() => {
@@ -441,13 +476,78 @@ const getSummaryData = async () => {
     }
 }
 
+// 设置echart时间为本月
+const setEchartTimeToThisMonth = (val) => {
+    if (val === 'exceptionReporting') {
+        exceptionReporting.startDate = dayjs().startOf('month').format('YYYY-MM-DD')
+        exceptionReporting.endDate = dayjs().format('YYYY-MM-DD')
+        getExceptionReportingTrend()
+    } else {
+        exceptionalDelivery.startDate = dayjs().startOf('month').format('YYYY-MM-DD')
+        exceptionalDelivery.endDate = dayjs().format('YYYY-MM-DD')
+        getExceptionalDelivery()
+    }
+}
+
+// 设置echart时间为近30天
+const setEchartTimeToNearlyThirtyDays = (val) => {
+    if (val === 'exceptionReporting') {
+        exceptionReporting.startDate = dayjs().subtract(30, 'day').format('YYYY-MM-DD')
+        exceptionReporting.endDate = dayjs().format('YYYY-MM-DD')
+        console.log(exceptionReporting.startDate, exceptionReporting.endDate)
+        getExceptionReportingTrend()
+    } else {
+        exceptionalDelivery.startDate = dayjs().subtract(30, 'day').format('YYYY-MM-DD')
+        exceptionalDelivery.endDate = dayjs().format('YYYY-MM-DD')
+        getExceptionalDelivery()
+    }
+}
+
+// 获取异常上报趋势统计数据
+const getExceptionReportingTrend = async () => {
+    const params = {
+        startTime: exceptionReporting.startDate,
+        endTime: exceptionReporting.endDate,
+    }
+    const { code, data } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/exceptionInfo/stat/trend?${qs.stringify(params)}`
+    )
+    exceptionReporting.data = data
+    await initExceptionReportingChart()
+}
+
 // 初始化异常上报图表
 const initExceptionReportingChart = () => {
-    exceptionReporting.chart = echarts.init(exceptionReportingChart.value)
+    exceptionReportingChart = echarts.init(exceptionReportingChartRef.value)
+    const xAxisData = exceptionReporting.data.map((item) => item.report_date)
+    const total_exceptions = exceptionReporting.data.map((item) => item.total_exceptions)
+    // 签收地偏离
+    const sign_deviation_count = exceptionReporting.data.map((item) => item.sign_deviation_count)
+    // 同脸异地
+    const same_face_diff_location_count = exceptionReporting.data.map(
+        (item) => item.same_face_diff_location_count
+    )
+    // 同店异脸
+    const same_store_diff_face_count = exceptionReporting.data.map(
+        (item) => item.same_store_diff_face_count
+    )
     const lineOption = {
-        // tooltip: {
-        //     trigger: 'axis',
-        // },
+        legend: {},
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+            formatter: (params) => {
+                const dataIndex = params[0].dataIndex
+                return `${xAxisData[dataIndex]}
+                        <br/>
+                        签收地偏离： ${sign_deviation_count[dataIndex]}
+                        <br/>
+                        同脸异地： ${same_face_diff_location_count[dataIndex]}
+                        <br/>
+                        同店异脸： ${same_store_diff_face_count[dataIndex]}`
+            },
+        },
         grid: {
             left: '3%',
             right: '4%',
@@ -458,7 +558,7 @@ const initExceptionReportingChart = () => {
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['10-01', '10-02', '10-03', '10-04', '10-05'],
+            data: xAxisData,
             axisLine: {
                 lineStyle: {
                     color: '#303133',
@@ -472,60 +572,142 @@ const initExceptionReportingChart = () => {
                     color: '#303133',
                 },
             },
+            minInterval: 1,
+            min: 0,
         },
         series: [
             {
                 name: '异常上报',
                 type: exceptionReporting.type,
-                data: [10, 12, 11, 8, 2],
+                data: total_exceptions,
+                stack: 'Total',
                 itemStyle: {
                     color: '#348DED',
                 },
             },
         ],
     }
-    const pieOption = {
-        tooltip: {
-            trigger: 'item',
-        },
-        legend: {
-            orient: 'vertical',
-            left: 'left',
-        },
-        series: [
-            {
-                name: 'Access From',
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: 'Search Engine' },
-                    { value: 735, name: 'Direct' },
-                    { value: 580, name: 'Email' },
-                    { value: 484, name: 'Union Ads' },
-                    { value: 300, name: 'Video Ads' },
-                ],
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
-            },
-        ],
-    }
-    exceptionReporting.chart.clear()
+
+    setTimeout(() => {
+        exceptionReportingChart.resize()
+    }, 100)
+    exceptionReportingChart.clear()
     if (exceptionReporting.type === 'line') {
-        lineOption && exceptionReporting.chart.setOption(lineOption)
+        lineOption && exceptionReportingChart.setOption(lineOption)
     } else {
-        pieOption && exceptionReporting.chart.setOption(pieOption)
+        const cellSize = [80, 80]
+        const pieRadius = 30
+
+        const scatterData = exceptionReporting.data.map((item, index) => {
+            return [
+                echarts.time.format(item.report_date, '{yyyy}-{MM}-{dd}', false),
+                item.sign_deviation_count,
+                item.same_face_diff_location_count,
+                item.same_store_diff_face_count,
+            ]
+        })
+        const pieSeries = scatterData.map((item, index) => {
+            return {
+                type: 'pie',
+                id: 'pie-' + index,
+                center: item[0],
+                radius: pieRadius,
+                coordinateSystem: 'calendar',
+                label: {
+                    formatter: '{c}',
+                    position: 'inside',
+                },
+                data: [
+                    { name: '签收地偏离', value: item[1] },
+                    { name: '同脸异地', value: item[2] },
+                    { name: '同店异脸', value: item[3] },
+                ],
+            }
+        })
+        const pieOption = {
+            tooltip: {},
+            legend: {
+                data: ['签收地偏离', '同脸异地', '同店异脸'],
+                // bottom: 20,
+            },
+            calendar: {
+                top: 'middle',
+                left: 'center',
+                orient: 'vertical',
+                cellSize: cellSize,
+                yearLabel: {
+                    show: false,
+                    fontSize: 30,
+                },
+                dayLabel: {
+                    margin: 20,
+                    firstDay: 1,
+                    nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                },
+                monthLabel: {
+                    show: false,
+                },
+                range: [xAxisData[0], xAxisData[xAxisData.length - 1]],
+            },
+            series: [
+                {
+                    id: 'label',
+                    type: 'scatter',
+                    coordinateSystem: 'calendar',
+                    symbolSize: 0,
+                    label: {
+                        show: true,
+                        formatter: function (params) {
+                            return echarts.time.format(params.value[0], '{dd}', false)
+                        },
+                        offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
+                        fontSize: 14,
+                    },
+                    data: scatterData,
+                },
+                ...pieSeries,
+            ],
+        }
+        pieOption && exceptionReportingChart.setOption(pieOption)
     }
+}
+
+// 获取异常签收客户数据
+const getExceptionalDelivery = async () => {
+    const params = {
+        startTime: exceptionalDelivery.startDate,
+        endTime: exceptionalDelivery.endDate,
+    }
+    const { code, data } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/exceptionInfo/stat/customerTrend?${qs.stringify(params)}`
+    )
+    exceptionalDelivery.data = data
+    await initExceptionalDeliveryChart()
 }
 
 // 初始化异常签收客户图表
 const initExceptionalDeliveryChart = () => {
-    exceptionalDelivery.chart = echarts.init(exceptionalDeliveryChart.value)
+    exceptionalDeliveryChart = echarts.init(exceptionalDeliveryChartRef.value)
+    const xAxisData = exceptionalDelivery.data.map((item) => item.report_date)
+    // 一级预警
+    const first_level_count = exceptionalDelivery.data.map((item) => {
+        return item['1']
+    })
+    // 二级预警
+    const second_level_count = exceptionalDelivery.data.map((item) => {
+        return item['2']
+    })
+    // 三级预警
+    const third_level_count = exceptionalDelivery.data.map((item) => {
+        return item['3']
+    })
     const lineOption = {
+        legend: {},
+        tooltip: {
+            show: true,
+            trigger: 'axis',
+        },
         grid: {
             left: '3%',
             right: '4%',
@@ -536,7 +718,7 @@ const initExceptionalDeliveryChart = () => {
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['10-01', '10-02', '10-03', '10-04', '10-05'],
+            data: xAxisData,
             axisLine: {
                 lineStyle: {
                     color: '#303133',
@@ -550,53 +732,161 @@ const initExceptionalDeliveryChart = () => {
                     color: '#303133',
                 },
             },
+            minInterval: 1,
+            min: 0,
         },
         series: [
             {
-                name: '异常上报',
+                name: '一级预警',
                 type: exceptionalDelivery.type,
-                data: [10, 12, 11, 8, 2],
+                data: first_level_count,
                 itemStyle: {
-                    color: '#348DED',
+                    color: '#f34628',
                 },
             },
-        ],
-    }
-    const pieOption = {
-        tooltip: {
-            trigger: 'item',
-        },
-        legend: {
-            orient: 'vertical',
-            left: 'left',
-        },
-        series: [
             {
-                name: 'Access From',
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: 'Search Engine' },
-                    { value: 735, name: 'Direct' },
-                    { value: 580, name: 'Email' },
-                    { value: 484, name: 'Union Ads' },
-                    { value: 300, name: 'Video Ads' },
-                ],
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
+                name: '二级预警',
+                type: exceptionalDelivery.type,
+                data: second_level_count,
+                itemStyle: {
+                    color: '#303133',
+                },
+            },
+            {
+                name: '三级预警',
+                type: exceptionalDelivery.type,
+                data: third_level_count,
+                itemStyle: {
+                    color: '#feea33',
                 },
             },
         ],
     }
-    exceptionalDelivery.chart.clear()
+    // const pieOption = {
+    //     tooltip: {
+    //         trigger: 'item',
+    //     },
+    //     legend: {
+    //         orient: 'vertical',
+    //         left: 'left',
+    //     },
+    //     series: [
+    //         {
+    //             name: 'Access From',
+    //             type: 'pie',
+    //             radius: '50%',
+    //             data: [
+    //                 { value: 1048, name: 'Search Engine' },
+    //                 { value: 735, name: 'Direct' },
+    //                 { value: 580, name: 'Email' },
+    //                 { value: 484, name: 'Union Ads' },
+    //                 { value: 300, name: 'Video Ads' },
+    //             ],
+    //             emphasis: {
+    //                 itemStyle: {
+    //                     shadowBlur: 10,
+    //                     shadowOffsetX: 0,
+    //                     shadowColor: 'rgba(0, 0, 0, 0.5)',
+    //                 },
+    //             },
+    //         },
+    //     ],
+    // }
+    exceptionalDeliveryChart.clear()
     if (exceptionalDelivery.type === 'line') {
-        lineOption && exceptionalDelivery.chart.setOption(lineOption)
+        lineOption && exceptionalDeliveryChart.setOption(lineOption)
     } else {
-        pieOption && exceptionalDelivery.chart.setOption(pieOption)
+        const cellSize = [80, 80]
+        const pieRadius = 30
+
+        const scatterData = exceptionalDelivery.data.map((item, index) => {
+            return [
+                echarts.time.format(item.report_date, '{yyyy}-{MM}-{dd}', false),
+                item[1],
+                item[2],
+                item[3],
+            ]
+        })
+        const pieSeries = scatterData.map((item, index) => {
+            return {
+                type: 'pie',
+                id: 'pie-' + index,
+                center: item[0],
+                radius: pieRadius,
+                coordinateSystem: 'calendar',
+                label: {
+                    formatter: '{c}',
+                    position: 'inside',
+                },
+                data: [
+                    {
+                        name: '一级预警',
+                        value: item[1],
+                        itemStyle: {
+                            color: '#f34628',
+                        },
+                    },
+                    {
+                        name: '二级预警',
+                        value: item[2],
+                        itemStyle: {
+                            color: '#303133',
+                        },
+                    },
+                    {
+                        name: '三级预警',
+                        value: item[3],
+                        itemStyle: {
+                            color: '#feea33',
+                        },
+                    },
+                ],
+            }
+        })
+        const pieOption = {
+            tooltip: {},
+            legend: {
+                data: ['一级预警', '二级预警', '三级预警'],
+            },
+            calendar: {
+                top: 'middle',
+                left: 'center',
+                orient: 'vertical',
+                cellSize: cellSize,
+                yearLabel: {
+                    show: false,
+                    fontSize: 30,
+                },
+                dayLabel: {
+                    margin: 20,
+                    firstDay: 1,
+                    nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                },
+                monthLabel: {
+                    show: false,
+                },
+                range: [xAxisData[0], xAxisData[xAxisData.length - 1]],
+            },
+            series: [
+                {
+                    id: 'label',
+                    type: 'scatter',
+                    coordinateSystem: 'calendar',
+                    symbolSize: 0,
+                    label: {
+                        show: true,
+                        formatter: function (params) {
+                            return echarts.time.format(params.value[0], '{dd}', false)
+                        },
+                        offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
+                        fontSize: 14,
+                    },
+                    data: scatterData,
+                },
+                ...pieSeries,
+            ],
+        }
+        pieOption && exceptionalDeliveryChart.setOption(pieOption)
     }
 }
 </script>
