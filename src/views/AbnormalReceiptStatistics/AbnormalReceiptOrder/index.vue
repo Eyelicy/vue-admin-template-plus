@@ -35,7 +35,11 @@
             </div>
             <div class="table-header">
                 <div class="table-header-lab">客户预警等级</div>
-                <el-input v-model="query.alertLevel" clearable> </el-input>
+                <el-select v-model="query.alertLevel" placeholder="请选择预警等级" clearable>
+                    <el-option label="红标客户（一级预警）" :value="1" />
+                    <el-option label="黑标客户（二级预警）" :value="2" />
+                    <el-option label="黄标客户（三级预警）" :value="3" />
+                </el-select>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
@@ -67,25 +71,31 @@
                 </el-table-column>
                 <el-table-column prop="orderSn" label="订单编号">
                     <template #default="{ row }">
-                        {{ row?.orderSn  }}
+                        {{ row?.orderSn }}
                         <copy-document :val="row?.orderSn" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="order.customer.customerName" label="客户名称">
                     <template #default="{ row }">
-                        {{ row?.order?.customer?.customerName }}
+                        <el-link
+                            type="primary"
+                            :underline="false"
+                            @click="router.push(`/abnormal-receipt-statistics/abnormal-receipt-customer/edit/${row?.order?.customer?.customerCode }`)"
+                        >
+                            {{ row?.order?.customer?.customerName }}
+                        </el-link>
                         <copy-document :val="row?.order?.customer?.customerName" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderAddress" label="签收地址">
                     <template #default="{ row }">
-                        {{ row?.orderAddress  }}
+                        {{ row?.orderAddress }}
                         <copy-document :val="row?.orderAddress" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="shippingOrder.shippingSn" label="运输单号">
                     <template #default="{ row }">
-                        {{ row?.shippingOrder.shippingSn  }}
+                        {{ row?.shippingOrder.shippingSn }}
                         <copy-document :val="row?.shippingOrder.shippingSn" />
                     </template>
                 </el-table-column>
@@ -160,6 +170,11 @@ const getTableData = async (init) => {
         pageNum: page.index,
         pageSize: page.size,
         ...query,
+    }
+    if (query.alertLevel) {
+        params.alertLevel = query.alertLevel
+    } else {
+        params.alertLevel = -1
     }
     if (query.datetimerange && query.datetimerange.length > 0) {
         params.createTimeStart = query.datetimerange[0]

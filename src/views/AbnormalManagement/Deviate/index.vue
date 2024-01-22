@@ -94,8 +94,9 @@
                 v-loading="state.loading"
                 :data="state.tableData"
                 @getTableData="getTableData"
+                style="width: 100%"
             >
-                <el-table-column prop="code" label="异常上报编号">
+                <el-table-column prop="code" label="异常上报编号" width="230">
                     <template #default="{ row }">
                         <el-link
                             type="primary"
@@ -155,7 +156,7 @@
                         <copy-document :val="row.shippingOrderSn" />
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="380px">
+                <el-table-column label="操作" width="380px" fixed="right">
                     <template #default="{ row }">
                         <el-button @click="handleEditRemark(row.code)">备注</el-button>
                         <el-button @click="handleShowForward(row)">转发</el-button>

@@ -95,7 +95,7 @@
                 :data="state.tableData"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="code" label="异常上报编号">
+                <el-table-column prop="code" label="异常上报编号" width="230">
                     <template #default="{ row }">
                         <el-link
                             type="primary"

@@ -118,7 +118,7 @@ export const routes = [
                 },
                 children: [
                     {
-                        path: 'abnormal-receipt-customer',
+                        path: 'abnormal-receipt-customer/:customerName?',
                         name: 'AbnormalReceiptCustomer',
                         meta: {
                             title: '异常签收客户',

@@ -139,9 +139,11 @@ import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute()
+const route = useRoute(),
+    router = useRouter()
+
 const state = reactive({
         labelId: '',
         customerCode: '',

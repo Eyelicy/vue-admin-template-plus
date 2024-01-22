@@ -103,7 +103,8 @@
                         >
                         <!-- <span>【{{ item?.order?.customer?.customerName }}】</span> -->
                         <!-- {{ JSON.parse(item?.details).locationSet }} -->
-                        <Vue3Marquee :pause-on-hover="true" class=" cursor-pointer">
+                        <!-- :pause-on-hover="true" -->
+                        <Vue3Marquee class="cursor-pointer">
                             <template
                                 class="h-[24px]"
                                 v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
@@ -248,8 +249,12 @@
                     value-format="YYYY-MM-DD"
                 />
                 <el-button type="primary" @click="getExceptionReportingTrend">查询</el-button>
-                <el-button type="primary" class="mr-auto" 
-                    @click="setEchartTimeToThisMonth('exceptionReporting')">重置</el-button>
+                <el-button
+                    type="primary"
+                    class="mr-auto"
+                    @click="setEchartTimeToThisMonth('exceptionReporting')"
+                    >重置</el-button
+                >
                 <el-button
                     type="primary"
                     plain
@@ -288,7 +293,7 @@
             <div
                 ref="exceptionReportingChartRef"
                 id="exceptionReportingChartRef"
-                class="w-full h-[500px]"
+                class="w-full h-[680px]"
             ></div>
         </div>
         <!-- 异常上报趋势统计 end -->
@@ -315,7 +320,12 @@
                     class="mr-4"
                 />
                 <el-button type="primary" @click="getExceptionalDelivery">查询</el-button>
-                <el-button type="primary" class="mr-auto" @click="setEchartTimeToThisMonth('exceptionalDelivery')">重置</el-button>
+                <el-button
+                    type="primary"
+                    class="mr-auto"
+                    @click="setEchartTimeToThisMonth('exceptionalDelivery')"
+                    >重置</el-button
+                >
                 <el-button
                     type="primary"
                     plain
@@ -354,7 +364,7 @@
             <div
                 ref="exceptionalDeliveryChartRef"
                 id="exceptionalDeliveryChartRef"
-                class="w-full h-[500px]"
+                class="w-full h-[680px]"
             ></div>
         </div>
         <!-- 异常上报趋势统计 end -->
@@ -602,8 +612,8 @@ const initExceptionReportingChart = () => {
     if (exceptionReporting.type === 'line') {
         lineOption && exceptionReportingChart.setOption(lineOption)
     } else {
-        const cellSize = [80, 80]
-        const pieRadius = 30
+        const cellSize = [140, 140]
+        const pieRadius = 60
 
         const scatterData = exceptionReporting.data.map((item, index) => {
             return [
@@ -803,8 +813,8 @@ const initExceptionalDeliveryChart = () => {
     if (exceptionalDelivery.type === 'line') {
         lineOption && exceptionalDeliveryChart.setOption(lineOption)
     } else {
-        const cellSize = [80, 80]
-        const pieRadius = 30
+        const cellSize = [140, 140]
+        const pieRadius = 60
 
         const scatterData = exceptionalDelivery.data.map((item, index) => {
             return [

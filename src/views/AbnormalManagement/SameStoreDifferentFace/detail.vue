@@ -52,7 +52,12 @@
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">同店多脸信息</div>
             <div class="flex">
-                <Table :data=" details?.details?.multiFaceInfo" :showPage="false" border style="width: 100%">
+                <Table
+                    :data="details?.details?.multiFaceInfo"
+                    :showPage="false"
+                    border
+                    style="width: 100%"
+                >
                     <el-table-column label="人脸">
                         <template #default="{ row }">
                             <el-image
@@ -66,7 +71,22 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" label="人名" />
-                    <el-table-column prop="probability" label="概率" />
+                    <el-table-column prop="probability" label="概率">
+                        <template #default="{ row }">
+                            概率
+                            {{
+                                `${
+                                    (row?.cnt /
+                                        details?.details?.multiFaceInfo.reduce(
+                                            (total, obj) => total + obj.cnt,
+                                            0
+                                        )) *
+                                    100
+                                }%`
+                            }}
+                            （{{ row?.cnt ?? 0 }}次）
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="label" label="备注" />
                 </Table>
             </div>
@@ -128,8 +148,8 @@
             </div>
         </div>
     </div>
-     <!-- 处理日志dialog -->
-     <log-dialog
+    <!-- 处理日志dialog -->
+    <log-dialog
         width="80%"
         v-model="state.logDialogVisible"
         :data="details.exceptionHandlingList"

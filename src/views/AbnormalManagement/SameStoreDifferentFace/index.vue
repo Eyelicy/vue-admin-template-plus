@@ -11,7 +11,7 @@
             <div class="table-header">
                 <div class="table-header-lab">状态</div>
                 <abnormal-order-status-select
-                class="w-[200px]"
+                    class="w-[200px]"
                     v-model="query.status"
                     placeholder="请选择状态"
                     clearable
@@ -95,7 +95,7 @@
                 :data="state.tableData"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="code" label="异常上报编号">
+                <el-table-column prop="code" label="异常上报编号" width="230">
                     <template #default="{ row }">
                         <el-link
                             type="primary"
@@ -168,7 +168,18 @@
                                             {{ item.name }}
                                         </div>
                                         <div class="text-xl text-help mb-4">
-                                            概率: {{ item.probability }}
+                                            概率
+                                            {{
+                                                `${
+                                                    (item?.cnt /
+                                                        row?.details?.multiFaceInfo.reduce(
+                                                            (total, obj) => total + obj.cnt,
+                                                            0
+                                                        )) *
+                                                    100
+                                                }%`
+                                            }}
+                                            （{{ item?.cnt ?? 0 }}次）
                                         </div>
                                         <div class="text-xl text-help">备注: {{ item.label }}</div>
                                     </div>
@@ -313,6 +324,8 @@ const getTableData = async (init) => {
         pageSize: page.size,
         exceptionType: 'B', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
         ...query,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
     }
     if (params.datetimerange && params.datetimerange.length > 0) {
         params.createTimeStart = query.datetimerange[0]
