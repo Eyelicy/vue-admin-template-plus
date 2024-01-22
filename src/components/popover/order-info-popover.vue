@@ -18,7 +18,7 @@
         popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
     >
         <template #reference>
-            <div class=" cursor-pointer">
+            <div class="cursor-pointer inline order-info-popover">
                 <slot></slot>
                 <el-icon class="ml-2"><View /></el-icon>
             </div>

@@ -19,12 +19,12 @@ tobacco.interceptors.request.use(
         const {
             token,
             userInfo: { guid },
-            storeId,
+            userInfo,
         } = useUserStore()
         config.headers.Authorization = `app_guid=${appGuid};`
         token && (config.headers.token = token)
         guid && (config.headers.UserGuid = guid)
-        storeId && (config.headers.storeId = storeId)
+        userInfo?.user_staff?.guid && (config.headers.StaffGuid = userInfo?.user_staff?.guid)
         return config
     },
     (error) => {
@@ -51,7 +51,7 @@ export const tobaccoApi = async (method, url, info) => {
             })
         }
     } catch (err) {
-        console.log(err);
+        console.log(err)
         if (err.response.status == '401')
             ElMessage.error('当前请求需要用户验证，刷新当前页面或重新登录！')
         else if (err.response.status == '403') ElMessage.error('您没有权限访问！')

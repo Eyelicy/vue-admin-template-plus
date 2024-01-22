@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <el-select v-bind="$attrs">
+    <el-select v-bind="$attrs" >
         <el-option
             v-for="(item, key) in abnormalOrderStatus"
             :key="key"

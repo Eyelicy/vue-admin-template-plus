@@ -54,7 +54,7 @@
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
-            <div class="grid grid-cols-12 gap-4 gap-y-8 items-center">
+            <div class="flex flex-wrap items-center">
                 <el-tag
                     v-for="tag in details.labelList"
                     type="success"

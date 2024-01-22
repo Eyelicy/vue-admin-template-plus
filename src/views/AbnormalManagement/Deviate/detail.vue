@@ -100,7 +100,7 @@
                     details?.shippingOrder?.shippingDate ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="车辆牌照">{{
-                    details?.shippingOrder?.vehicleCode ?? '--'
+                    details?.shippingOrder?.licensePlate ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="运输人">{{
                     details?.shippingOrder?.deliveryPersonCode ?? '--'

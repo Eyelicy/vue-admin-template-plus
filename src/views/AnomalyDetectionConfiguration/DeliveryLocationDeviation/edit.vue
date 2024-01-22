@@ -15,9 +15,7 @@
                 <p class="text-title">更新者：</p>
                 <p>{{ detail.updateBy ?? '--' }}</p>
             </div>
-            <el-button round class="ml-auto" @click="state.logDialogVisible = true"
-                >查看日志
-            </el-button>
+            <el-button round class="ml-auto" @click="handleShowLog(detail.id)">查看日志 </el-button>
             <el-button round type="danger" @click="handleDelete">删除 </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-4 gap-4">
@@ -49,16 +47,14 @@
                     @click="state.centralizedSigningPointDialogVisible = true"
                     >集中签收点
                 </el-button>
-                <el-button type="primary" @click="getCentralizedSigningPointData" :loading="state.loading"
+                <el-button
+                    type="primary"
+                    @click="getCentralizedSigningPointData"
+                    :loading="state.loading"
                     >刷新同步
                 </el-button>
             </div>
-            <Table
-                :data="state.tableData"
-                height="380px"
-                v-loading="state.loading"
-                :page="page"
-            >
+            <Table :data="state.tableData" height="380px" v-loading="state.loading" :page="page">
                 <el-table-column prop="name" label="集中签收点名称"> </el-table-column>
                 <el-table-column prop="address" label="集中签收点地址" />
                 <el-table-column prop="坐标" label="坐标">
@@ -70,13 +66,12 @@
                         }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="启用状态" >
+                <el-table-column prop="status" label="启用状态">
                     <template #default="{ row }">
                         <el-switch
                             v-model="row.status"
                             active-value="A"
                             inactive-value="D"
-                            
                             :loading="state.statusLoading"
                             @change="handleEditStatus(row)"
                         />
@@ -85,26 +80,13 @@
             </Table>
         </div>
     </div>
-    <Dialog width="600px" v-model="state.logDialogVisible" title="操作日志" center>
-        <div
-            class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in 3"
-            :key="index"
-        >
-            <div class="mb-[1.6rem]">
-                <label>日期时间：</label>
-                <span>2021-08-09 12:00:00</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理操作：</label>
-                <span>转发下一级</span>
-            </div>
-            <div>
-                <label>操作人：</label>
-                <span>-</span>
-            </div>
-        </div>
-    </Dialog>
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
     <Dialog
         width="600px"
         v-model="state.centralizedSigningPointDialogVisible"
@@ -210,6 +192,23 @@ onMounted(async () => {
     await getCentralizedSigningPointData()
 })
 
+// 查看日志
+const handleShowLog = async () => {
+    state.logDialogVisible = true
+    await getLogData()
+}
+
+// 获取日志数据
+const getLogData = async () => {
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/signingDeviationConfigHis/list?id=${detail.id}`)
+    if (code === 200) {
+        state.exceptionHandlingList = rows
+    }
+}
+
 // 删除签收地偏离配置
 const handleDelete = async () => {
     try {
@@ -285,11 +284,7 @@ const handleAddCentralizedSigningPoint = async (formEl) => {
 // 修改集中签收点状态
 const handleEditStatus = async (row) => {
     state.statusLoading = true
-    const { code } = await tobaccoApi(
-        'put',
-        `/api/v1/tobacco/unifiedSigningPoint`,
-        row
-    )
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/unifiedSigningPoint`, row)
     if (code === 200) {
         ElMessage.success('修改成功')
         await getCentralizedSigningPointData()

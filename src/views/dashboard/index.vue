@@ -103,13 +103,20 @@
                         >
                         <!-- <span>【{{ item?.order?.customer?.customerName }}】</span> -->
                         <!-- {{ JSON.parse(item?.details).locationSet }} -->
-                        <div class="flex flex-auto whitespace-nowrap overflow-hidden">
+                        <Vue3Marquee :pause-on-hover="true" class=" cursor-pointer">
                             <template
                                 class="h-[24px]"
                                 v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
                                 >{{ item.customerName }} {{ item.signingTime }}签收
                             </template>
-                        </div>
+                        </Vue3Marquee>
+                        <!-- <div class="flex flex-auto whitespace-nowrap overflow-hidden">
+                            <template
+                                class="h-[24px]"
+                                v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
+                                >{{ item.customerName }} {{ item.signingTime }}签收
+                            </template>
+                        </div> -->
                         <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4 flex-shrink-0"

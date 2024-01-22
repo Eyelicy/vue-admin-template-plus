@@ -1,3 +1,5 @@
+import { ElMessage } from 'element-plus'
+
 export const getImageUrl = (name) => {
     return new URL(`../assets/img/${name}`, import.meta.url).href
 }
@@ -139,5 +141,38 @@ export const isDischarge = (date1, data2) => {
         return false
     } else if (d1 > d2) {
         return true
+    }
+}
+
+
+/**
+ *
+ * 复制文本到剪贴板
+ * @param {string} text - 文本
+ * @returns
+ */
+export const copyTextToClipboard = async (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+        // navigator clipboard 向剪贴板写文本
+        await navigator.clipboard.writeText(text)
+        ElMessage.success('复制成功！')
+    } else {
+        // 创建text area
+        let textArea = document.createElement('textarea')
+        textArea.value = text
+        // 使text area不在viewport，同时设置不可见
+        textArea.style.position = 'absolute'
+        textArea.style.opacity = '0'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        ElMessage.success('复制成功！')
+        return new Promise((res, rej) => {
+            // 执行复制命令并移除文本框
+            document.execCommand('copy') ? res(text) : rej()
+            textArea.remove()
+        })
     }
 }

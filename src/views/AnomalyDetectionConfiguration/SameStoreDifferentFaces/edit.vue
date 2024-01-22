@@ -15,9 +15,7 @@
                 <p class="text-title">更新者：</p>
                 <p>{{ configuration.updateBy ?? '--' }}</p>
             </div>
-            <el-button round class="ml-auto" @click="state.logDialogVisible = true"
-                >查看日志
-            </el-button>
+            <el-button round class="ml-auto" @click="handleShowLog">查看日志 </el-button>
             <el-button round type="danger" @click="handleDelete">删除 </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-4 gap-4 mb-[5.6rem]">
@@ -37,31 +35,18 @@
             <el-button round type="primary" class="w-[120px]" @click="handleSave">保存</el-button>
         </div>
     </div>
-    <Dialog width="600px" v-model="state.logDialogVisible" title="操作日志" center>
-        <div
-            class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in 3"
-            :key="index"
-        >
-            <div class="mb-[1.6rem]">
-                <label>日期时间：</label>
-                <span>2021-08-09 12:00:00</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理操作：</label>
-                <span>转发下一级</span>
-            </div>
-            <div>
-                <label>操作人：</label>
-                <span>-</span>
-            </div>
-        </div>
-    </Dialog>
+    
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
 </template>
 
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
-import Dialog from '@/components/dialog/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { onMounted, reactive } from 'vue'
@@ -96,6 +81,26 @@ onMounted(async () => {
     configuration.id = route.params.id // 获取同店异脸配置id
     await getConfigurationDetail() // 获取同店异脸配置详情
 })
+
+// 查看日志
+const handleShowLog = async () => {
+    state.logDialogVisible = true
+    await getLogData()
+}
+
+// 获取日志数据
+const getLogData = async () => {
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingMultiFacesConfigHis/list?id=${configuration.id}`
+    )
+    if (code === 200) {
+        state.exceptionHandlingList = rows
+    }
+}
 
 // 删除同店异脸配置
 const handleDelete = async () => {

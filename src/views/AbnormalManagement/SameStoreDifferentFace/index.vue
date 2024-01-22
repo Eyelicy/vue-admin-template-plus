@@ -11,6 +11,7 @@
             <div class="table-header">
                 <div class="table-header-lab">状态</div>
                 <abnormal-order-status-select
+                class="w-[200px]"
                     v-model="query.status"
                     placeholder="请选择状态"
                     clearable
@@ -19,31 +20,16 @@
             <div class="table-header">
                 <div class="table-header-lab">异常上报时间</div>
                 <el-date-picker
-                    v-model="query.createTimeStart"
-                    type="datetime"
-                    placeholder="开始时间"
-                    clearable
-                    style="width: 100px"
+                    :default-time="[
+                        new Date(2000, 1, 1, 0, 0, 0),
+                        new Date(2000, 2, 1, 23, 59, 59),
+                    ]"
+                    v-model="query.datetimerange"
+                    type="datetimerange"
+                    range-separator="至"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
                     value-format="YYYY-MM-DD HH:mm:ss"
-                    :picker-options="{
-                        disabledDate: (time) => {
-                            return time.getTime() > Date.now()
-                        },
-                    }"
-                />
-                <span class="mx-2">至</span>
-                <el-date-picker
-                    v-model="query.createTimeEnd"
-                    type="datetime"
-                    placeholder="结束时间"
-                    clearable
-                    style="width: 100px"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    :picker-options="{
-                        disabledDate: (time) => {
-                            return time.getTime() > Date.now()
-                        },
-                    }"
                 />
             </div>
             <!-- 暂无 -->
@@ -121,6 +107,7 @@
                             "
                             >{{ row.code }}
                         </el-link>
+                        <copy-document :val="row.code" />
                     </template>
                 </el-table-column>
                 <el-table-column prop="status" label="状态">
@@ -201,9 +188,15 @@
                         <order-info-popover :value="row">
                             {{ row.orderSn }}
                         </order-info-popover>
+                        <copy-document :val="row.orderSn" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="shippingOrderSn" label="运输单号" />
+                <el-table-column prop="shippingOrderSn" label="运输单号">
+                    <template #default="{ row }">
+                        {{ row.shippingOrderSn }}
+                        <copy-document :val="row.shippingOrderSn" />
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="380px">
                     <template #default="{ row }">
                         <el-button @click="handleEditRemark(row.code)">备注</el-button>
@@ -320,6 +313,11 @@ const getTableData = async (init) => {
         pageSize: page.size,
         exceptionType: 'B', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
         ...query,
+    }
+    if (params.datetimerange && params.datetimerange.length > 0) {
+        params.createTimeStart = query.datetimerange[0]
+        params.createTimeEnd = query.datetimerange[1]
+        delete params.datetimerange
     }
     try {
         const {

@@ -6,31 +6,16 @@
             <div class="table-header">
                 <div class="table-header-lab">异常预警时间</div>
                 <el-date-picker
-                    v-model="query.createTimeStart"
-                    type="datetime"
-                    placeholder="开始时间"
-                    clearable
-                    style="width: 100px"
+                    :default-time="[
+                        new Date(2000, 1, 1, 0, 0, 0),
+                        new Date(2000, 2, 1, 23, 59, 59),
+                    ]"
+                    v-model="query.datetimerange"
+                    type="datetimerange"
+                    range-separator="至"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
                     value-format="YYYY-MM-DD HH:mm:ss"
-                    :picker-options="{
-                        disabledDate: (time) => {
-                            return time.getTime() > Date.now()
-                        },
-                    }"
-                />
-                <span class="mx-2">至</span>
-                <el-date-picker
-                    v-model="query.createTimeEnd"
-                    type="datetime"
-                    placeholder="结束时间"
-                    clearable
-                    style="width: 100px"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    :picker-options="{
-                        disabledDate: (time) => {
-                            return time.getTime() > Date.now()
-                        },
-                    }"
                 />
             </div>
             <div class="table-header">
@@ -80,9 +65,30 @@
                         {{ exceptionStatus[row.exceptionType] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="orderSn" label="订单编号" />
-                <el-table-column prop="order.customer.contactPerson" label="客户名称" />
-                <el-table-column prop="orderAddress" label="签收地址" />
+                <el-table-column prop="orderSn" label="订单编号">
+                    <template #default="{ row }">
+                        {{ row?.orderSn  }}
+                        <copy-document :val="row?.orderSn" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="order.customer.customerName" label="客户名称">
+                    <template #default="{ row }">
+                        {{ row?.order?.customer?.customerName }}
+                        <copy-document :val="row?.order?.customer?.customerName" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="orderAddress" label="签收地址">
+                    <template #default="{ row }">
+                        {{ row?.orderAddress  }}
+                        <copy-document :val="row?.orderAddress" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="shippingOrder.shippingSn" label="运输单号">
+                    <template #default="{ row }">
+                        {{ row?.shippingOrder.shippingSn  }}
+                        <copy-document :val="row?.shippingOrder.shippingSn" />
+                    </template>
+                </el-table-column>
                 <el-table-column prop="order.skuCount" label="品种数" />
                 <el-table-column prop="order.quantity" label="总盒数" />
                 <el-table-column prop="order.amount" label="总金额（元）" />
@@ -154,6 +160,11 @@ const getTableData = async (init) => {
         pageNum: page.index,
         pageSize: page.size,
         ...query,
+    }
+    if (query.datetimerange && query.datetimerange.length > 0) {
+        params.createTimeStart = query.datetimerange[0]
+        params.createTimeEnd = query.datetimerange[1]
+        delete params.datetimerange
     }
     try {
         const {

@@ -1,5 +1,5 @@
 <template>
-    <el-menu class="pt-12" router :default-active="activeIndex">
+    <el-menu class="pt-12" router :default-active="activeIndex" unique-opened	>
         <menu-item v-for="(menu, key) in menusList" :key="key" :menu="menu" />
     </el-menu>
 </template>

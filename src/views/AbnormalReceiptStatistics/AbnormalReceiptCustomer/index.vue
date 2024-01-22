@@ -5,47 +5,28 @@
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">预警等级</div>
-                <el-select v-model="query.status" placeholder="请选择预警等级" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
+                <el-select v-model="query.alertLevel" placeholder="请选择预警等级" clearable>
+                    <el-option label="红标客户（一级预警）" :value="1" />
+                    <el-option label="黑标客户（二级预警）" :value="2" />
+                    <el-option label="黄标客户（三级预警）" :value="3" />
                 </el-select>
             </div>
+
             <div class="table-header">
                 <div class="table-header-lab">派送员</div>
-                <el-select v-model="query.status" placeholder="请选择派送员" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
+                <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">送货路线</div>
-                <el-select v-model="query.status" placeholder="请选择送货路线" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
+                <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
             </div>
             <div class="table-header">
-                <div class="table-header-lab">客户名称</div>
-                <el-select v-model="query.status" placeholder="输入关键字模糊检索" clearable>
-                    <el-option
-                        v-for="item in state.statusList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    />
-                </el-select>
+                <div class="table-header-lab">包含客户</div>
+                <client-select
+                    v-model="query.customerName"
+                    placeholder="请选择包含客户"
+                    clearable
+                />
             </div>
         </TableHead>
         <div class="flex-auto flex flex-col">
@@ -119,6 +100,8 @@
 
 <script setup>
 import Dialog from '@/components/dialog/index.vue'
+import clientSelect from '@/components/select/client-select.vue'
+import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
@@ -192,8 +175,12 @@ const getTableData = async (init) => {
     let params = {
         pageNum: page.index,
         pageSize: page.size,
-        alertLevel: -1,
         ...query,
+    }
+    if (query.alertLevel) {
+        params.alertLevel = query.alertLevel
+    } else {
+        params.alertLevel = -1
     }
     try {
         const {

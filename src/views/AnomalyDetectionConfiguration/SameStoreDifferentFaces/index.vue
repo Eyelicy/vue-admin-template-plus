@@ -77,7 +77,7 @@
                             "
                             >编辑</el-button
                         >
-                        <el-button @click="state.logDialogVisible = true">日志</el-button>
+                        <el-button @click="handleShowLog(row)">日志</el-button>
                         <el-popconfirm
                             title="请确认是否删除该条数据？"
                             @confirm="handleDelete(row)"
@@ -91,26 +91,13 @@
             </Table>
         </div>
     </div>
-    <Dialog width="600px" v-model="state.logDialogVisible" title="操作日志" center>
-        <div
-            class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in 3"
-            :key="index"
-        >
-            <div class="mb-[1.6rem]">
-                <label>日期时间：</label>
-                <span>2021-08-09 12:00:00</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理操作：</label>
-                <span>转发下一级</span>
-            </div>
-            <div>
-                <label>操作人：</label>
-                <span>-</span>
-            </div>
-        </div>
-    </Dialog>
+    <log-dialog
+        width="80%"
+        v-model="state.logDialogVisible"
+        :data="state.exceptionHandlingList"
+        center
+    >
+    </log-dialog>
     <Dialog
         width="600px"
         v-model="state.addConfigurationDialogVisible"
@@ -213,6 +200,23 @@ const router = useRouter(),
 onMounted(async () => {
     await getTableData(true)
 })
+
+// 查看日志
+const handleShowLog = async (row) => {
+    state.logDialogVisible = true
+    await getLogData(row.id)
+}
+
+// 获取日志数据
+const getLogData = async (id) => {
+    const {
+        code,
+        data: { rows },
+    } = await tobaccoApi('get', `/api/v1/tobacco/signingMultiLocationsConfigHis/list?id=${id}`)
+    if (code === 200) {
+        state.exceptionHandlingList = rows
+    }
+}
 
 // 新增同店异脸配置
 const handleAddConfiguration = async (formEl) => {

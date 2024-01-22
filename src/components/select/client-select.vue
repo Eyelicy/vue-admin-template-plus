@@ -13,8 +13,8 @@
         <el-option
             v-for="(item,index) in state.lineList"
             :key="index"
-            :label="item.contactPerson"
-            :value="item.contactPerson"
+            :label="item.customerName"
+            :value="item.customerName"
         />
     </el-select>
 </template>

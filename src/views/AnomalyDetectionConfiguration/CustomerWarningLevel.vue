@@ -16,7 +16,7 @@
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">异常客户自定义分类管理</div>
-            <div class="flex items-center">
+            <div class="flex flex-wrap items-center">
                 <el-tag
                     v-for="tag in state.warningLevelData"
                     :key="tag.id"
