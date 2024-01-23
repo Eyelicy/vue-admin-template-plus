@@ -96,7 +96,7 @@
                 @getTableData="getTableData"
                 style="width: 100%"
             >
-                <el-table-column prop="code" label="异常上报编号" width="230">
+                <el-table-column prop="code"  label="异常上报编号" width="230">
                     <template #default="{ row }">
                         <el-link
                             type="primary"
@@ -116,7 +116,7 @@
                         {{ abnormalOrderStatus[row.status] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="异常上报时间" />
+                <el-table-column prop="createTime" sortable label="异常上报时间" />
                 <el-table-column prop="order_code" label="实际签收地">
                     <template #default="{ row }">
                         {{ JSON.parse(row.details).address }}
@@ -137,10 +137,10 @@
                         {{ row.orderLongitude }},{{ row.orderLatitude }}
                     </template>
                 </el-table-column>
-                <el-table-column label="偏差距离" sortable>
-                    <template #default="{ row }">
+                <el-table-column prop="deviation" label="偏差距离" sortable>
+                    <!-- <template #default="{ row }">
                         {{ JSON.parse(row.details).deviation }}
-                    </template>
+                    </template> -->
                 </el-table-column>
                 <el-table-column prop="orderSn" label="订单编号">
                     <template #default="{ row }">
@@ -288,6 +288,9 @@ const getTableData = async (init) => {
         const {
             data: { rows, total },
         } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
+        rows.forEach((element,index) => {
+            rows[index].deviation = JSON.parse(element.details).deviation
+        });
         state.tableData = rows
         page.total = Number(total)
     } catch (error) {

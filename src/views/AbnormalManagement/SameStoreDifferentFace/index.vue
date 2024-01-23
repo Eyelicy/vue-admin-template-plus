@@ -115,7 +115,7 @@
                         {{ abnormalOrderStatus[row.status] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="异常上报时间" />
+                <el-table-column prop="createTime" sortable label="异常上报时间" />
                 <el-table-column prop="customerName" label="签收店名">
                     <template #default="{ row }">
                         {{ row.details.customerName }}
@@ -128,7 +128,7 @@
                         </registrant-info-popover>
                     </template>
                 </el-table-column>
-                <el-table-column prop="order_code" label="多脸信息集合">
+                <el-table-column prop="faceCount" sortable label="多脸信息集合">
                     <template #default="{ row }">
                         <el-popover
                             width="300"
@@ -338,6 +338,7 @@ const getTableData = async (init) => {
         } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
         rows.forEach((item) => {
             item.details = JSON.parse(item.details)
+            item.faceCount = item.details?.multiFaceInfo?.length
         })
         state.tableData = rows
         console.log(state.tableData)

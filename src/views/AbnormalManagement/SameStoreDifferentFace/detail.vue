@@ -134,13 +134,13 @@
                     details?.shippingOrder?.licensePlate ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="运输人">{{
-                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                    details?.shippingOrder?.driver?.name ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="驾驶证号">{{
                     details?.shippingOrder?.driver?.driverLicense ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="配送人">{{
-                    details?.shippingOrder?.deliveryPersonCode ?? '--'
+                    details?.shippingOrder?.deliveryPerson?.name?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="身份证号"
                     >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}

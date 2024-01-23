@@ -115,7 +115,7 @@
                         {{ abnormalOrderStatus[row.status] }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="异常上报时间" />
+                <el-table-column prop="createTime" sortable label="异常上报时间" />
                 <el-table-column prop="order_code" label="同脸图像">
                     <template #default="{ row }">
                         <el-image
@@ -135,7 +135,7 @@
                         </registrant-info-popover>
                     </template>
                 </el-table-column>
-                <el-table-column prop="order_code" label="出现地集合">
+                <el-table-column prop="placeCount" sortable label="出现地集合">
                     <template #default="{ row }">
                         <el-popover
                             width="240"
@@ -327,6 +327,7 @@ const getTableData = async (init) => {
         } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
         rows.forEach((item) => {
             item.details = JSON.parse(item.details)
+            item.placeCount = item.details?.locationSet?.length
         })
         state.tableData = rows
         console.log(state.tableData)
