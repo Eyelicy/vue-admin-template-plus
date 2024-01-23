@@ -47,7 +47,9 @@
                     details?.customerDeliveryInfo?.deliveryRoute?.stationCode ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="关联派送员">{{
-                    details?.deliveryPersonnelNames ?? '--'
+                    details?.deliveryPersonnelList?.length !== 0
+                        ? details?.deliveryPersonnelList?.map((item) => item.name).join(',')
+                        : null ?? '--'
                 }}</descriptions-item>
             </div>
         </div>
@@ -196,6 +198,7 @@ const handleAddTag = async () => {
     if (code === 200) {
         ElMessage.success('新增成功')
         classification.dialogVisible = false
+        state.labelId = ''
         await getDetails()
     } else {
         ElMessage.error('新增失败')
@@ -221,9 +224,9 @@ const handleResetLevel = async () => {
             ElMessage.error('重置失败')
         }
     } catch (error) {
-        if (error !== 'cancel') {
-            ElMessage.error('重置失败')
-        }
+        // if (error === 'cancel') {
+        //     ElMessage.error('重置失败')
+        // }
     }
 }
 

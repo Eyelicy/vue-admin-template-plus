@@ -135,7 +135,7 @@ export const useUserStore = defineStore(
                     ElMessage.success('成功登录')
                     token.value = data.userinfo.token
                     userInfo.value = data.userinfo
-                    router.push('/patient/patient')
+                    router.push(config.homeName)
                 } else {
                     captcha.value = null
                     ElMessage.error(msg)

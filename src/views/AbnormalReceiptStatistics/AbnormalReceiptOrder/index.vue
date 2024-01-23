@@ -80,7 +80,11 @@
                         <el-link
                             type="primary"
                             :underline="false"
-                            @click="router.push(`/abnormal-receipt-statistics/abnormal-receipt-customer/edit/${row?.order?.customer?.customerCode }`)"
+                            @click="
+                                router.push(
+                                    `/abnormal-receipt-statistics/abnormal-receipt-customer/edit/${row?.order?.customer?.customerCode}`
+                                )
+                            "
                         >
                             {{ row?.order?.customer?.customerName }}
                         </el-link>
@@ -170,6 +174,8 @@ const getTableData = async (init) => {
         pageNum: page.index,
         pageSize: page.size,
         ...query,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
     }
     if (query.alertLevel) {
         params.alertLevel = query.alertLevel

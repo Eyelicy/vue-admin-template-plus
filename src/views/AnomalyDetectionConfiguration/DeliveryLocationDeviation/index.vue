@@ -44,8 +44,25 @@
                 <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
                 <el-table-column prop="deliveryRoute.routeName" label="送货路线名称">
                 </el-table-column>
-                <el-table-column prop="unifiedSigningPointCount" label="集中签收点个数" />
-                <el-table-column prop="maxDistance" label="容许偏差距离（米/m）" />
+                <el-table-column prop="unifiedSigningPointCount" label="集中签收点个数">
+                </el-table-column>
+                <el-table-column prop="maxDistance" label="容许偏差距离（米/m）">
+                    <template #default="{ row, $index }">
+                        <div class="flex items-center">
+                            <el-input
+                                v-if="state.editIndex === $index && state.name === 'maxDistance'"
+                                v-model="row.maxDistance"
+                                @keyup.enter="(e) => handleEdit(row)"
+                            />
+                            <span v-else>{{ row.maxDistance }}</span>
+                            <el-icon
+                                class="cursor-pointer ml-auto"
+                                @click="setEdit('maxDistance', $index)"
+                                ><EditPen
+                            /></el-icon>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column
                     prop="unifiedSigning"
                     label="是否支持集中签收"
@@ -100,26 +117,6 @@
             </Table>
         </div>
     </div>
-    <!-- <Dialog width="600px" v-model="state.logDialogVisible" title="操作日志" center>
-        <div
-            class="w-[calc(536px - 3.2rem)] bg-[rgba(232,239,247,0.5)] rounded-md flex flex-col mx-auto px-[1.6rem] py-[1.6rem] mb-8"
-            v-for="(item, index) in 3"
-            :key="index"
-        >
-            <div class="mb-[1.6rem]">
-                <label>日期时间：</label>
-                <span>2021-08-09 12:00:00</span>
-            </div>
-            <div class="mb-[1.6rem]">
-                <label>处理操作：</label>
-                <span>转发下一级</span>
-            </div>
-            <div>
-                <label>操作人：</label>
-                <span>-</span>
-            </div>
-        </div>
-    </Dialog> -->
     <log-dialog
         width="80%"
         v-model="state.logDialogVisible"
@@ -183,14 +180,15 @@ import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
 import { clearObject } from '@/utils/index.js'
-import { Plus } from '@element-plus/icons-vue'
+import { EditPen, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
 const router = useRouter(),
     state = reactive({
+        name: '',
+        editIndex: '',
         loading: false, // 表格loading
         statusLoading: false, // 状态loading
         logDialogVisible: false, // 处理日志弹窗
@@ -225,6 +223,23 @@ const router = useRouter(),
 onMounted(async () => {
     await getTableData(true)
 })
+
+// 编辑
+const setEdit = (name, index) => {
+    state.name = name
+    state.editIndex = index
+}
+
+// 编辑表格数据
+const handleEdit = async (row) => {
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/signingDeviationConfig`, row)
+    if (code === 200) {
+        ElMessage.success('修改成功')
+        await getTableData()
+    }
+    state.editIndex = ''
+    state.name = ''
+}
 
 // 查看日志
 const handleShowLog = async (row) => {

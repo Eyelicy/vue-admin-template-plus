@@ -276,6 +276,8 @@ const getTableData = async (init) => {
         pageSize: page.size,
         exceptionType: 'A',
         ...query,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
     }
     if (query.datetimerange && query.datetimerange.length > 0) {
         params.createTimeStart = query.datetimerange[0]

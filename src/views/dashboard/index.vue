@@ -58,13 +58,27 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400">【{{ item?.signingInfo?.address }}】</span>
-                        <span>【{{ item?.order?.customer?.customerName }}】</span>
+                        <span class="text-blue-400 flex-shrink-0"
+                            >【{{ item?.signingInfo?.address }}】</span
+                        >
+                        <Vue3Marquee
+                            class="cursor-pointer h-[24px]"
+                            :pause-on-hover="true"
+                            :clone="true"
+                            :duration="80"
+                        >
+                            <span>
+                                【{{ item?.order?.customer?.customerName }}】
+                                {{ item?.order?.customer?.createTime }}签收 偏离签收地
+                                {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米
+                            </span>
+                        </Vue3Marquee>
+                        <!-- <span>【{{ item?.order?.customer?.customerName }}】</span>
                         <span
                             >{{ item?.order?.customer?.createTime }}签收 偏离签收地
                             {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米</span
-                        >
-                        <span class="ml-auto">{{ item.createTime }}</span>
+                        > -->
+                        <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4"
                             color="#348DED"
@@ -104,7 +118,12 @@
                         <!-- <span>【{{ item?.order?.customer?.customerName }}】</span> -->
                         <!-- {{ JSON.parse(item?.details).locationSet }} -->
                         <!-- :pause-on-hover="true" -->
-                        <Vue3Marquee class="cursor-pointer">
+                        <Vue3Marquee
+                            class="cursor-pointer"
+                            :pause-on-hover="true"
+                            :clone="true"
+                            :duration="80"
+                        >
                             <template
                                 class="h-[24px]"
                                 v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
@@ -635,9 +654,9 @@ const initExceptionReportingChart = () => {
                     position: 'inside',
                 },
                 data: [
-                    { name: '签收地偏离', value: item[1] },
-                    { name: '同脸异地', value: item[2] },
-                    { name: '同店异脸', value: item[3] },
+                    { name: '签收地偏离', value: item[1], itemStyle: { color: '#5A8FF7' } },
+                    { name: '同脸异地', value: item[2], itemStyle: { color: '#54DFA7' } },
+                    { name: '同店异脸', value: item[3], itemStyle: { color: '#FCBE28' } },
                 ],
             }
         })

@@ -44,8 +44,40 @@
                 <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
                 <el-table-column prop="deliveryRoute.routeName" label="送货路线名称">
                 </el-table-column>
-                <el-table-column prop="threshold" label="同店异脸告警数值（大于等于）" />
-                <el-table-column prop="period" label="订单统计周期（小于等于/天）" />
+                <el-table-column prop="threshold" label="同店异脸告警数值（大于等于）" >
+                    <template #default="{ row, $index }">
+                        <div class="flex items-center">
+                            <el-input
+                                v-if="state.editIndex === $index && state.name === 'threshold'"
+                                v-model="row.threshold"
+                                @keyup.enter="(e) => handleEdit(row)"
+                            />
+                            <span v-else>{{ row.threshold }}</span>
+                            <el-icon
+                                class="cursor-pointer ml-auto"
+                                @click="setEdit('threshold', $index)"
+                                ><EditPen
+                            /></el-icon>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="period" label="订单统计周期（小于等于/天）" >
+                    <template #default="{ row, $index }">
+                        <div class="flex items-center">
+                            <el-input
+                                v-if="state.editIndex === $index && state.name === 'period'"
+                                v-model="row.period"
+                                @keyup.enter="(e) => handleEdit(row)"
+                            />
+                            <span v-else>{{ row.period }}</span>
+                            <el-icon
+                                class="cursor-pointer ml-auto"
+                                @click="setEdit('period', $index)"
+                                ><EditPen
+                            /></el-icon>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column
                     prop="updateTime"
                     label="更新时间"
@@ -162,7 +194,7 @@ import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
-import { Plus } from '@element-plus/icons-vue'
+import { EditPen, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive, ref } from 'vue'
@@ -200,6 +232,23 @@ const router = useRouter(),
 onMounted(async () => {
     await getTableData(true)
 })
+
+// 编辑
+const setEdit = (name, index) => {
+    state.name = name
+    state.editIndex = index
+}
+
+// 编辑表格数据
+const handleEdit = async (row) => {
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/signingMultiFacesConfig`, row)
+    if (code === 200) {
+        ElMessage.success('修改成功')
+        await getTableData()
+    }
+    state.editIndex = ''
+    state.name = ''
+}
 
 // 查看日志
 const handleShowLog = async (row) => {

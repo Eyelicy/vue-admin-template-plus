@@ -313,6 +313,8 @@ const getTableData = async (init) => {
         pageSize: page.size,
         exceptionType: 'C', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
         ...query,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
     }
     if (params.datetimerange && params.datetimerange.length > 0) {
         params.createTimeStart = query.datetimerange[0]
