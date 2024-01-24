@@ -30,9 +30,12 @@
                 <el-button
                     type="primary"
                     plain
+                    class="text-primary"
+                    color="#569DED"
                     :icon="Plus"
                     @click="classification.dialogVisible = true"
                     >增加分类标记
+                    
                 </el-button>
             </div>
         </div>
