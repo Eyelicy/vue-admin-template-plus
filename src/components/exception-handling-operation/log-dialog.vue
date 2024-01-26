@@ -35,7 +35,7 @@
                 <el-table-column prop="operation" label="类型"></el-table-column>
                 <el-table-column prop="detail" label="处理详情"></el-table-column>
                 <el-table-column prop="createTime" label="时间"></el-table-column>
-                <el-table-column prop="handler" label="处理者"></el-table-column>
+                <el-table-column prop="handler_username" label="处理者"></el-table-column>
             </Table>
         </div>
         <template #footer>

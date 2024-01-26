@@ -123,13 +123,23 @@
             </Table>
         </div>
     </div>
-    <log-dialog
-        width="80%"
-        v-model="state.logDialogVisible"
-        :data="state.exceptionHandlingList"
-        center
-    >
-    </log-dialog>
+    <!-- 处理日志 -->
+    <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
+        <div>
+            <Table :data="state.exceptionHandlingList" :show-page="false">
+                <el-table-column
+                    prop="threshold"
+                    label="同店异脸告警数值（大于等于）"
+                ></el-table-column>
+                <el-table-column
+                    prop="period"
+                    label="订单统计周期（小于等于/天）"
+                ></el-table-column>
+                <el-table-column prop="createTime" label="时间"></el-table-column>
+                <el-table-column prop="updateBy" label="处理者"></el-table-column>
+            </Table>
+        </div>
+    </Dialog>
     <Dialog
         width="600px"
         v-model="state.addConfigurationDialogVisible"
@@ -258,10 +268,15 @@ const handleShowLog = async (row) => {
 
 // 获取日志数据
 const getLogData = async (id) => {
+    let params = {
+        id: id,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
     const {
         code,
         data: { rows },
-    } = await tobaccoApi('get', `/api/v1/tobacco/signingMultiLocationsConfigHis/list?id=${id}`)
+    } = await tobaccoApi('get', `/api/v1/tobacco/signingMultiFacesConfigHis/list?${qs.stringify(params)}`)
     if (code === 200) {
         state.exceptionHandlingList = rows
     }

@@ -158,9 +158,11 @@
                                             :append-to-body="true"
                                             :preview-teleported="true"
                                             style="width: 50px; height: 50px"
-                                            :src="item.image"
+                                            :src="`${item.image}?${Date.now()}`"
                                             :preview-src-list="
-                                                row.details.multiFaceInfo.map((item) => item.image)
+                                                row.details.multiFaceInfo.map(
+                                                    (item) => `${item.image}?${Date.now()}`
+                                                )
                                             "
                                             fit="cover"
                                         />
@@ -170,14 +172,14 @@
                                         <div class="text-xl text-help mb-4">
                                             概率
                                             {{
-                                                `${
+                                                `${(
                                                     (item?.cnt /
                                                         row?.details?.multiFaceInfo.reduce(
                                                             (total, obj) => total + obj.cnt,
                                                             0
                                                         )) *
                                                     100
-                                                }%`
+                                                ).toFixed(2)}%`
                                             }}
                                             （{{ item?.cnt ?? 0 }}次）
                                         </div>

@@ -117,13 +117,26 @@
             </Table>
         </div>
     </div>
-    <log-dialog
-        width="80%"
-        v-model="state.logDialogVisible"
-        :data="state.exceptionHandlingList"
-        center
-    >
-    </log-dialog>
+    <!-- 处理日志 -->
+    <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
+        <div>
+            <Table :data="state.exceptionHandlingList" :show-page="false">
+                <el-table-column prop="maxDistance" label="容许偏差距离（米/m）"></el-table-column>
+                <el-table-column
+                    prop="unifiedSigning"
+                    label="是否支持集中签收"
+                    :formatter="
+                        (row) => {
+                            return row.unifiedSigning ? '是' : '否'
+                        }
+                    "
+                ></el-table-column>
+                <el-table-column prop="createTime" label="时间"></el-table-column>
+                <el-table-column prop="updateBy" label="处理者"></el-table-column>
+            </Table>
+        </div>
+    </Dialog>
+    <!-- 新增签收地偏离配置 -->
     <Dialog
         width="600px"
         v-model="state.addConfigurationDialogVisible"
@@ -185,6 +198,7 @@ import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
 const router = useRouter(),
     state = reactive({
         name: '',
@@ -249,10 +263,18 @@ const handleShowLog = async (row) => {
 
 // 获取日志数据
 const getLogData = async (id) => {
+    let params = {
+        id: id,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
     const {
         code,
         data: { rows },
-    } = await tobaccoApi('get', `/api/v1/tobacco/signingDeviationConfigHis/list?id=${id}`)
+    } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingDeviationConfigHis/list?${qs.stringify(params)}`
+    )
     if (code === 200) {
         state.exceptionHandlingList = rows
     }

@@ -122,8 +122,8 @@
                             :append-to-body="true"
                             :preview-teleported="true"
                             style="width: 50px; height: 50px"
-                            :src="row.signingInfo.image"
-                            :preview-src-list="[row.signingInfo.image]"
+                            :src="`${row.signingInfo.image}?${Date.now()}`"
+                            :preview-src-list="[`${row.signingInfo.image}?${Date.now()}`]"
                             fit="cover"
                         />
                     </template>

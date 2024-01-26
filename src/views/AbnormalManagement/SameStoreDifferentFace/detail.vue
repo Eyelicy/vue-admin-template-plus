@@ -62,9 +62,13 @@
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="row.image"
+                                :src="`${row.image}?${Date.now()}`"
                                 fit="cover"
-                                :preview-src-list="[row.image]"
+                                :preview-src-list="
+                                    details?.details.multiFaceInfo.map(
+                                        (item) => `${item.image}?${Date.now()}`
+                                    )
+                                "
                                 :append-to-body="true"
                                 :preview-teleported="true"
                             />
@@ -75,14 +79,14 @@
                         <template #default="{ row }">
                             概率
                             {{
-                                `${
+                                `${(
                                     (row?.cnt /
                                         details?.details?.multiFaceInfo.reduce(
                                             (total, obj) => total + obj.cnt,
                                             0
                                         )) *
                                     100
-                                }%`
+                                ).toFixed(2)}%`
                             }}
                             （{{ row?.cnt ?? 0 }}次）
                         </template>
@@ -140,7 +144,7 @@
                     details?.shippingOrder?.driver?.driverLicense ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="配送人">{{
-                    details?.shippingOrder?.deliveryPerson?.name?? '--'
+                    details?.shippingOrder?.deliveryPerson?.name ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="身份证号"
                     >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}

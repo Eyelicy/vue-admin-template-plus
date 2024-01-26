@@ -56,9 +56,9 @@
                     <descriptions-item label="同脸图像">
                         <el-image
                             style="width: 100px; height: 100px"
-                            :src="details?.signingInfo?.image"
+                            :src="`${details?.signingInfo?.image}?${Date.now()}`"
                             fit="cover"
-                            :preview-src-list="[details?.signingInfo?.image]"
+                            :preview-src-list="[`${details?.signingInfo?.image}?${Date.now()}`]"
                             :append-to-body="true"
                             :preview-teleported="true"
                     /></descriptions-item>
@@ -79,9 +79,9 @@
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="row?.signingInfo?.image"
+                                :src="`${details?.signingInfo?.image}?${Date.now()}`"
                                 fit="cover"
-                                :preview-src-list="[row?.signingInfo?.image]"
+                                :preview-src-list="[`${details?.signingInfo?.image}?${Date.now()}`]"
                                 :append-to-body="true"
                                 :preview-teleported="true"
                             />
