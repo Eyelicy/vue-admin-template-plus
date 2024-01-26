@@ -32,11 +32,10 @@
                     value-format="YYYY-MM-DD HH:mm:ss"
                 />
             </div>
-            <!-- 暂无 -->
-            <!-- <div class="table-header">
-                <div class="table-header-lab">偏差距离范围 ≤（暂无）</div>
-                <el-input v-model="query.error_num" clearable> </el-input>
-            </div> -->
+            <div class="table-header">
+                <div class="table-header-lab">偏差距离范围 ≤</div>
+                <el-input v-model="query.value" clearable> </el-input>
+            </div>
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
                 <el-input v-model="query.orderSn" clearable> </el-input>
@@ -89,14 +88,16 @@
         <div class="flex-auto flex flex-col">
             <Table
                 class="flex-auto"
-                ref="table"
+                ref="tableRef"
                 v-model:page="page"
                 v-loading="state.loading"
                 :data="state.tableData"
                 @getTableData="getTableData"
+                sortable="custom"
+                @sort-change="sortChange"
                 style="width: 100%"
             >
-                <el-table-column prop="code"  label="异常上报编号" width="230">
+                <el-table-column prop="code" label="异常上报编号" width="230">
                     <template #default="{ row }">
                         <el-link
                             type="primary"
@@ -208,7 +209,7 @@ import { useExceptionMonitoringManagement } from '@/composables/useExceptionMoni
 import { tobaccoApi } from '@/server/api/tobacco'
 import { abnormalOrderStatus } from '@/utils/enum'
 import qs from 'qs'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { handleRevoke } = useExceptionMonitoringManagement()
@@ -233,7 +234,12 @@ const router = useRouter(),
         index: 1,
         total: 0,
         size: 10,
-    })
+    }),
+    sort = reactive({
+        prop: '',
+        order: '',
+    }),
+    tableRef = ref(null)
 
 onMounted(async () => {
     await getTableData(true)
@@ -264,13 +270,20 @@ const handleShowLog = (data) => {
     state.exceptionHandlingList = data
 }
 
+const sortChange = (e) => {
+    const { order, prop } = e
+    sort.order = order
+    sort.prop = prop
+}
+
 // 获取表格数据
 const getTableData = async (init) => {
     state.loading = true
     if (init) {
         page.index = 1
     }
-
+    // tableRef.value.tableRef.clearSort()
+    console.log(tableRef.value)
     let params = {
         pageNum: page.index,
         pageSize: page.size,
@@ -288,10 +301,15 @@ const getTableData = async (init) => {
         const {
             data: { rows, total },
         } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
-        rows.forEach((element,index) => {
+        rows.forEach((element, index) => {
             rows[index].deviation = JSON.parse(element.details).deviation
-        });
-        state.tableData = rows
+        })
+        if (sort.order && sort.prop) {
+            state.tableData = sortByField(rows, sort.prop, sort.order)
+        } else {
+            state.tableData = rows
+        }
+
         page.total = Number(total)
     } catch (error) {
         state.tableData = []
@@ -300,5 +318,20 @@ const getTableData = async (init) => {
     } finally {
         state.loading = false
     }
+}
+
+const sortByField = (arr, field, order) => {
+    return arr.sort((a, b) => {
+        const valueA = a[field]
+        const valueB = b[field]
+
+        if (valueA < valueB) {
+            return order === 'ascending' ? -1 : 1
+        }
+        if (valueA > valueB) {
+            return order === 'ascending' ? 1 : -1
+        }
+        return 0
+    })
 }
 </script>

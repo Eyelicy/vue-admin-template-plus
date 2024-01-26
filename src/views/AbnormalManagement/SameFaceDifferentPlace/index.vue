@@ -32,11 +32,10 @@
                     value-format="YYYY-MM-DD HH:mm:ss"
                 />
             </div>
-            <!-- 暂无 -->
-            <!-- <div class="table-header">
-                <div class="table-header-lab">偏差距离范围 ≤（暂无）</div>
-                <el-input v-model="query.error_num" clearable> </el-input>
-            </div> -->
+            <div class="table-header">
+                <div class="table-header-lab">同脸出现地数 ≤</div>
+                <el-input v-model="query.value" clearable> </el-input>
+            </div>
             <div class="table-header">
                 <div class="table-header-lab">订单编号</div>
                 <el-input v-model="query.orderSn" clearable> </el-input>
@@ -93,6 +92,8 @@
                 v-model:page="page"
                 v-loading="state.loading"
                 :data="state.tableData"
+                sortable="custom"
+                @sort-change="sortChange"
                 @getTableData="getTableData"
             >
                 <el-table-column prop="code" label="异常上报编号" width="230">
@@ -266,6 +267,10 @@ const router = useRouter(),
         ],
     }),
     query = reactive({}),
+    sort = reactive({
+        prop: '',
+        order: '',
+    }),
     page = reactive({
         index: 1,
         total: 0,
@@ -301,6 +306,12 @@ const handleShowLog = (data) => {
     state.exceptionHandlingList = data
 }
 
+const sortChange = (e) => {
+    const { order, prop } = e
+    sort.order = order
+    sort.prop = prop
+}
+
 // 获取表格数据
 const getTableData = async (init) => {
     state.loading = true
@@ -329,8 +340,12 @@ const getTableData = async (init) => {
             item.details = JSON.parse(item.details)
             item.placeCount = item.details?.locationSet?.length
         })
-        state.tableData = rows
-        console.log(state.tableData)
+        
+        if (sort.order && sort.prop) {
+            state.tableData = sortByField(rows, sort.prop, sort.order)
+        } else {
+            state.tableData = rows
+        }
         page.total = Number(total)
     } catch (error) {
         state.tableData = []
@@ -339,5 +354,20 @@ const getTableData = async (init) => {
     } finally {
         state.loading = false
     }
+}
+
+const sortByField = (arr, field, order) => {
+    return arr.sort((a, b) => {
+        const valueA = a[field]
+        const valueB = b[field]
+
+        if (valueA < valueB) {
+            return order === 'ascending' ? -1 : 1
+        }
+        if (valueA > valueB) {
+            return order === 'ascending' ? 1 : -1
+        }
+        return 0
+    })
 }
 </script>
