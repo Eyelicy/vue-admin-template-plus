@@ -81,7 +81,7 @@
                         }
                     "
                 />
-                <el-table-column prop="updateBy" label="更新者" />
+                <el-table-column prop="updateBy_username" label="更新者" />
                 <el-table-column prop="status" label="启用状态">
                     <template #default="{ row }">
                         <el-switch
@@ -132,7 +132,7 @@
                     "
                 ></el-table-column>
                 <el-table-column prop="createTime" label="时间"></el-table-column>
-                <el-table-column prop="updateBy" label="处理者"></el-table-column>
+                <el-table-column prop="createBy_username" label="处理者"></el-table-column>
             </Table>
         </div>
     </Dialog>

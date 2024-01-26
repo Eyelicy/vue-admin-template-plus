@@ -79,7 +79,7 @@
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="`${details?.signingInfo?.image}?${Date.now()}`"
+                                :src="`${details?.signingInfo?.image}?x-oss-process=image/resize,w_100,h_100`"
                                 fit="cover"
                                 :preview-src-list="[`${details?.signingInfo?.image}?${Date.now()}`]"
                                 :append-to-body="true"

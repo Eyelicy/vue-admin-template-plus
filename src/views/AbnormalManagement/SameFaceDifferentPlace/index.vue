@@ -122,7 +122,7 @@
                             :append-to-body="true"
                             :preview-teleported="true"
                             style="width: 50px; height: 50px"
-                            :src="`${row.signingInfo.image}?${Date.now()}`"
+                            :src="`${row.signingInfo.image}?x-oss-process=image/resize,w_100,h_100`"
                             :preview-src-list="[`${row.signingInfo.image}?${Date.now()}`]"
                             fit="cover"
                         />

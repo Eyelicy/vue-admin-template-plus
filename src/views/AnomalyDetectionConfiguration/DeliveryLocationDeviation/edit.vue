@@ -13,7 +13,7 @@
             </div>
             <div class="flex">
                 <p class="text-title">更新者：</p>
-                <p>{{ detail.updateBy ?? '--' }}</p>
+                <p>{{ detail.updateBy_username ?? '--' }}</p>
             </div>
             <el-button round class="ml-auto" @click="handleShowLog(detail.id)">查看日志 </el-button>
             <el-button round type="danger" @click="handleDelete">删除 </el-button>
@@ -80,13 +80,25 @@
             </Table>
         </div>
     </div>
-    <log-dialog
-        width="80%"
-        v-model="state.logDialogVisible"
-        :data="state.exceptionHandlingList"
-        center
-    >
-    </log-dialog>
+    <!-- 处理日志 -->
+    <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
+        <div>
+            <Table :data="state.exceptionHandlingList" :show-page="false">
+                <el-table-column prop="maxDistance" label="容许偏差距离（米/m）"></el-table-column>
+                <el-table-column
+                    prop="unifiedSigning"
+                    label="是否支持集中签收"
+                    :formatter="
+                        (row) => {
+                            return row.unifiedSigning ? '是' : '否'
+                        }
+                    "
+                ></el-table-column>
+                <el-table-column prop="createTime" label="时间"></el-table-column>
+                <el-table-column prop="createBy_username" label="处理者"></el-table-column>
+            </Table>
+        </div>
+    </Dialog>
     <Dialog
         width="600px"
         v-model="state.centralizedSigningPointDialogVisible"
@@ -200,10 +212,18 @@ const handleShowLog = async () => {
 
 // 获取日志数据
 const getLogData = async () => {
+    let params = {
+        id: detail.id,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
     const {
         code,
         data: { rows },
-    } = await tobaccoApi('get', `/api/v1/tobacco/signingDeviationConfigHis/list?id=${detail.id}`)
+    } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingDeviationConfigHis/list?${qs.stringify(params)}`
+    )
     if (code === 200) {
         state.exceptionHandlingList = rows
     }

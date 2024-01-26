@@ -13,11 +13,9 @@
             </div>
             <div class="flex">
                 <p class="text-title">更新者：</p>
-                <p>{{ configuration.updateBy ?? '--' }}</p>
+                <p>{{ configuration.updateBy_username ?? '--' }}</p>
             </div>
-            <el-button round class="ml-auto" @click="handleShowLog">
-                查看日志
-            </el-button>
+            <el-button round class="ml-auto" @click="handleShowLog"> 查看日志 </el-button>
             <el-button round type="danger" @click="handleDelete">删除 </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-4 gap-4 mb-[5.6rem]">
@@ -38,19 +36,31 @@
         </div>
     </div>
     <!-- 操作日志弹窗 -->
-    <log-dialog
-        width="80%"
-        v-model="state.logDialogVisible"
-        :data="state.exceptionHandlingList"
-        center
-    >
-    </log-dialog>
+    <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
+        <div>
+            <Table :data="state.exceptionHandlingList" :show-page="false">
+                <el-table-column
+                    prop="threshold"
+                    label="同脸异地告警数值（大于等于）"
+                ></el-table-column>
+                <el-table-column
+                    prop="period"
+                    label="订单统计周期（小于等于/天）"
+                ></el-table-column>
+                <el-table-column prop="createTime" label="时间"></el-table-column>
+                <el-table-column prop="createBy_username" label="处理者"></el-table-column>
+            </Table>
+        </div>
+    </Dialog>
 </template>
 
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
+import Dialog from '@/components/dialog/index.vue'
+import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -92,15 +102,22 @@ const handleShowLog = async () => {
 
 // 获取日志数据
 const getLogData = async () => {
+    let params = {
+        id: configuration.id,
+        orderByColumn: 'createTime',
+        isAsc: 'desc',
+    }
     const {
         code,
         data: { rows },
-    } = await tobaccoApi('get', `/api/v1/tobacco/signingMultiLocationsConfigHis/list?id=${configuration.id}`)
+    } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingMultiLocationsConfigHis/list?${qs.stringify(params)}`
+    )
     if (code === 200) {
         state.exceptionHandlingList = rows
     }
 }
-
 
 // 删除签收地偏离配置
 const handleDelete = async () => {

@@ -62,7 +62,7 @@
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="`${row.image}?${Date.now()}`"
+                                :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`"
                                 fit="cover"
                                 :preview-src-list="
                                     details?.details.multiFaceInfo.map(
