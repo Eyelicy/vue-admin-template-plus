@@ -73,11 +73,6 @@
                                 {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米
                             </span>
                         </Vue3Marquee>
-                        <!-- <span>【{{ item?.order?.customer?.customerName }}】</span>
-                        <span
-                            >{{ item?.order?.customer?.createTime }}签收 偏离签收地
-                            {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米</span
-                        > -->
                         <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4"
@@ -181,7 +176,7 @@
                             plain
                             @click="
                                 router.push({
-                                    path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
+                                    path: `/exception-monitoring-management/same-store-different-faces/detail/${item.code}`,
                                 })
                             "
                             >详情</el-button

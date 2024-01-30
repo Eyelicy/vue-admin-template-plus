@@ -44,10 +44,9 @@
                 <div class="table-header-lab">店名关键词</div>
                 <el-input v-model="query.customerName" clearable> </el-input>
             </div>
-            <!-- 暂无 -->
             <div class="table-header">
                 <div class="table-header-lab">购方关键词</div>
-                <el-input v-model="query.buyer_name" clearable> </el-input>
+                <el-input v-model="query.custKeyWords" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">订单总金额 ≤</div>
@@ -140,6 +139,7 @@
                     <template #default="{ row }">
                         <el-popover
                             width="240"
+                            popper-class="max-h-[400px] overflow-y-auto"
                             popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
                         >
                             <template #reference>
@@ -254,7 +254,6 @@ import { View } from '@element-plus/icons-vue'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-
 const { handleRevoke } = useExceptionMonitoringManagement()
 
 const router = useRouter(),

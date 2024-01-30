@@ -44,11 +44,10 @@
                 <div class="table-header-lab">店名关键词</div>
                 <el-input v-model="query.customerName" clearable> </el-input>
             </div>
-            <!-- 暂无 -->
-            <!-- <div class="table-header">
+            <div class="table-header">
                 <div class="table-header-lab">购方关键词</div>
-                <el-input v-model="query.buyer_name" clearable> </el-input>
-            </div> -->
+                <el-input v-model="query.custKeyWords" clearable> </el-input>
+            </div>
             <div class="table-header">
                 <div class="table-header-lab">订单总金额 ≤</div>
                 <el-input v-model="query.orderTotalAmount" clearable> </el-input>
