@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full flex flex-col p-12 detail">
+    <div class="w-full h-full flex flex-col detail">
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">异常签收预警配置</div>
             <div class="grid grid-cols-4 gap-4 gap-y-8">
@@ -16,12 +16,14 @@
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">异常客户自定义分类管理</div>
-            <div class="flex flex-wrap items-center">
+            <div
+                class="flex flex-wrap items-center bg-[#EEEEEE] py-[24px] px-[12px] pb-[64px] relative"
+            >
                 <el-tag
                     v-for="tag in state.warningLevelData"
                     :key="tag.id"
                     type="success"
-                    class="mr-12"
+                    class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]"
                     effect="dark"
                     closable
                     @close="handleDeleteWarningLevel(tag)"
@@ -30,12 +32,11 @@
                 <el-button
                     type="primary"
                     plain
-                    class="text-primary"
+                    class="w-[200px] absolute m-auto bottom-[16px] right-0 left-0"
                     color="#569DED"
                     :icon="Plus"
                     @click="classification.dialogVisible = true"
                     >增加分类标记
-                    
                 </el-button>
             </div>
         </div>
@@ -94,8 +95,8 @@ const handleAddWarningLevel = async () => {
     classification.dialogVisible = false
 }
 
-const handleDeleteWarningLevel = async(tag) => {
-    const {code} = await tobaccoApi('delete', `/api/v1/tobacco/customerAlertLevel/${tag.id}`)
+const handleDeleteWarningLevel = async (tag) => {
+    const { code } = await tobaccoApi('delete', `/api/v1/tobacco/customerAlertLevel/${tag.id}`)
     if (code === 200) {
         ElMessage.success('删除成功')
         await getWarningLevel()

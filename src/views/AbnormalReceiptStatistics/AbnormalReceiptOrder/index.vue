@@ -54,71 +54,66 @@
                 <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="createTime" label="异常预警时间"> </el-table-column>
-                <el-table-column prop="status" label="异常类型">
-                    <template #default="{ row }">
-                        {{ exceptionStatus[row.exceptionType] }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="orderSn" label="订单编号">
-                    <template #default="{ row }">
-                        {{ row?.orderSn }}
-                        <copy-document :val="row?.orderSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="order.customer.customerName" label="客户名称">
-                    <template #default="{ row }">
-                        <el-link
-                            type="primary"
-                            :underline="false"
-                            @click="
-                                router.push(
-                                    `/abnormal-receipt-statistics/abnormal-receipt-customer/edit/${row?.order?.customer?.customerCode}`
-                                )
-                            "
-                        >
-                            {{ row?.order?.customer?.customerName }}
-                        </el-link>
-                        <copy-document :val="row?.order?.customer?.customerName" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="orderAddress" label="签收地址">
-                    <template #default="{ row }">
-                        <map-popover
-                            :longitude="row?.orderLongitude"
-                            :latitude="row?.orderLatitude"
-                        >
-                            {{ row?.orderAddress ?? '--' }}
-                        </map-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="shippingOrder.shippingSn" label="运输单号">
-                    <template #default="{ row }">
-                        {{ row?.shippingOrder.shippingSn }}
-                        <copy-document :val="row?.shippingOrder.shippingSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="order.skuCount" label="品种数" />
-                <el-table-column prop="order.quantity" label="总盒数" />
-                <el-table-column prop="order.amount" label="总金额（元）" />
-                <el-table-column label="操作" width="115">
-                    <template #default="{ row }">
-                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
-                            >处理日志</el-button
-                        >
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="createTime" label="异常预警时间"> </el-table-column>
+            <el-table-column prop="status" label="异常类型">
+                <template #default="{ row }">
+                    {{ exceptionStatus[row.exceptionType] }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="orderSn" label="订单编号">
+                <template #default="{ row }">
+                    {{ row?.orderSn }}
+                    <copy-document :val="row?.orderSn" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="order.customer.customerName" label="客户名称">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        :underline="false"
+                        @click="
+                            router.push(
+                                `/abnormal-receipt-statistics/abnormal-receipt-customer/edit/${row?.order?.customer?.customerCode}`
+                            )
+                        "
+                    >
+                        {{ row?.order?.customer?.customerName }}
+                    </el-link>
+                    <copy-document :val="row?.order?.customer?.customerName" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="orderAddress" label="签收地址">
+                <template #default="{ row }">
+                    <map-popover :longitude="row?.orderLongitude" :latitude="row?.orderLatitude">
+                        {{ row?.orderAddress ?? '--' }}
+                    </map-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="shippingOrder.shippingSn" label="运输单号">
+                <template #default="{ row }">
+                    {{ row?.shippingOrder.shippingSn }}
+                    <copy-document :val="row?.shippingOrder.shippingSn" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="order.skuCount" label="品种数" />
+            <el-table-column prop="order.quantity" label="总盒数" />
+            <el-table-column prop="order.amount" label="总金额（元）" />
+            <el-table-column label="操作" width="115">
+                <template #default="{ row }">
+                    <el-button @click="handleShowLog(row.exceptionHandlingList)"
+                        >处理日志</el-button
+                    >
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <!-- 处理日志dialog -->
     <log-dialog

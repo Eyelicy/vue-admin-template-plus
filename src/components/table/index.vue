@@ -1,5 +1,5 @@
 <template>
-    <div class="system-table-box">
+    <div class="system-table-box overflow-hidden flex-auto">
         <!-- @selection-change="handleSelectionChange" -->
         <el-table
             v-bind="$attrs"
@@ -10,6 +10,8 @@
             @select-all="selectChange"
             ref="tableRef"
             :class="multiple ? '' : 'multipleShow'"
+            height="100%"
+            max-height="100%"
         >
             <el-table-column type="selection" align="center" width="50" v-if="showSelection" />
             <el-table-column label="序号" width="60" align="center" v-if="showIndex">
@@ -125,11 +127,7 @@ export default defineComponent({
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    // height: 100%;
-
-    .system-table {
-        flex: 1;
-    }
+    overflow: hidden;
 
     .multipleShow {
         ::v-deep .el-table__header {

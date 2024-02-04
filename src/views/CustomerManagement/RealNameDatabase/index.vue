@@ -75,59 +75,58 @@
                 />
             </div> -->
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <el-button
-                class="mb-8"
-                type="primary"
-                style="width: 100px"
-                :icon="Plus"
-                @click="state.addDialogVisible = true"
-                >新增
-            </el-button>
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="name" label="人名"> </el-table-column>
-                <el-table-column prop="image" label="人脸">
-                    <template #default="{ row }">
-                        <template v-if="!row.image"> -- </template>
-                        <el-image
-                            v-else
-                            :append-to-body="true"
-                            :preview-teleported="true"
-                            style="width: 50px; height: 50px"
-                            :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`"
-                            :preview-src-list="[`${row.image}?${Date.now()}`]"
-                            fit="cover"
-                        />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="entityType" label="类型">
-                    <template #default="{ row }">
-                        <div class="flex flex-wrap">
-                            {{ entityTypeText[row.entityType] }}
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="customer.customerName" label="归属客户" />
-                <el-table-column prop="idCard" label="身份证号" />
-                <el-table-column prop="deliveryRoute.routeName" label="所属路线" />
-                <el-table-column prop="deliveryRoute.stationCode" label="所属服务站点" />
-                <el-table-column prop="label" label="备注" />
-                <el-table-column label="操作">
-                    <template #default="{ row }">
-                        <el-button
-                            @click="handleStatus(row)"
-                            :type="row.status === 'A' ? 'danger' : 'primary'"
-                            >{{ row.status === 'A' ? '禁用' : '启用' }}</el-button
-                        >
-                        <el-button @click="handleEdit(row)">编辑</el-button>
-                        <!-- <el-button @click="handleLogDialogVisible(row)">日志</el-button>
+        <el-button
+            class="mb-8"
+            type="primary"
+            style="width: 100px"
+            :icon="Plus"
+            @click="state.addDialogVisible = true"
+            >新增
+        </el-button>
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="name" label="人名"> </el-table-column>
+            <el-table-column prop="image" label="人脸">
+                <template #default="{ row }">
+                    <template v-if="!row.image"> -- </template>
+                    <el-image
+                        v-else
+                        :append-to-body="true"
+                        :preview-teleported="true"
+                        style="width: 50px; height: 50px"
+                        :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`"
+                        :preview-src-list="[`${row.image}?${Date.now()}`]"
+                        fit="cover"
+                    />
+                </template>
+            </el-table-column>
+            <el-table-column prop="entityType" label="类型">
+                <template #default="{ row }">
+                    <div class="flex flex-wrap">
+                        {{ entityTypeText[row.entityType] }}
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="customer.customerName" label="归属客户" />
+            <el-table-column prop="idCard" label="身份证号" />
+            <el-table-column prop="deliveryRoute.routeName" label="所属路线" />
+            <el-table-column prop="deliveryRoute.stationCode" label="所属服务站点" />
+            <el-table-column prop="label" label="备注" />
+            <el-table-column label="操作">
+                <template #default="{ row }">
+                    <el-button
+                        @click="handleStatus(row)"
+                        :type="row.status === 'A' ? 'danger' : 'primary'"
+                        >{{ row.status === 'A' ? '禁用' : '启用' }}</el-button
+                    >
+                    <el-button @click="handleEdit(row)">编辑</el-button>
+                    <!-- <el-button @click="handleLogDialogVisible(row)">日志</el-button>
                         <el-button
                             @click="
                                 router.push({
@@ -144,10 +143,9 @@
                                 <el-button>删除 </el-button>
                             </template>
                         </el-popconfirm> -->
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <Dialog width="600px" v-model="state.addDialogVisible" title="新增" center>
         <el-form
@@ -234,7 +232,12 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="状态">
-                <el-switch v-model="addRealName.status" active-value="A" inactive-value="D" />
+                <el-switch
+                    v-model="addRealName.status"
+                    active-value="A"
+                    inactive-value="D"
+                    :active-text="addRealName.status === 'A' ? '禁用' : '启用'"
+                />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -276,9 +279,7 @@
                 <el-input v-model="editRealName.label" class="w-full" />
             </el-form-item>
             <el-form-item label="类型" prop="entityType">
-                <el-select
-                    v-model="editRealName.entityType"
-                >
+                <el-select v-model="editRealName.entityType">
                     <el-option
                         v-for="(item, key) in entityTypeText"
                         :key="key"
@@ -328,7 +329,12 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="状态">
-                <el-switch v-model="editRealName.status" active-value="A" inactive-value="D" />
+                <el-switch
+                    v-model="editRealName.status"
+                    active-value="A"
+                    inactive-value="D"
+                    :active-text="editRealName.status === 'A' ? '禁用' : '启用'"
+                />
             </el-form-item>
         </el-form>
         <template #footer>

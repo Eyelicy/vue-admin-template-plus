@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.detail {
+    @apply overflow-y-auto;
+}
+
+.detail::-webkit-scrollbar {
+    position: absolute;
+    right: 0px;
+}
+
 .el-button--primary:focus {
     color: var(--el-color-white);
     border-color: var(--el-color-primary);
@@ -129,7 +138,7 @@ body {
 }
 
 .table-header {
-    @apply flex items-center flex flex-row text-gray-600;
+    @apply flex items-center flex flex-row text-gray-600 text-[14px];
 
     &-lab {
         width: 130px;

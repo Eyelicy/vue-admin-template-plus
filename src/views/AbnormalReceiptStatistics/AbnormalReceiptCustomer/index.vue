@@ -47,74 +47,66 @@
                 />
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="customerName" label="客户名称"> </el-table-column>
-                <el-table-column prop="customerAlertLevel.name" label="预警等级">
-                    <template #default="{ row }">
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="customerName" label="客户名称"> </el-table-column>
+            <el-table-column prop="customerAlertLevel.name" label="预警等级">
+                <template #default="{ row }">
+                    <el-tag
+                        class="p-4 rounded-md mr-12"
+                        :class="`tag-level-${row?.customerAlertLevel.id}`"
+                    >
+                        {{ row.customerAlertLevel.name }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="labelList" label="自定义分类">
+                <template #default="{ row }">
+                    <div class="flex flex-wrap">
                         <el-tag
-                            class="p-4 rounded-md mr-12"
-                            :class="`tag-level-${row?.customerAlertLevel.id}`"
+                            v-for="(item, index) in row.labelList"
+                            :key="item.id"
+                            :type="item.type"
+                            class="mb-2"
+                            :class="index === row.labelList.length - 1 ? '' : 'mr-2'"
                         >
-                            {{ row.customerAlertLevel.name }}
+                            {{ item.labelName }}
                         </el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="labelList" label="自定义分类">
-                    <template #default="{ row }">
-                        <div class="flex flex-wrap">
-                            <el-tag
-                                v-for="(item, index) in row.labelList"
-                                :key="item.id"
-                                :type="item.type"
-                                class="mb-2"
-                                :class="index === row.labelList.length - 1 ? '' : 'mr-2'"
-                            >
-                                {{ item.labelName }}
-                            </el-tag>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="customerDeliveryInfo.deliveryRoute.routeName"
-                    label="所属路线"
-                />
-                <el-table-column
-                    prop="customerDeliveryInfo.deliveryRoute.stationCode"
-                    label="所属服务站点"
-                />
-                <el-table-column prop="deliveryPersonnelNames" label="关联派送员" />
-                <el-table-column label="操作" width="380px">
-                    <template #default="{ row }">
-                        <el-button @click="handleEdit(row)">编辑</el-button>
-                        <el-button @click="handleLogDialogVisible(row)">日志</el-button>
-                        <el-button
-                            @click="
-                                router.push({
-                                    path: `abnormal-receipt-order/${row.customerName}`,
-                                })
-                            "
-                            >订单</el-button
-                        >
-                        <el-popconfirm
-                            title="请确认是否删除该条数据？"
-                            @confirm="handleDelete(row)"
-                        >
-                            <template #reference>
-                                <el-button>删除 </el-button>
-                            </template>
-                        </el-popconfirm>
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="customerDeliveryInfo.deliveryRoute.routeName" label="所属路线" />
+            <el-table-column
+                prop="customerDeliveryInfo.deliveryRoute.stationCode"
+                label="所属服务站点"
+            />
+            <el-table-column prop="deliveryPersonnelNames" label="关联派送员" />
+            <el-table-column label="操作" width="380px">
+                <template #default="{ row }">
+                    <el-button @click="handleEdit(row)">编辑</el-button>
+                    <el-button @click="handleLogDialogVisible(row)">日志</el-button>
+                    <el-button
+                        @click="
+                            router.push({
+                                path: `abnormal-receipt-order/${row.customerName}`,
+                            })
+                        "
+                        >订单</el-button
+                    >
+                    <el-popconfirm title="请确认是否删除该条数据？" @confirm="handleDelete(row)">
+                        <template #reference>
+                            <el-button>删除 </el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <Dialog width="600px" v-model="state.logDialogVisible" title="风险预警等级变化日志" center>
         <Table :data="warningLog.tableData" border style="width: 100%" :showPage="false">

@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex flex-col items-center">
+    <div class="w-full flex flex-col items-center table-header-content">
         <div class="w-full grid grid-cols-4 gap-4 mb-12">
             <slot></slot>
         </div>
@@ -12,14 +12,14 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from 'vue';
+import { defineEmits, defineProps } from 'vue'
 const props = defineProps({
     modelValue: {
         type: Object,
     },
 })
 
-const emit = defineEmits(['onSearch','onReset', 'onExport', 'update:modelValue'])
+const emit = defineEmits(['onSearch', 'onReset', 'onExport', 'update:modelValue'])
 
 const handleSearch = async () => {
     emit('onSearch')
@@ -43,4 +43,15 @@ const handleExport = async () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// :deep(.table-header-content) {
+//     position: sticky;
+//     top: 0;
+// }
+// .table-header-content {
+//     position: sticky;
+//     top: 0;
+//     z-index: 999;
+//     background-color: #fff;
+// }
+</style>

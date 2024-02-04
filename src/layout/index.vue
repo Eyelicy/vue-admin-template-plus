@@ -1,7 +1,7 @@
 <style lang="scss">
 .scrollbar-div::-webkit-scrollbar {
-    // position: absolute;
-    // right: 0px;
+    position: absolute;
+    right: 0px;
 }
 </style>
 
@@ -38,7 +38,7 @@
                             height: calc(100vh - 60px - 40px - 36px);
                         "
                     >
-                        <div class="w-full h-full overflow-y-auto scrollbar-div">
+                        <div class="w-full h-full overflow-hidden">
                             <router-view v-slot="{ Component }">
                                 <KeepAlive
                                     ><component

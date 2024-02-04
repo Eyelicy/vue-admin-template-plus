@@ -184,6 +184,7 @@ const confirm = async () => {
         return
     }
     await handleForward(props.exceptionCode, staffGuid[0])
+    staffTreeRef.value.setCheckedKeys([])
     emits('update:modelValue', false)
     emits('confirm')
 }

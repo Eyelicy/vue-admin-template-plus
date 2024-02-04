@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full flex flex-col p-12 detail">
+    <div class="w-full h-full flex flex-col detail">
         <div class="flex items-center mb-[5.6rem]">
             <div class="flex mr-12">
                 <p class="text-title">创建时间：</p>

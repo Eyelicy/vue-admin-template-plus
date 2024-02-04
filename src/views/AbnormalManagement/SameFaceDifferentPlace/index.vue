@@ -83,155 +83,148 @@
                 <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                sortable="custom"
-                @sort-change="sortChange"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="code" label="异常上报编号" width="235">
-                    <template #default="{ row }">
-                        <el-link
-                            type="primary"
-                            :underline="false"
-                            @click="
-                                router.push({
-                                    path: `same-face-different-places/detail/${row.code}`,
-                                })
-                            "
-                            >{{ row.code }}
-                        </el-link>
-                        <copy-document :val="row.code" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="status" label="状态" width="75">
-                    <template #default="{ row }">
-                        <span :style="`color:${abnormalOrderColor[row.status]}`">
-                            {{ abnormalOrderStatus[row.status] }}
-                        </span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="createTime" sortable label="异常上报时间" />
-                <el-table-column prop="order_code" label="同脸图像" width="90">
-                    <template #default="{ row }">
-                        <el-image
-                            :append-to-body="true"
-                            :preview-teleported="true"
-                            style="width: 50px; height: 50px"
-                            :src="`${row.signingInfo.image}?x-oss-process=image/resize,w_100,h_100`"
-                            :preview-src-list="[`${row.signingInfo.image}`]"
-                            fit="cover"
-                        />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="order_code" label="系统标记人名">
-                    <template #default="{ row }">
-                        <registrant-info-popover :value="row.details">
-                            {{ row.details.contactPerson }}
-                        </registrant-info-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="placeCount" sortable label="出现地集合">
-                    <template #default="{ row }">
-                        <el-popover
-                            width="240"
-                            popper-class="max-h-[400px] overflow-y-auto"
-                            popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
-                        >
-                            <template #reference>
-                                <div class="cursor-pointer">
-                                    {{ row.details.locationSet.length }}
-                                    <el-icon color="#348DED" class="ml-2"><View /></el-icon>
-                                </div>
-                            </template>
-                            <template #default>
-                                <div>
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            sortable="custom"
+            @sort-change="sortChange"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="code" label="异常上报编号" width="235">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        :underline="false"
+                        @click="
+                            router.push({
+                                path: `same-face-different-places/detail/${row.code}`,
+                            })
+                        "
+                        >{{ row.code }}
+                    </el-link>
+                    <copy-document :val="row.code" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="75">
+                <template #default="{ row }">
+                    <span :style="`color:${abnormalOrderColor[row.status]}`">
+                        {{ abnormalOrderStatus[row.status] }}
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="createTime" sortable label="异常上报时间" />
+            <el-table-column prop="order_code" label="同脸图像" width="90">
+                <template #default="{ row }">
+                    <el-image
+                        :append-to-body="true"
+                        :preview-teleported="true"
+                        style="width: 50px; height: 50px"
+                        :src="`${row.signingInfo.image}?x-oss-process=image/resize,w_100,h_100`"
+                        :preview-src-list="[`${row.signingInfo.image}`]"
+                        fit="cover"
+                    />
+                </template>
+            </el-table-column>
+            <el-table-column prop="order_code" label="系统标记人名">
+                <template #default="{ row }">
+                    <registrant-info-popover :value="row.details">
+                        {{ row.details.contactPerson }}
+                    </registrant-info-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="placeCount" sortable label="出现地集合">
+                <template #default="{ row }">
+                    <el-popover
+                        width="240"
+                        popper-class="max-h-[400px] overflow-y-auto"
+                        popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+                    >
+                        <template #reference>
+                            <div class="cursor-pointer">
+                                {{ row.details.locationSet.length }}
+                                <el-icon color="#348DED" class="ml-2"><View /></el-icon>
+                            </div>
+                        </template>
+                        <template #default>
+                            <div>
+                                <div v-for="(item, index) in row.details.locationSet" :key="index">
                                     <div
-                                        v-for="(item, index) in row.details.locationSet"
-                                        :key="index"
+                                        class="bg-[rgba(232,239,247,0.5)] p-2 rounded-md"
+                                        :class="`${
+                                            index === row.details.locationSet.length - 1
+                                                ? ''
+                                                : 'mb-8'
+                                        }`"
                                     >
-                                        <div
-                                            class="bg-[rgba(232,239,247,0.5)] p-2 rounded-md"
-                                            :class="`${
-                                                index === row.details.locationSet.length - 1
-                                                    ? ''
-                                                    : 'mb-8'
-                                            }`"
-                                        >
-                                            <div class="text-xl text-help mb-4">
-                                                {{ item.customerName }}
-                                            </div>
-                                            <div class="text-xl text-help mb-4">
-                                                {{ item.signingTime }}
-                                            </div>
-                                            <div class="text-xl text-help">
-                                                {{ item.orderSn }}
-                                            </div>
+                                        <div class="text-xl text-help mb-4">
+                                            {{ item.customerName }}
+                                        </div>
+                                        <div class="text-xl text-help mb-4">
+                                            {{ item.signingTime }}
+                                        </div>
+                                        <div class="text-xl text-help">
+                                            {{ item.orderSn }}
                                         </div>
                                     </div>
                                 </div>
-                            </template>
-                        </el-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="orderAddress" label="订单签收地" />
-                <el-table-column prop="order_code" label="订单地址坐标" width="120">
-                    <template #default="{ row }">
-                        <map-popover :longitude="row.orderLongitude" :latitude="row.orderLatitude">
-                            {{ row.orderLongitude }},{{ row.orderLatitude }}
-                        </map-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="orderSn" label="订单编号" width="150">
-                    <template #default="{ row }">
-                        <order-info-popover :value="row">
-                            {{ row.orderSn }}
-                        </order-info-popover>
-                        <copy-document :val="row.orderSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="shippingOrderSn" label="运输单号" width="160">
-                    <template #default="{ row }">
-                        <transport-staff-popover :value="row.shippingOrder">
-                            {{ row.shippingOrderSn }}
-                        </transport-staff-popover>
-                        <copy-document :val="row.shippingOrderSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="380px" fixed="right">
-                    <template #default="{ row }">
-                        <el-button
-                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
-                            @click="handleEditRemark(row.code)"
-                            >备注</el-button
-                        >
-                        <el-button
-                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
-                            @click="handleShowForward(row)"
-                            >转发</el-button
-                        >
-                        <el-button
-                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
-                            @click="handleEditResult(row)"
-                            >结果</el-button
-                        >
-                        <el-button
-                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
-                            @click="handleRevoke(row.code, getTableData)"
-                            >撤销
-                        </el-button>
-                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
-                            >日志
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+                            </div>
+                        </template>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="orderAddress" label="订单签收地" />
+            <el-table-column prop="order_code" label="订单地址坐标" width="120">
+                <template #default="{ row }">
+                    <map-popover :longitude="row.orderLongitude" :latitude="row.orderLatitude">
+                        {{ row.orderLongitude }},{{ row.orderLatitude }}
+                    </map-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="orderSn" label="订单编号" width="150">
+                <template #default="{ row }">
+                    <order-info-popover :value="row">
+                        {{ row.orderSn }}
+                    </order-info-popover>
+                    <copy-document :val="row.orderSn" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="shippingOrderSn" label="运输单号" width="160">
+                <template #default="{ row }">
+                    <transport-staff-popover :value="row.shippingOrder">
+                        {{ row.shippingOrderSn }}
+                    </transport-staff-popover>
+                    <copy-document :val="row.shippingOrderSn" />
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="380px" fixed="right">
+                <template #default="{ row }">
+                    <el-button
+                        v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                        @click="handleEditRemark(row.code)"
+                        >备注</el-button
+                    >
+                    <el-button
+                        v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                        @click="handleShowForward(row)"
+                        >转发</el-button
+                    >
+                    <el-button
+                        v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                        @click="handleEditResult(row)"
+                        >结果</el-button
+                    >
+                    <el-button
+                        v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                        @click="handleRevoke(row.code, getTableData)"
+                        >撤销
+                    </el-button>
+                    <el-button @click="handleShowLog(row.exceptionHandlingList)">日志 </el-button>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <!-- 日志弹窗 -->
     <log-dialog

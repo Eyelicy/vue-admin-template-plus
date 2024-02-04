@@ -1,4 +1,9 @@
 <style lang="scss" scoped>
+.scrollbar-div::-webkit-scrollbar {
+    position: absolute;
+    right: 0px;
+}
+
 .abnormal-content {
     @apply w-full flex flex-wrap;
 
@@ -41,7 +46,7 @@
 </style>
 
 <template>
-    <div class="w-full h-full flex flex-col">
+    <div class="w-full h-full flex flex-col overflow-y-auto scrollbar-div">
         <p class="text-title font-bold text-[24px] mb-12">{{ state.currentTime }}</p>
 
         <!-- 异常监控实时消息 start -->
@@ -463,13 +468,13 @@
 </template>
 
 <script setup>
-import { tobaccoApi } from '@/server/api/tobacco';
-import { PieChart, QuestionFilled, TrendCharts } from '@element-plus/icons-vue';
+import { tobaccoApi } from '@/server/api/tobacco'
+import { PieChart, QuestionFilled, TrendCharts } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'; // 引入中文语言包
-import * as echarts from 'echarts';
-import qs from 'qs';
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import * as echarts from 'echarts'
+import qs from 'qs'
+import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
@@ -731,7 +736,7 @@ const initExceptionReportingChart = () => {
                     { name: '同店异脸', value: item[3], itemStyle: { color: '#FCBE28' } },
                 ],
                 itemStyle: {
-                        color:'#C2C2C2',
+                    color: '#C2C2C2',
                     normal: {
                         borderColor: '#fff', // 设置边框颜色为白色（或者任意想要的颜色）
                         borderWidth: 0, // 将边框宽度设置为0，即不显示边框
@@ -797,7 +802,7 @@ const initExceptionReportingChart = () => {
                         },
                         offset: [-cellSize[0] / 2 + 20, -cellSize[1] / 2 + 20],
                         fontSize: 26,
-                        lineHeight:26,
+                        lineHeight: 26,
                         color: '#C2C2C2',
                     },
                     data: scatterData,
@@ -996,7 +1001,7 @@ const initExceptionalDeliveryChart = () => {
                         },
                         offset: [-cellSize[0] / 2 + 20, -cellSize[1] / 2 + 20],
                         fontSize: 26,
-                        lineHeight:26,
+                        lineHeight: 26,
                         color: '#C2C2C2',
                     },
                     data: scatterData,

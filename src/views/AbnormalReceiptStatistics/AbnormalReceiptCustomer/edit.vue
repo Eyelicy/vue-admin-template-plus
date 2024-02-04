@@ -19,7 +19,7 @@
 </style>
 
 <template>
-    <div class="w-full flex flex-col p-12 detail">
+    <div class="w-full h-full flex flex-col detail">
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">客户基础信息</div>
             <div class="grid grid-cols-4 gap-4 gap-y-8">
@@ -63,6 +63,7 @@
             </div>
         </div>
         <el-divider />
+        <!-- 自定义分类 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
             <div
@@ -71,7 +72,7 @@
                 <el-tag
                     v-for="tag in details.labelList"
                     type="success"
-                    class="mr-12 mb-6"
+                    class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]"
                     effect="dark"
                     closable
                     @close="handleCloseTag(tag.id)"

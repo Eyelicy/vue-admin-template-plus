@@ -24,8 +24,7 @@
                 />
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <el-button
+        <el-button
                 class="mb-8"
                 type="primary"
                 style="width: 100px"
@@ -115,7 +114,6 @@
                     </template>
                 </el-table-column>
             </Table>
-        </div>
     </div>
     <!-- 处理日志 -->
     <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>

@@ -24,104 +24,96 @@
                 />
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <el-button
-                class="mb-8"
-                type="primary"
-                style="width: 100px"
-                :icon="Plus"
-                @click="state.addConfigurationDialogVisible = true"
-                >新增配置
-            </el-button>
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
-                <el-table-column prop="deliveryRoute.routeName" label="送货路线名称">
-                </el-table-column>
-                <el-table-column prop="threshold" label="同店异脸告警数值（大于等于）" >
-                    <template #default="{ row, $index }">
-                        <div class="flex items-center">
-                            <el-input
-                                v-if="state.editIndex === $index && state.name === 'threshold'"
-                                v-model="row.threshold"
-                                @keyup.enter="(e) => handleEdit(row)"
-                            />
-                            <span v-else>{{ row.threshold }}</span>
-                            <el-icon
-                                class="cursor-pointer ml-auto"
-                                @click="setEdit('threshold', $index)"
-                                ><EditPen
-                            /></el-icon>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="period" label="订单统计周期（小于等于/天）" >
-                    <template #default="{ row, $index }">
-                        <div class="flex items-center">
-                            <el-input
-                                v-if="state.editIndex === $index && state.name === 'period'"
-                                v-model="row.period"
-                                @keyup.enter="(e) => handleEdit(row)"
-                            />
-                            <span v-else>{{ row.period }}</span>
-                            <el-icon
-                                class="cursor-pointer ml-auto"
-                                @click="setEdit('period', $index)"
-                                ><EditPen
-                            /></el-icon>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="updateTime"
-                    label="更新时间"
-                    :formatter="
-                        (row) => {
-                            return row.updateTime ?? row.createTime
-                        }
-                    "
-                />
-                <el-table-column prop="updateBy_username" label="更新者" />
-                <el-table-column prop="status" label="启用状态">
-                    <template #default="{ row }">
-                        <el-switch
-                            v-model="row.status"
-                            active-value="A"
-                            inactive-value="D"
-                            :loading="state.statusLoading"
-                            @change="handleStatus(row)"
+        <el-button
+            class="mb-8"
+            type="primary"
+            style="width: 100px"
+            :icon="Plus"
+            @click="state.addConfigurationDialogVisible = true"
+            >新增配置
+        </el-button>
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
+            <el-table-column prop="deliveryRoute.routeName" label="送货路线名称"> </el-table-column>
+            <el-table-column prop="threshold" label="同店异脸告警数值（大于等于）">
+                <template #default="{ row, $index }">
+                    <div class="flex items-center">
+                        <el-input
+                            v-if="state.editIndex === $index && state.name === 'threshold'"
+                            v-model="row.threshold"
+                            @keyup.enter="(e) => handleEdit(row)"
                         />
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="280px">
-                    <template #default="{row}">
-                        <el-button
-                            @click="
-                                router.push({
-                                    path: `/anomaly-detection-configuration/same-store-different-faces/edit/${row.id}`,
-                                })
-                            "
-                            >编辑</el-button
-                        >
-                        <el-button @click="handleShowLog(row)">日志</el-button>
-                        <el-popconfirm
-                            title="请确认是否删除该条数据？"
-                            @confirm="handleDelete(row)"
-                        >
-                            <template #reference>
-                                <el-button>删除 </el-button>
-                            </template>
-                        </el-popconfirm>
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+                        <span v-else>{{ row.threshold }}</span>
+                        <el-icon
+                            class="cursor-pointer ml-auto"
+                            @click="setEdit('threshold', $index)"
+                            ><EditPen
+                        /></el-icon>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop="period" label="订单统计周期（小于等于/天）">
+                <template #default="{ row, $index }">
+                    <div class="flex items-center">
+                        <el-input
+                            v-if="state.editIndex === $index && state.name === 'period'"
+                            v-model="row.period"
+                            @keyup.enter="(e) => handleEdit(row)"
+                        />
+                        <span v-else>{{ row.period }}</span>
+                        <el-icon class="cursor-pointer ml-auto" @click="setEdit('period', $index)"
+                            ><EditPen
+                        /></el-icon>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="updateTime"
+                label="更新时间"
+                :formatter="
+                    (row) => {
+                        return row.updateTime ?? row.createTime
+                    }
+                "
+            />
+            <el-table-column prop="updateBy_username" label="更新者" />
+            <el-table-column prop="status" label="启用状态">
+                <template #default="{ row }">
+                    <el-switch
+                        v-model="row.status"
+                        active-value="A"
+                        inactive-value="D"
+                        :loading="state.statusLoading"
+                        @change="handleStatus(row)"
+                    />
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="280px">
+                <template #default="{ row }">
+                    <el-button
+                        @click="
+                            router.push({
+                                path: `/anomaly-detection-configuration/same-store-different-faces/edit/${row.id}`,
+                            })
+                        "
+                        >编辑</el-button
+                    >
+                    <el-button @click="handleShowLog(row)">日志</el-button>
+                    <el-popconfirm title="请确认是否删除该条数据？" @confirm="handleDelete(row)">
+                        <template #reference>
+                            <el-button>删除 </el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <!-- 处理日志 -->
     <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
@@ -276,7 +268,10 @@ const getLogData = async (id) => {
     const {
         code,
         data: { rows },
-    } = await tobaccoApi('get', `/api/v1/tobacco/signingMultiFacesConfigHis/list?${qs.stringify(params)}`)
+    } = await tobaccoApi(
+        'get',
+        `/api/v1/tobacco/signingMultiFacesConfigHis/list?${qs.stringify(params)}`
+    )
     if (code === 200) {
         state.exceptionHandlingList = rows
     }
@@ -290,11 +285,7 @@ const handleAddConfiguration = async (formEl) => {
         const {
             data: { data },
             code,
-        } = await tobaccoApi(
-            'post',
-            '/api/v1/tobacco/signingMultiFacesConfig',
-            addConfiguration
-        )
+        } = await tobaccoApi('post', '/api/v1/tobacco/signingMultiFacesConfig', addConfiguration)
         if (code === 200) {
             formEl.resetFields()
             getTableData(true)
@@ -306,7 +297,7 @@ const handleAddConfiguration = async (formEl) => {
 }
 
 // 删除
-const handleDelete = async(row) => {
+const handleDelete = async (row) => {
     const { code, data } = await tobaccoApi(
         'delete',
         `/api/v1/tobacco/signingMultiFacesConfig/${row.id}`

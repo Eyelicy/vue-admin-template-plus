@@ -83,116 +83,112 @@
                 <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
         </TableHead>
-        <div class="flex-auto flex flex-col">
-            <Table
-                class="flex-auto"
-                ref="tableRef"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-                sortable="custom"
-                @sort-change="sortChange"
-                style="width: 100%"
-            >
-                <el-table-column prop="code" label="异常上报编号" width="235">
-                    <template #default="{ row }">
-                        <el-link
-                            type="primary"
-                            :underline="false"
-                            @click="
-                                router.push({
-                                    path: `delivery-location-deviation/detail/${row.code}`,
-                                })
-                            "
-                            >{{ row.code }}
-                        </el-link>
-                        <copy-document :val="row.code" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="status" label="状态" width="80">
-                    <template #default="{ row }">
-                        <span :style="`color:${abnormalOrderColor[row.status]}`">
-                            {{ abnormalOrderStatus[row.status] }}
-                        </span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="createTime" sortable label="异常上报时间" />
-                <el-table-column prop="order_code" label="实际签收地">
-                    <template #default="{ row }">
-                        {{ JSON.parse(row.details).address }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="order_code" label="实际地址坐标">
-                    <template #default="{ row }">
-                        <map-popover
-                            :longitude="JSON.parse(row.details).longitude"
-                            :latitude="JSON.parse(row.details).latitude"
-                        >
-                            {{
-                                `${JSON.parse(row.details).longitude},${
-                                    JSON.parse(row.details).latitude
-                                }`
-                            }}
-                        </map-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="orderAddress" label="订单签收地" />
-                <el-table-column prop="order_code" label="订单地址坐标">
-                    <template #default="{ row }">
-                        <map-popover :longitude="row.orderLongitude" :latitude="row.orderLatitude">
-                            {{ row.orderLongitude }},{{ row.orderLatitude }}
-                        </map-popover>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="deviation" label="偏差距离" sortable>
-                    <template #default="{ row }"> {{ row.deviation.toFixed(2) }}米 </template>
-                </el-table-column>
-                <el-table-column prop="orderSn" label="订单编号" width="150">
-                    <template #default="{ row }">
-                        <order-info-popover :value="row">
-                            {{ row.orderSn }}
-                        </order-info-popover>
-                        <copy-document :val="row.orderSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column prop="shippingOrderSn" label="运输单号" width="160">
-                    <template #default="{ row }">
-                        <transport-staff-popover :value="row.shippingOrder">
-                            {{ row.shippingOrderSn }}
-                        </transport-staff-popover>
-                        <copy-document :val="row.shippingOrderSn" />
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="380px" fixed="right">
-                    <template #default="{ row }">
-                        <el-button
-                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
-                            @click="handleEditRemark(row.code)"
-                            >备注</el-button
-                        >
-                        <el-button
-                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
-                            @click="handleShowForward(row)"
-                            >转发</el-button
-                        >
-                        <el-button
-                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
-                            @click="handleEditResult(row)"
-                            >结果</el-button
-                        >
-                        <el-button
-                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
-                            @click="handleRevoke(row.code, getTableData)"
-                            >撤销
-                        </el-button>
-                        <el-button @click="handleShowLog(row.exceptionHandlingList)"
-                            >日志
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </Table>
-        </div>
+        <Table
+            class="flex-auto"
+            ref="tableRef"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+            sortable="custom"
+            @sort-change="sortChange"
+            style="width: 100%"
+        >
+            <el-table-column prop="code" label="异常上报编号" width="235">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        :underline="false"
+                        @click="
+                            router.push({
+                                path: `delivery-location-deviation/detail/${row.code}`,
+                            })
+                        "
+                        >{{ row.code }}
+                    </el-link>
+                    <copy-document :val="row.code" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="80">
+                <template #default="{ row }">
+                    <span :style="`color:${abnormalOrderColor[row.status]}`">
+                        {{ abnormalOrderStatus[row.status] }}
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="createTime" sortable label="异常上报时间" />
+            <el-table-column prop="order_code" label="实际签收地">
+                <template #default="{ row }">
+                    {{ JSON.parse(row.details).address }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="order_code" label="实际地址坐标">
+                <template #default="{ row }">
+                    <map-popover
+                        :longitude="JSON.parse(row.details).longitude"
+                        :latitude="JSON.parse(row.details).latitude"
+                    >
+                        {{
+                            `${JSON.parse(row.details).longitude},${
+                                JSON.parse(row.details).latitude
+                            }`
+                        }}
+                    </map-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="orderAddress" label="订单签收地" />
+            <el-table-column prop="order_code" label="订单地址坐标">
+                <template #default="{ row }">
+                    <map-popover :longitude="row.orderLongitude" :latitude="row.orderLatitude">
+                        {{ row.orderLongitude }},{{ row.orderLatitude }}
+                    </map-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="deviation" label="偏差距离" sortable>
+                <template #default="{ row }"> {{ row.deviation.toFixed(2) }}米 </template>
+            </el-table-column>
+            <el-table-column prop="orderSn" label="订单编号" width="150">
+                <template #default="{ row }">
+                    <order-info-popover :value="row">
+                        {{ row.orderSn }}
+                    </order-info-popover>
+                    <copy-document :val="row.orderSn" />
+                </template>
+            </el-table-column>
+            <el-table-column prop="shippingOrderSn" label="运输单号" width="160">
+                <template #default="{ row }">
+                    <transport-staff-popover :value="row.shippingOrder">
+                        {{ row.shippingOrderSn }}
+                    </transport-staff-popover>
+                    <copy-document :val="row.shippingOrderSn" />
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="380px" fixed="right">
+                <template #default="{ row }">
+                    <el-button
+                        v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                        @click="handleEditRemark(row.code)"
+                        >备注</el-button
+                    >
+                    <el-button
+                        v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                        @click="handleShowForward(row)"
+                        >转发</el-button
+                    >
+                    <el-button
+                        v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                        @click="handleEditResult(row)"
+                        >结果</el-button
+                    >
+                    <el-button
+                        v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                        @click="handleRevoke(row.code, getTableData)"
+                        >撤销
+                    </el-button>
+                    <el-button @click="handleShowLog(row.exceptionHandlingList)">日志 </el-button>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <!-- 日志弹窗 -->
     <log-dialog

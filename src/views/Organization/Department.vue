@@ -86,11 +86,7 @@
             </span>
         </template>
     </Dialog>
-    <Dialog
-        v-model="editDialogVisible"
-        title="编辑部门"
-        center
-    >
+    <Dialog v-model="editDialogVisible" title="编辑部门" center>
         <el-form
             :model="form"
             ref="formRef"

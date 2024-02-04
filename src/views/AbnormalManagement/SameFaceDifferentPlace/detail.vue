@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col">
+    <div class="w-full h-full flex flex-col detail">
         <div class="flex items-center mb-[5.6rem]">
             <div class="w-[160px] flex items-center">
                 <p class="text-title">同脸出现地总数</p>
