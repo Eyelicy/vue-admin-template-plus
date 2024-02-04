@@ -1,6 +1,6 @@
 el-date-picker
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <div class="">
             <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
                 <div class="table-header">

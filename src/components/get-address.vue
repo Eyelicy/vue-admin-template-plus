@@ -101,34 +101,54 @@ const mapInit = async () => {
     AMap = await AMapLoader.load({
         key: '536f8f9c0f3cd71f799cba67901c571f',
         version: '2.0',
-        plugins: ['AMap.Geocoder', 'AMap.PlaceSearch', 'AMap.AutoComplete'],
+        plugins: [
+            'AMap.Geocoder',
+            'AMap.PlaceSearch',
+            'AMap.AutoComplete',
+            'AMap.Scale',
+            'AMap.ToolBar',
+            'AMap.ControlBar',
+        ],
     })
     //输入提示
     var autoOptions = {
         input: 'tipinput',
     }
 
-    var satellite = new AMap.TileLayer.Satellite()
-    var roadNet = new AMap.TileLayer.RoadNet()
+    // var satellite = new AMap.TileLayer.Satellite()
+    // var roadNet = new AMap.TileLayer.RoadNet()
+
     geocoder = new AMap.Geocoder({
         city: '全国',
     })
     map = new AMap.Map('map', {
         zoom: 13, //级别
+        // viewMode: '3D',
         // center: [props.location.lng, props.location.lat],
     })
 
-    AMap.plugin(['AMap.PlaceSearch', 'AMap.AutoComplete'], function () {
-        var auto = new AMap.AutoComplete(autoOptions)
-        var placeSearch = new AMap.PlaceSearch({
-            map: map,
-        }) //构造地点查询类
-        auto.on('select', select) //注册监听，当选中某条记录时会触发
-        function select(e) {
-            placeSearch.setCity(e.poi.adcode)
-            placeSearch.search(e.poi.name) //关键字查询查询
+    AMap.plugin(
+        ['AMap.PlaceSearch', 'AMap.AutoComplete', 'AMap.Scale', 'AMap.ToolBar', 'AMap.ControlBar'],
+        function () {
+            var auto = new AMap.AutoComplete(autoOptions)
+            var placeSearch = new AMap.PlaceSearch({
+                map: map,
+            }) //构造地点查询类
+
+            auto.on('select', select) //注册监听，当选中某条记录时会触发
+
+            function select(e) {
+                placeSearch.setCity(e.poi.adcode)
+                placeSearch.search(e.poi.name) //关键字查询查询
+            }
+
+            //添加控件-比例尺控件
+            map.addControl(new AMap.Scale())
+            //添加控件-工具条控件
+            map.addControl(new AMap.ToolBar())
+            map.addControl(new AMap.ControlBar())
         }
-    })
+    )
 
     // if (props.location.lng && props.location.lat) {
     //     map.setCenter([props.location.lng, props.location.lat])

@@ -5,8 +5,8 @@ module.exports = {
     theme: {
         extend: {},
         fontSize: {
-            'xs': ['0.875rem', '0.875rem'],
-            'xl': ['1.6rem', '1.6rem'],
+            xs: ['0.875rem', '0.875rem'],
+            xl: ['1.6rem', '1.6rem'],
             '2xl': ['2.2rem', '2.2rem'],
             '3xl': ['3.2rem', '3.2rem'],
         },
@@ -22,6 +22,10 @@ module.exports = {
             help: '#888888',
             explanation: '#C2C2C2',
             'test-black': '#515864',
+            'WAITING': '#FA9F16',
+            'PROCESSING': '#348DED',
+            'COMPLETED': '#16D585',
+            'CANCELLED': '#F34628',
         }),
     },
     plugins: [],

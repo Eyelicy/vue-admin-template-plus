@@ -35,10 +35,19 @@
                     </el-tag>
                     <el-button type="danger" plain @click="handleResetLevel">重置</el-button>
                 </descriptions-item>
-                <descriptions-item label="签收地址">{{ details.address }}</descriptions-item>
-                <descriptions-item label="注册人名">{{
-                    details?.realname?.name
-                }}</descriptions-item>
+                <descriptions-item label="签收地址">
+                    <map-popover
+                        :longitude="details?.longitude"
+                        :latitude="details?.latitude"
+                    >
+                        {{ details?.address ?? '--' }}
+                    </map-popover>
+                </descriptions-item>
+                <descriptions-item label="注册人名">
+                    <registrant-name-popover :value="details?.realname">
+                        {{ details?.realname?.name }}
+                    </registrant-name-popover>
+                </descriptions-item>
                 <descriptions-item label="所属路线编号/路线名"
                     >{{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
                     {{ details?.customerDeliveryInfo?.deliveryRoute?.routeName }}
@@ -56,17 +65,20 @@
         <el-divider />
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
-            <div class="flex flex-wrap items-center">
+            <div
+                class="flex flex-wrap items-center bg-[#EEEEEE] py-[24px] px-[12px] pb-[64px] relative"
+            >
                 <el-tag
                     v-for="tag in details.labelList"
                     type="success"
-                    class="mr-12"
+                    class="mr-12 mb-6"
                     effect="dark"
                     closable
                     @close="handleCloseTag(tag.id)"
                     >{{ tag.labelName }}
                 </el-tag>
                 <el-button
+                    class="w-[200px] absolute m-auto bottom-[16px] right-0 left-0"
                     type="primary"
                     plain
                     :icon="Plus"
@@ -76,8 +88,8 @@
             </div>
         </div>
         <el-divider />
-        <div class="w-full px-16 flex-auto">
-            <div class="box-title text-title text-2xl">异常订单信息</div>
+        <div class="w-full px-16 flex-auto text-center">
+            <div class="box-title text-title text-2xl text-left">异常订单信息</div>
             <Table :data="state.tableData" :show-page="false">
                 <el-table-column prop="createTime" label="异常预警时间"> </el-table-column>
                 <el-table-column prop="status" label="异常类型">
@@ -92,6 +104,18 @@
                 <el-table-column prop="order.quantity" label="总盒数" />
                 <el-table-column prop="order.amount" label="总金额（元）" />
             </Table>
+            <el-button
+                v-if="state.tableData.length > 0"
+                type="primary"
+                class="w-[200px] mx-auto mt-[32px]"
+                @click="
+                    router.push({
+                        path: `/abnormal-receipt-statistics/abnormal-receipt-order/${details.customerName}`,
+                    })
+                "
+            >
+                查看更多
+            </el-button>
         </div>
     </div>
     <Dialog width="600px" v-model="classification.dialogVisible" title="添加分类标记" center>
@@ -241,6 +265,8 @@ const getDetails = async () => {
 const getOrderList = async () => {
     let params = {
         customerCode: details.customerCode,
+        pageNum: 1,
+        pageSize: 5,
     }
     const {
         data: { rows, total },

@@ -16,9 +16,16 @@ export const staffStatusText = {
 export const abnormalOrderStatus = {
     WAITING: '待处理',
     PROCESSING: '处理中',
-    COMPLETED: '已处理',
-    CANCELLED: '已取消',
+    COMPLETED: '已办结',
+    CANCELLED: '已撤销',
 }
+
+export const abnormalOrderColor = {
+    WAITING: '#F34628',
+    PROCESSING: '#16D585',
+    COMPLETED: '#348DED',
+}
+
 
 export const exceptionStatus = {
     A: '签收地偏离',

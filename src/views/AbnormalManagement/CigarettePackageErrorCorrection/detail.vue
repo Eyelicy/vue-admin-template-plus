@@ -7,7 +7,7 @@
 </style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <div class="flex items-center mb-[5.6rem]">
             <div class="w-[160px] flex items-center">
                 <p class="text-title">烟包纠错数</p>

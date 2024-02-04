@@ -20,7 +20,7 @@
         <template #reference>
             <div class=" cursor-pointer">
                 <slot></slot>
-                <el-icon class="ml-2 "><View /></el-icon>
+                <el-icon color="#348DED" class="ml-2 "><View /></el-icon>
             </div>
         </template>
         <template #default>

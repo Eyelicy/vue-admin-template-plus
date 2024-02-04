@@ -11,7 +11,7 @@
         <div
             class="flex container mx-auto overflow-hidden"
             style="
-                height: 550px;
+                height: 500px;
                 max-width: 1000px;
                 background: #ffffff;
                 border: 1px solid #dddddd;
@@ -200,7 +200,8 @@ if (!loginModel.rememberAccountName) {
 <style lang="scss" scoped>
 .bg {
     background: url('@/assets/bg-1.png') no-repeat;
-    background-size: contain;
+    background-size: cover;
     background-position: center;
+
 }
 </style>

@@ -1,10 +1,17 @@
+<style lang="scss">
+.scrollbar-div::-webkit-scrollbar {
+    // position: absolute;
+    // right: 0px;
+}
+</style>
+
 <template>
     <el-config-provider :locale="zhCn">
-        <el-container class="h-screen">
+        <el-container class="h-screen flex">
             <el-header class="p-0 flex-initial shrink-0">
                 <Header></Header>
             </el-header>
-            <el-container class="flex-auto">
+            <el-container class="flex-auto flex">
                 <el-aside
                     class="bg-white rounded-2xl"
                     width="220px"
@@ -25,22 +32,27 @@
                         </template>
                     </el-breadcrumb>
                     <div
-                        class="bg-white rounded-2xl flex flex-col flex-auto"
-                        style="box-shadow: 0px 3px 20px rgb(178 175 223 / 30%)"
+                        class="bg-white rounded-2xl flex flex-col p-[32px]"
+                        style="
+                            box-shadow: 0px 3px 20px rgb(178 175 223 / 30%);
+                            height: calc(100vh - 60px - 40px - 36px);
+                        "
                     >
-                        <router-view v-slot="{ Component }">
-                            <KeepAlive
-                                ><component
+                        <div class="w-full h-full overflow-y-auto scrollbar-div">
+                            <router-view v-slot="{ Component }">
+                                <KeepAlive
+                                    ><component
+                                        :is="Component"
+                                        :key="$route.fullPath"
+                                        v-if="$route.meta.keepAlive"
+                                /></KeepAlive>
+                                <component
                                     :is="Component"
                                     :key="$route.fullPath"
-                                    v-if="$route.meta.keepAlive"
-                            /></KeepAlive>
-                            <component
-                                :is="Component"
-                                :key="$route.fullPath"
-                                v-if="!$route.meta.keepAlive"
-                            />
-                        </router-view>
+                                    v-if="!$route.meta.keepAlive"
+                                />
+                            </router-view>
+                        </div>
                     </div>
                 </el-main>
             </el-container>
@@ -73,5 +85,3 @@ watch(route, (value) => {
     }, [])
 })
 </script>
-
-<style lang="scss" scoped></style>

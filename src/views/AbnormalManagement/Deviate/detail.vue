@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12 detail" v-loading="state.loading">
+    <div class="w-full h-full flex flex-col detail" v-loading="state.loading">
         <div class="flex items-center mb-[5.6rem]">
             <div class="flex flex-col">
                 <div class="flex mb-4">
@@ -13,12 +13,13 @@
                 </div>
                 <el-button @click="handleMapDialogVisible">地图模式</el-button>
             </div>
-            <el-button round class="mx-8">{{
+            <el-button round class="mx-8" :color="abnormalOrderColor[details?.status]" plain>{{
                 abnormalOrderStatus[details?.status] ?? '--'
             }}</el-button>
-            <div class="flex mr-8">
+            <div class="flex items-center mr-8">
                 <p class="text-title">异常上报编号:</p>
                 <p>{{ details.code ?? '--' }}</p>
+                <copy-document :val="details?.code" />
             </div>
             <div class="flex">
                 <p class="text-title">上报时间:</p>
@@ -27,16 +28,32 @@
             <el-button round class="ml-auto" @click="state.logDialogVisible = true"
                 >处理日志
             </el-button>
-            <el-button round type="primary" @click="state.remarkDialogVisible = true"
+            <el-button
+                v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'"
+                round
+                type="primary"
+                @click="state.remarkDialogVisible = true"
                 >编辑备注
             </el-button>
-            <el-button round type="primary" @click="state.forwardDialogVisible = true"
+            <el-button
+                v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'"
+                round
+                type="primary"
+                @click="state.forwardDialogVisible = true"
                 >转发下一级
             </el-button>
-            <el-button round type="success" @click="state.resultDialogVisible = true"
+            <el-button
+                v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'"
+                round
+                type="success"
+                @click="state.resultDialogVisible = true"
                 >填写处理结果
             </el-button>
-            <el-button round type="danger" @click="handleRevoke(state.code, getDetails)"
+            <el-button
+                v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'"
+                round
+                type="danger"
+                @click="handleRevoke(state.code, getDetails)"
                 >撤销本上报
             </el-button>
         </div>
@@ -45,38 +62,55 @@
                 details.orderAddress ?? '--'
             }}</descriptions-item>
             <descriptions-item label="订单地址坐标">
-                {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
+                <map-popover
+                    :longitude="details?.orderLongitude"
+                    :latitude="details?.orderLatitude"
+                >
+                    {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
+                </map-popover>
             </descriptions-item>
             <descriptions-item label="实际签收地">{{
                 details?.details?.address ?? '--'
             }}</descriptions-item>
             <descriptions-item label="实际地址坐标">
-                {{ `${details?.details?.longitude},${details?.details?.latitude}` ?? '--' }}
+                <map-popover
+                    :longitude="details?.details?.longitude"
+                    :latitude="details?.details?.latitude"
+                >
+                    {{ `${details?.details?.longitude},${details?.details?.latitude}` ?? '--' }}
+                </map-popover>
             </descriptions-item>
-            <descriptions-item label="签收店名">
+            <descriptions-item label="客户名称">
                 {{ details?.order?.customer?.customerName ?? '--' }}
+                <copy-document :val="details?.order?.customer?.customerName" />
             </descriptions-item>
             <descriptions-item label="注册人名">
-                {{ details?.order?.customer?.contactPerson ?? '--' }}
+                <registrant-name-popover :value="details?.order?.customer">
+                    {{ details?.order?.customer?.contactPerson ?? '--' }}
+                </registrant-name-popover>
             </descriptions-item>
         </div>
         <el-divider />
         <!-- 订单信息 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">订单信息</div>
-            <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="订单编号">{{
-                    details?.order?.orderSn ?? '--'
-                }}</descriptions-item>
-                <descriptions-item label="购方姓名">{{
-                    details?.order?.customer?.contactPerson ?? '--'
-                }}</descriptions-item>
-                <descriptions-item label="店名">{{
-                    details?.order?.customer?.customerName ?? '--'
-                }}</descriptions-item>
-                <descriptions-item label="签收地址">{{
-                    details?.orderAddress ?? '--'
-                }}</descriptions-item>
+            <div class="grid grid-cols-6 gap-4 gap-y-[3.2rem]">
+                <descriptions-item label="订单编号">
+                    {{ details?.order?.orderSn ?? '--' }}
+                    <copy-document :val="details?.order?.orderSn" />
+                </descriptions-item>
+                <descriptions-item label="客户名称">
+                    {{ details?.order?.customer?.customerName ?? '--' }}
+                    <copy-document :val="details?.order?.customer?.customerName" />
+                </descriptions-item>
+                <descriptions-item label="签收地址">
+                    <map-popover
+                        :longitude="details?.orderLongitude"
+                        :latitude="details?.orderLatitude"
+                    >
+                        {{ details?.orderAddress ?? '--' }}
+                    </map-popover>
+                </descriptions-item>
                 <descriptions-item label="品种数">{{
                     details?.order?.skuCount ?? '--'
                 }}</descriptions-item>
@@ -92,16 +126,18 @@
         <!-- 运输信息 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">运输信息</div>
-            <div class="grid grid-cols-6 gap-4 gap-y-8">
-                <descriptions-item label="运输单号">{{
-                    details?.shippingOrder?.shippingSn ?? '--'
-                }}</descriptions-item>
+            <div class="grid grid-cols-6 gap-4 gap-y-[3.2rem]">
+                <descriptions-item label="运输单号">
+                    {{ details?.shippingOrder?.shippingSn ?? '--' }}
+                    <copy-document :val="details?.shippingOrder?.shippingSn" />
+                </descriptions-item>
                 <descriptions-item label="运输日期">{{
                     details?.shippingOrder?.shippingDate ?? '--'
                 }}</descriptions-item>
-                <descriptions-item label="车辆牌照">{{
-                    details?.shippingOrder?.licensePlate ?? '--'
-                }}</descriptions-item>
+                <descriptions-item label="车辆牌照">
+                    {{ details?.shippingOrder?.licensePlate ?? '--' }}
+                    <copy-document :val="details?.shippingOrder?.licensePlate" />
+                </descriptions-item>
                 <descriptions-item label="运输人">{{
                     details?.shippingOrder?.driver?.name ?? '--'
                 }}</descriptions-item>
@@ -109,7 +145,7 @@
                     details?.shippingOrder?.driver?.driverLicense ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="配送人">{{
-                    details?.shippingOrder?.deliveryPerson?.name?? '--'
+                    details?.shippingOrder?.deliveryPerson?.name ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="身份证号"
                     >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
@@ -153,10 +189,9 @@
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
-import ForwardDialog from '@/components/exception-handling-operation/forward-dialog.vue'
 import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { tobaccoApi } from '@/server/api/tobacco'
-import { abnormalOrderStatus } from '@/utils/enum'
+import { abnormalOrderColor, abnormalOrderStatus } from '@/utils/enum'
 import { getImageUrl } from '@/utils/index'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { nextTick, onMounted, reactive, ref } from 'vue'

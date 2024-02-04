@@ -29,7 +29,7 @@
     color: var(--el-button-text-color);
 }
 .el-button.is-link:hover {
-    color: var(--el-button-hover-link-text-color);
+    // color: var(--el-button-hover-link-text-color);
 }
 .el-button--primary.is-link:hover,
 .el-button--primary.is-plain:hover,
@@ -44,7 +44,7 @@
 }
 
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: Arial;
     font-weight: 400;
     font-size: 10px;
 }
@@ -64,7 +64,7 @@ body {
 
 .box-title {
     position: relative;
-    @apply pl-4 mb-12;
+    @apply pl-4 mb-12 text-primary text-[18px];
 
     &::before {
         content: '';
@@ -137,7 +137,7 @@ body {
     }
 
     .el-input {
-        width: 200px;
+        width: 100%;
     }
 }
 

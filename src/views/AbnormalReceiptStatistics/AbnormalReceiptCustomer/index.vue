@@ -1,7 +1,25 @@
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tag-level-1 {
+    background-color: #f34628;
+    border-color: #f34628;
+    color: #fff;
+}
+
+.tag-level-2 {
+    background-color: #303133;
+    border-color: #303133;
+    color: #fff;
+}
+
+.tag-level-3 {
+    background-color: #feea33;
+    border-color: #feea33;
+    color: #000;
+}
+</style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">预警等级</div>
@@ -39,7 +57,16 @@
                 @getTableData="getTableData"
             >
                 <el-table-column prop="customerName" label="客户名称"> </el-table-column>
-                <el-table-column prop="customerAlertLevel.name" label="预警等级"> </el-table-column>
+                <el-table-column prop="customerAlertLevel.name" label="预警等级">
+                    <template #default="{ row }">
+                        <el-tag
+                            class="p-4 rounded-md mr-12"
+                            :class="`tag-level-${row?.customerAlertLevel.id}`"
+                        >
+                            {{ row.customerAlertLevel.name }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="labelList" label="自定义分类">
                     <template #default="{ row }">
                         <div class="flex flex-wrap">
@@ -93,15 +120,13 @@
         <Table :data="warningLog.tableData" border style="width: 100%" :showPage="false">
             <el-table-column prop="detail" label="等级变化" />
             <el-table-column prop="createTime" label="时间" />
-            <el-table-column prop="createBy" label="处理者" />
+            <el-table-column prop="createBy_username" label="处理者" />
         </Table>
     </Dialog>
 </template>
 
 <script setup>
 import Dialog from '@/components/dialog/index.vue'
-import clientSelect from '@/components/select/client-select.vue'
-import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'

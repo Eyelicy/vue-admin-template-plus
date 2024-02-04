@@ -32,8 +32,20 @@
         </template>
         <div>
             <Table :data="data" :show-page="false">
-                <el-table-column prop="operation" label="类型"></el-table-column>
-                <el-table-column prop="detail" label="处理详情"></el-table-column>
+                <el-table-column prop="operation" label="类型">
+                    <template #default="{ row }">
+                        <span :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
+                            >{{ row.operation }}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="detail" label="处理详情">
+                    <template #default="{ row }">
+                        <span :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
+                            >{{ row.detail }}
+                        </span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="createTime" label="时间"></el-table-column>
                 <el-table-column prop="handler_username" label="处理者"></el-table-column>
             </Table>

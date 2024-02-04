@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead>
             <div class="table-header">
                 <div class="table-header-lab">员工部门</div>

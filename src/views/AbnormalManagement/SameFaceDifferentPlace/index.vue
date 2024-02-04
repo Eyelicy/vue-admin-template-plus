@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">异常上报编号</div>
@@ -11,7 +11,6 @@
             <div class="table-header">
                 <div class="table-header-lab">状态</div>
                 <abnormal-order-status-select
-                    class="w-[200px]"
                     v-model="query.status"
                     placeholder="请选择状态"
                     clearable
@@ -95,7 +94,7 @@
                 @sort-change="sortChange"
                 @getTableData="getTableData"
             >
-                <el-table-column prop="code" label="异常上报编号" width="230">
+                <el-table-column prop="code" label="异常上报编号" width="235">
                     <template #default="{ row }">
                         <el-link
                             type="primary"
@@ -110,20 +109,22 @@
                         <copy-document :val="row.code" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="状态">
+                <el-table-column prop="status" label="状态" width="75">
                     <template #default="{ row }">
-                        {{ abnormalOrderStatus[row.status] }}
+                        <span :style="`color:${abnormalOrderColor[row.status]}`">
+                            {{ abnormalOrderStatus[row.status] }}
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="createTime" sortable label="异常上报时间" />
-                <el-table-column prop="order_code" label="同脸图像">
+                <el-table-column prop="order_code" label="同脸图像" width="90">
                     <template #default="{ row }">
                         <el-image
                             :append-to-body="true"
                             :preview-teleported="true"
                             style="width: 50px; height: 50px"
                             :src="`${row.signingInfo.image}?x-oss-process=image/resize,w_100,h_100`"
-                            :preview-src-list="[`${row.signingInfo.image}?${Date.now()}`]"
+                            :preview-src-list="[`${row.signingInfo.image}`]"
                             fit="cover"
                         />
                     </template>
@@ -145,7 +146,7 @@
                             <template #reference>
                                 <div class="cursor-pointer">
                                     {{ row.details.locationSet.length }}
-                                    <el-icon class="ml-2"><View /></el-icon>
+                                    <el-icon color="#348DED" class="ml-2"><View /></el-icon>
                                 </div>
                             </template>
                             <template #default>
@@ -179,12 +180,14 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderAddress" label="订单签收地" />
-                <el-table-column prop="order_code" label="订单地址坐标">
+                <el-table-column prop="order_code" label="订单地址坐标" width="120">
                     <template #default="{ row }">
-                        {{ row.orderLongitude }},{{ row.orderLatitude }}
+                        <map-popover :longitude="row.orderLongitude" :latitude="row.orderLatitude">
+                            {{ row.orderLongitude }},{{ row.orderLatitude }}
+                        </map-popover>
                     </template>
                 </el-table-column>
-                <el-table-column prop="orderSn" label="订单编号">
+                <el-table-column prop="orderSn" label="订单编号" width="150">
                     <template #default="{ row }">
                         <order-info-popover :value="row">
                             {{ row.orderSn }}
@@ -192,18 +195,36 @@
                         <copy-document :val="row.orderSn" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="shippingOrderSn" label="运输单号">
+                <el-table-column prop="shippingOrderSn" label="运输单号" width="160">
                     <template #default="{ row }">
-                        {{ row.shippingOrderSn }}
+                        <transport-staff-popover :value="row.shippingOrder">
+                            {{ row.shippingOrderSn }}
+                        </transport-staff-popover>
                         <copy-document :val="row.shippingOrderSn" />
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="380px">
+                <el-table-column label="操作" width="380px" fixed="right">
                     <template #default="{ row }">
-                        <el-button @click="handleEditRemark(row.code)">备注</el-button>
-                        <el-button @click="handleShowForward(row)">转发</el-button>
-                        <el-button @click="handleEditResult(row)">结果</el-button>
-                        <el-button @click="handleRevoke(row.code, getTableData)">撤销</el-button>
+                        <el-button
+                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                            @click="handleEditRemark(row.code)"
+                            >备注</el-button
+                        >
+                        <el-button
+                            v-if="row.status !== 'COMPLETED' && row.status !== 'CANCELLED'"
+                            @click="handleShowForward(row)"
+                            >转发</el-button
+                        >
+                        <el-button
+                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                            @click="handleEditResult(row)"
+                            >结果</el-button
+                        >
+                        <el-button
+                            v-if="row.status === 'PROCESSING' || row.status === 'WAITING'"
+                            @click="handleRevoke(row.code, getTableData)"
+                            >撤销
+                        </el-button>
                         <el-button @click="handleShowLog(row.exceptionHandlingList)"
                             >日志
                         </el-button>
@@ -230,6 +251,7 @@
     <processing-result-dialog
         v-model="state.resultDialogVisible"
         v-model:result="state.result"
+        :exceptionCode="state.exceptionCode"
         @confirm="getTableData"
     >
     </processing-result-dialog>
@@ -242,18 +264,16 @@
 </template>
 
 <script setup>
-import orderInfoPopover from '@/components/popover/order-info-popover.vue'
-import registrantInfoPopover from '@/components/popover/registrant-info-popover.vue'
-import abnormalOrderStatusSelect from '@/components/select/abnormal-order-status-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
 import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { tobaccoApi } from '@/server/api/tobacco'
-import { abnormalOrderStatus } from '@/utils/enum'
+import { abnormalOrderColor, abnormalOrderStatus } from '@/utils/enum'
 import { View } from '@element-plus/icons-vue'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+
 const { handleRevoke } = useExceptionMonitoringManagement()
 
 const router = useRouter(),
@@ -323,8 +343,8 @@ const getTableData = async (init) => {
         pageSize: page.size,
         exceptionType: 'C', // 异常类型 A:签收地偏离, B:同店异脸, C:同脸异地
         ...query,
-        orderByColumn: 'createTime',
-        isAsc: 'desc',
+        // orderByColumn: 'createTime',
+        // isAsc: 'desc',
     }
     if (params.datetimerange && params.datetimerange.length > 0) {
         params.createTimeStart = query.datetimerange[0]
@@ -339,7 +359,7 @@ const getTableData = async (init) => {
             item.details = JSON.parse(item.details)
             item.placeCount = item.details?.locationSet?.length
         })
-        
+
         if (sort.order && sort.prop) {
             state.tableData = sortByField(rows, sort.prop, sort.order)
         } else {

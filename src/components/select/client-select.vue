@@ -14,7 +14,7 @@
             v-for="(item,index) in state.lineList"
             :key="index"
             :label="item.customerName"
-            :value="item.customerName"
+            :value="item[val]"
         />
     </el-select>
 </template>
@@ -25,6 +25,13 @@ import qs from 'qs'
 import { onMounted, reactive, useAttrs } from 'vue'
 
 const attrs = useAttrs()
+
+const props = defineProps({
+    val: {
+        type: String,
+        default: 'customerName',
+    },
+})
 
 const state = reactive({
     loading: false,

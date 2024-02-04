@@ -244,6 +244,47 @@ export const routes = [
                     },
                 ],
             },
+            // 客户管理
+            {
+                path: '/customer-management',
+                name: 'CustomerManagement',
+                // redirect: '/anomaly-detection-configuration/delivery-location-deviation',
+                meta: {
+                    title: '客户管理',
+                },
+                children: [
+                    {
+                        path: 'customer-list',
+                        name: 'CustomerList',
+                        meta: {
+                            title: '客户列表',
+                        },
+                        component: () =>
+                            import('@/views/CustomerManagement/CustomerList/index.vue'),
+                    },
+                    {
+                        path: 'customer-list/edit/:id',
+                        name: 'CustomerListEdit',
+                        meta: {
+                            title: '客户详情',
+                            hideMenu: true,
+                        },
+                        component: () =>
+                            import(
+                                '@/views/CustomerManagement/CustomerList/edit.vue'
+                            ),
+                    },
+                    {
+                        path: 'real-name-database',
+                        name: 'RealNameDatabase',
+                        meta: {
+                            title: '实名身份库',
+                        },
+                        component: () =>
+                            import('@/views/CustomerManagement/RealNameDatabase/index.vue'),
+                    },
+                ],
+            },
             // 机构管理
             {
                 path: '/Organization',

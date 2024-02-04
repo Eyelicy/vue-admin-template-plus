@@ -7,12 +7,20 @@
 .order-info-popover + .copy-document {
     margin-left: 8px;
 }
+
+.transport-staff-popover + .copy-document {
+    margin-left: 8px;
+}
 </style>
 
 <template>
-    <el-icon v-if="val" class="cursor-pointer copy-document text-xl" @click="copyTextToClipboard(val)"
-        ><CopyDocument
-    /></el-icon>
+    <el-icon
+        color="#348DED"
+        v-if="val"
+        class="cursor-pointer copy-document text-xl"
+        @click="copyTextToClipboard(val)"
+        ><CopyDocument />
+    </el-icon>
 </template>
 
 <script setup>

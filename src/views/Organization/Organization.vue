@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onReset=";(time = []), getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">机构名称</div>

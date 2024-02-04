@@ -3,7 +3,7 @@
 <template>
     <div>
         <div class="text-xl text-help mb-4">{{ label }}</div>
-        <div class="text-xl text-title">
+        <div class="text-xl text-title flex items-center">
             <slot></slot>
         </div>
     </div>

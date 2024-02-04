@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">异常上报编号</div>

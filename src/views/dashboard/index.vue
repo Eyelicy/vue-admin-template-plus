@@ -10,6 +10,7 @@
         box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.08);
         border-radius: 8px;
         border: 1px solid #e8eff7;
+        position: relative;
 
         @apply flex flex-col justify-center items-center;
 
@@ -19,6 +20,13 @@
 
         p:nth-child(2) {
             @apply text-title text-3xl font-bold;
+        }
+
+        .card-icon {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            cursor: pointer;
         }
     }
 }
@@ -33,12 +41,12 @@
 </style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-[3.2rem]">
+    <div class="w-full h-full flex flex-col">
         <p class="text-title font-bold text-[24px] mb-12">{{ state.currentTime }}</p>
 
         <!-- 异常监控实时消息 start -->
         <div class="box-title text-primary text-[18px]">异常监控实时消息</div>
-        <div class="grid grid-cols-2 gap-8 text-test-black">
+        <div class="grid grid-cols-2 gap-8 text-test-black text-[14px]">
             <!-- 签收地偏离 -->
             <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
                 <div class="flex justify-between items-center mb-4">
@@ -58,22 +66,24 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400 flex-shrink-0"
+                        <span class="text-primary flex-shrink-0 mr-1"
                             >【{{ item?.signingInfo?.address }}】</span
                         >
                         <Vue3Marquee
                             class="cursor-pointer h-[24px]"
                             :pause-on-hover="true"
                             :clone="true"
-                            :duration="80"
+                            :duration="50"
                         >
                             <span>
                                 【{{ item?.order?.customer?.customerName }}】
                                 {{ item?.order?.customer?.createTime }}签收 偏离签收地
-                                {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }}米
+                                <span class="text-primary">
+                                    {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }} </span
+                                >米
                             </span>
                         </Vue3Marquee>
-                        <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
+                        <span class="ml-auto flex-shrink-0 ml-[16px]">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4"
                             color="#348DED"
@@ -107,12 +117,9 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400 flex-shrink-0"
+                        <span class="text-primary flex-shrink-0 mr-1"
                             >【{{ item?.signingInfo?.address }}】</span
                         >
-                        <!-- <span>【{{ item?.order?.customer?.customerName }}】</span> -->
-                        <!-- {{ JSON.parse(item?.details).locationSet }} -->
-                        <!-- :pause-on-hover="true" -->
                         <Vue3Marquee
                             class="cursor-pointer"
                             :pause-on-hover="true"
@@ -122,7 +129,11 @@
                             <template
                                 class="h-[24px]"
                                 v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
-                                >{{ item.customerName }} {{ item.signingTime }}签收
+                            >
+                                &nbsp;&nbsp;
+                                {{ item.customerName }}
+                                {{ item.signingTime }}
+                                签收
                             </template>
                         </Vue3Marquee>
                         <!-- <div class="flex flex-auto whitespace-nowrap overflow-hidden">
@@ -132,7 +143,7 @@
                                 >{{ item.customerName }} {{ item.signingTime }}签收
                             </template>
                         </div> -->
-                        <span class="ml-auto flex-shrink-0">{{ item.createTime }}</span>
+                        <span class="flex-shrink-0 ml-[16px]">{{ item.createTime }}</span>
                         <el-button
                             class="mx-4 flex-shrink-0"
                             color="#348DED"
@@ -211,28 +222,94 @@
             <div class="card">
                 <p>今日异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_exception_report }}</p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="今日累计（从今日0:00开始至当前时刻）所有类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <div class="card">
                 <p>昨日异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.yesterday_exception_report }}</p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="昨日累计（从昨日0:00开始至昨日23:59）所有类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <div class="card">
                 <p>本月异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.this_month_exception_report }}</p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="本月累计（从本月1号0:00开始至今日此刻）所有类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <div class="card">
                 <p>今日签收地偏离</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_sign_deviation }}</p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="今日累计（从今日0:00开始至当前时刻）所有“签收地偏离”类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <div class="card">
                 <p>今日同脸异地</p>
                 <p class="text-[#303133]">
                     {{ state?.summaryData?.today_same_face_diff_location }}
                 </p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="今日累计（从今日0:00开始至当前时刻）所有“同脸异地”类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <div class="card">
                 <p>今日同店异脸</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_same_store_diff_face }}</p>
+                <el-popover
+                    :width="300"
+                    trigger="hover"
+                    content="今日累计（从今日0:00开始至当前时刻）所有“同店异脸”类型的异常签收上报数量"
+                >
+                    <template #reference>
+                        <el-icon class="card-icon" color="#FA9F16" size="16"
+                            ><QuestionFilled />
+                        </el-icon>
+                    </template>
+                </el-popover>
             </div>
             <!-- <div class="card">
                 <p>今日烟包纠错</p>
@@ -307,7 +384,7 @@
             <div
                 ref="exceptionReportingChartRef"
                 id="exceptionReportingChartRef"
-                class="w-full h-[680px]"
+                class="w-full h-[760px]"
             ></div>
         </div>
         <!-- 异常上报趋势统计 end -->
@@ -378,7 +455,7 @@
             <div
                 ref="exceptionalDeliveryChartRef"
                 id="exceptionalDeliveryChartRef"
-                class="w-full h-[680px]"
+                class="w-full h-[760px]"
             ></div>
         </div>
         <!-- 异常上报趋势统计 end -->
@@ -387,7 +464,7 @@
 
 <script setup>
 import { tobaccoApi } from '@/server/api/tobacco';
-import { PieChart, TrendCharts } from '@element-plus/icons-vue';
+import { PieChart, QuestionFilled, TrendCharts } from '@element-plus/icons-vue';
 import dayjs from 'dayjs'; // 引入中文语言包
 import * as echarts from 'echarts';
 import qs from 'qs';
@@ -626,8 +703,8 @@ const initExceptionReportingChart = () => {
     if (exceptionReporting.type === 'line') {
         lineOption && exceptionReportingChart.setOption(lineOption)
     } else {
-        const cellSize = [140, 140]
-        const pieRadius = 60
+        const cellSize = [180, 120]
+        const pieRadius = 45
 
         const scatterData = exceptionReporting.data.map((item, index) => {
             return [
@@ -653,6 +730,13 @@ const initExceptionReportingChart = () => {
                     { name: '同脸异地', value: item[2], itemStyle: { color: '#54DFA7' } },
                     { name: '同店异脸', value: item[3], itemStyle: { color: '#FCBE28' } },
                 ],
+                itemStyle: {
+                        color:'#C2C2C2',
+                    normal: {
+                        borderColor: '#fff', // 设置边框颜色为白色（或者任意想要的颜色）
+                        borderWidth: 0, // 将边框宽度设置为0，即不显示边框
+                    },
+                },
             }
         })
         const pieOption = {
@@ -660,6 +744,12 @@ const initExceptionReportingChart = () => {
             legend: {
                 data: ['签收地偏离', '同脸异地', '同店异脸'],
                 // bottom: 20,
+            },
+            grid: {
+                left: 0,
+                right: 0,
+                bottom: 0,
+                top: 0,
             },
             calendar: {
                 top: 'middle',
@@ -670,10 +760,24 @@ const initExceptionReportingChart = () => {
                     show: false,
                     fontSize: 30,
                 },
+                calculable: false,
+                itemStyle: {
+                    borderWidth: 1,
+                    borderColor: '#EEEEEE',
+                },
+                splitLine: {
+                    show: false,
+                },
                 dayLabel: {
                     margin: 20,
                     firstDay: 1,
-                    nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    nameMap: ['周日', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    backgroundColor: 'rgba(240,242,245,0.8)',
+                    width: 180,
+                    height: 40,
+                    lineHeight: 40,
+                    fontSize: 16,
+                    fontWeight: 'bold',
                 },
                 monthLabel: {
                     show: false,
@@ -691,8 +795,10 @@ const initExceptionReportingChart = () => {
                         formatter: function (params) {
                             return echarts.time.format(params.value[0], '{dd}', false)
                         },
-                        offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
-                        fontSize: 14,
+                        offset: [-cellSize[0] / 2 + 20, -cellSize[1] / 2 + 20],
+                        fontSize: 26,
+                        lineHeight:26,
+                        color: '#C2C2C2',
                     },
                     data: scatterData,
                 },
@@ -793,42 +899,12 @@ const initExceptionalDeliveryChart = () => {
             },
         ],
     }
-    // const pieOption = {
-    //     tooltip: {
-    //         trigger: 'item',
-    //     },
-    //     legend: {
-    //         orient: 'vertical',
-    //         left: 'left',
-    //     },
-    //     series: [
-    //         {
-    //             name: 'Access From',
-    //             type: 'pie',
-    //             radius: '50%',
-    //             data: [
-    //                 { value: 1048, name: 'Search Engine' },
-    //                 { value: 735, name: 'Direct' },
-    //                 { value: 580, name: 'Email' },
-    //                 { value: 484, name: 'Union Ads' },
-    //                 { value: 300, name: 'Video Ads' },
-    //             ],
-    //             emphasis: {
-    //                 itemStyle: {
-    //                     shadowBlur: 10,
-    //                     shadowOffsetX: 0,
-    //                     shadowColor: 'rgba(0, 0, 0, 0.5)',
-    //                 },
-    //             },
-    //         },
-    //     ],
-    // }
     exceptionalDeliveryChart.clear()
     if (exceptionalDelivery.type === 'line') {
         lineOption && exceptionalDeliveryChart.setOption(lineOption)
     } else {
-        const cellSize = [140, 140]
-        const pieRadius = 60
+        const cellSize = [180, 120]
+        const pieRadius = 45
 
         const scatterData = exceptionalDelivery.data.map((item, index) => {
             return [
@@ -888,10 +964,19 @@ const initExceptionalDeliveryChart = () => {
                     show: false,
                     fontSize: 30,
                 },
+                splitLine: {
+                    show: false,
+                },
                 dayLabel: {
                     margin: 20,
                     firstDay: 1,
-                    nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    nameMap: ['周日', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    backgroundColor: 'rgba(240,242,245,0.8)',
+                    width: 180,
+                    height: 40,
+                    lineHeight: 40,
+                    fontSize: 16,
+                    fontWeight: 'bold',
                 },
                 monthLabel: {
                     show: false,
@@ -909,8 +994,10 @@ const initExceptionalDeliveryChart = () => {
                         formatter: function (params) {
                             return echarts.time.format(params.value[0], '{dd}', false)
                         },
-                        offset: [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10],
-                        fontSize: 14,
+                        offset: [-cellSize[0] / 2 + 20, -cellSize[1] / 2 + 20],
+                        fontSize: 26,
+                        lineHeight:26,
+                        color: '#C2C2C2',
                     },
                     data: scatterData,
                 },

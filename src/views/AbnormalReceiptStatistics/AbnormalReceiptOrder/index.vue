@@ -1,7 +1,7 @@
 <style lang="scss" scoped></style>
 
 <template>
-    <div class="w-full h-full flex flex-col p-12">
+    <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
                 <div class="table-header-lab">异常预警时间</div>
@@ -93,8 +93,12 @@
                 </el-table-column>
                 <el-table-column prop="orderAddress" label="签收地址">
                     <template #default="{ row }">
-                        {{ row?.orderAddress }}
-                        <copy-document :val="row?.orderAddress" />
+                        <map-popover
+                            :longitude="row?.orderLongitude"
+                            :latitude="row?.orderLatitude"
+                        >
+                            {{ row?.orderAddress ?? '--' }}
+                        </map-popover>
                     </template>
                 </el-table-column>
                 <el-table-column prop="shippingOrder.shippingSn" label="运输单号">
@@ -106,7 +110,7 @@
                 <el-table-column prop="order.skuCount" label="品种数" />
                 <el-table-column prop="order.quantity" label="总盒数" />
                 <el-table-column prop="order.amount" label="总金额（元）" />
-                <el-table-column label="操作" width="380px">
+                <el-table-column label="操作" width="115">
                     <template #default="{ row }">
                         <el-button @click="handleShowLog(row.exceptionHandlingList)"
                             >处理日志</el-button
