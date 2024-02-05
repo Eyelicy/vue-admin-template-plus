@@ -59,21 +59,22 @@
             <div class="table-header">
                 <div class="table-header-lab">包含客户</div>
                 <client-select
-                    v-model="query.customerName"
+                    v-model="query.customerCode"
                     placeholder="请选择包含客户"
                     clearable
+                    val="customerCode"
                 />
             </div>
-            <!-- <div class="table-header">
+            <div class="table-header" v-if="query.entityType === 'DELIVERY'">
                 <div class="table-header-lab">所属服务站点</div>
-                <client-select
+                <station-code-select
                     v-model="query.stationCode"
                     placeholder="请选择所属服务站点"
                     clearable
                     val="stationCode"
                     label="stationName"
                 />
-            </div> -->
+            </div>
         </TableHead>
         <el-button
             class="mb-8"

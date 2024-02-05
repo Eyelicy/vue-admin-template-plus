@@ -45,10 +45,13 @@
                         {{ details?.realname?.name }}
                     </registrant-name-popover>
                 </descriptions-item>
-                <descriptions-item label="所属路线编号/路线名"
-                    >{{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
-                    {{ details?.customerDeliveryInfo?.deliveryRoute?.routeName }}
+                <descriptions-item label="所属路线编号/路线名">
+                    <line-select style="width: 240px;" v-model="details.routeCode" @change="handleLine"/>
                 </descriptions-item>
+
+                <!-- {{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
+                    {{ details?.customerDeliveryInfo?.deliveryRoute?.routeName }} -->
+                <!-- </descriptions-item> -->
                 <descriptions-item label="所属服务站点">{{
                     details?.customerDeliveryInfo?.deliveryRoute?.stationCode ?? '--'
                 }}</descriptions-item>
@@ -219,7 +222,8 @@ const state = reactive({
         typeText: '', // 新增分类标记文本
         customerLabelData: [], // 客户自定义分类
     }),
-    details = reactive({}),
+    details = reactive({
+    }),
     classification = reactive({
         dynamicTags: ['标签一', '标签二', '标签三'],
         dialogVisible: false,
@@ -233,6 +237,18 @@ onMounted(async () => {
     await getWarningLevel()
     await getRealNameList()
 })
+
+const handleLine = async () => {
+    const { code } = await tobaccoApi('post', `/api/v1/tobacco/customerDeliveryInfo`, {
+        customerCode: details.customerCode,
+        routeCode: details.routeCode,
+    })
+    if (code === 200) {
+        ElMessage.success('修改成功')
+    } else {
+        ElMessage.error('修改失败')
+    }
+}
 
 // 删除客户自定义分类
 const handleCloseTag = (id) => {
@@ -299,7 +315,9 @@ const handleResetLevel = async () => {
 // 获取详情
 const getDetails = async () => {
     const { data } = await tobaccoApi('get', `/api/v1/tobacco/customer/${state.customerCode}`)
+    
     Object.assign(details, data)
+    details.routeCode = details?.customerDeliveryInfo?.deliveryRoute?.routeCode
     console.log('details:', details)
 }
 

@@ -69,7 +69,7 @@
             <el-table-column prop="faceCount" label="已备案人脸数" />
             <el-table-column prop="customerDeliveryInfo.deliveryRoute.routeName" label="所属路线" />
             <el-table-column
-                prop="customerDeliveryInfo.deliveryRoute.stationCode"
+                prop="station.stationName"
                 label="所属服务站点"
             />
             <el-table-column prop="deliveryPersonnelNames" label="关联派送员" />
@@ -80,7 +80,7 @@
                     <el-button
                         @click="
                             router.push({
-                                path: `abnormal-receipt-order/${row.customerName}`,
+                                path: `/abnormal-receipt-statistics/abnormal-receipt-order/${row.customerName}`,
                             })
                         "
                         >订单</el-button
