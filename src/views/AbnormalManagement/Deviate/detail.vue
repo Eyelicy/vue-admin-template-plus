@@ -235,8 +235,15 @@ const initMap = async () => {
         const AMap = await AMapLoader.load({
             key: '536f8f9c0f3cd71f799cba67901c571f',
             version: '2.0',
-            plugins: ['AMap.Geolocation', 'AMap.Geocoder'],
+            plugins: [
+                'AMap.Geolocation',
+                'AMap.Geocoder',
+                'AMap.Scale',
+                'AMap.ToolBar',
+                'AMap.ControlBar',
+            ],
         })
+
         state.map = new AMap.Map(mapRef.value, {
             center: [116.395577, 39.892257],
             zoom: 12,
@@ -316,6 +323,13 @@ const initMap = async () => {
             zIndex: 50,
         })
         state.map.add([startMarker, polyline, endMarker])
+        
+        //添加控件-比例尺控件
+        state.map.addControl(new AMap.Scale())
+        //添加控件-工具条控件
+        state.map.addControl(new AMap.ToolBar())
+        state.map.addControl(new AMap.ControlBar())
+        
         const text = new AMap.Text({
             text: '',
             className: 'text',

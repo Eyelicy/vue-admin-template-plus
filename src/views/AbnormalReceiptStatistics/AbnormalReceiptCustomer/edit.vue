@@ -36,10 +36,7 @@
                     <el-button type="danger" plain @click="handleResetLevel">重置</el-button>
                 </descriptions-item>
                 <descriptions-item label="签收地址">
-                    <map-popover
-                        :longitude="details?.longitude"
-                        :latitude="details?.latitude"
-                    >
+                    <map-popover :longitude="details?.longitude" :latitude="details?.latitude">
                         {{ details?.address ?? '--' }}
                     </map-popover>
                 </descriptions-item>
@@ -67,7 +64,8 @@
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
             <div
-                class="flex flex-wrap items-center bg-[#EEEEEE] py-[24px] px-[12px] pb-[64px] relative"
+                class="flex flex-wrap items-center bg-[#F9FAFA] py-[24px] px-[12px] pb-[64px] relative"
+                style="border: 1px solid #eeeeee"
             >
                 <el-tag
                     v-for="tag in details.labelList"

@@ -76,12 +76,13 @@
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
             <div
-                class="flex flex-wrap items-center bg-[#EEEEEE] py-[24px] px-[12px] pb-[64px] relative"
+                class="flex flex-wrap items-center bg-[#F9FAFA] py-[24px] px-[12px] pb-[64px] relative"
+                style="border: 1px solid #eeeeee"
             >
                 <el-tag
                     v-for="tag in details.labelList"
                     type="success"
-                    class="mr-12 mb-6"
+                    class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]"
                     effect="dark"
                     closable
                     @close="handleCloseTag(tag.id)"
@@ -219,7 +220,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
 const route = useRoute(),
     router = useRouter()
 

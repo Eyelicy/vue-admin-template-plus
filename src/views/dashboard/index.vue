@@ -71,7 +71,7 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-primary flex-shrink-0 mr-1"
+                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
                             >【{{ item?.signingInfo?.address }}】</span
                         >
                         <Vue3Marquee
@@ -88,11 +88,12 @@
                                 >米
                             </span>
                         </Vue3Marquee>
-                        <span class="ml-auto flex-shrink-0 ml-[16px]">{{ item.createTime }}</span>
+                        <span class="ml-auto flex-shrink-0 ml-[16px] text-[#999999]">{{
+                            item.createTime
+                        }}</span>
                         <el-button
-                            class="mx-4"
-                            color="#348DED"
-                            plain
+                            class="mx-4 w-[48px]"
+                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
                             @click="
                                 router.push({
                                     path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
@@ -122,9 +123,9 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-primary flex-shrink-0 mr-1"
-                            >【{{ item?.signingInfo?.address }}】</span
-                        >
+                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
+                            >【{{ item?.signingInfo?.address }}】
+                        </span>
                         <Vue3Marquee
                             class="cursor-pointer"
                             :pause-on-hover="true"
@@ -148,11 +149,12 @@
                                 >{{ item.customerName }} {{ item.signingTime }}签收
                             </template>
                         </div> -->
-                        <span class="flex-shrink-0 ml-[16px]">{{ item.createTime }}</span>
+                        <span class="flex-shrink-0 ml-[16px] text-[#999999]">{{
+                            item.createTime
+                        }}</span>
                         <el-button
-                            class="mx-4 flex-shrink-0"
-                            color="#348DED"
-                            plain
+                            class="mx-4 w-[48px] flex-shrink-0"
+                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
                             @click="
                                 router.push({
                                     path: `/exception-monitoring-management/same-face-different-places/detail/${item.code}`,
@@ -182,14 +184,15 @@
                         class="flex py-2 items-center bg-sky-100/50"
                         :class="index < 4 ? 'mb-[0.8rem]' : ''"
                     >
-                        <span class="text-blue-400">【{{ item?.signingInfo?.address }}】</span>
+                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
+                            >【{{ item?.signingInfo?.address }}】</span
+                        >
                         <span>【{{ item?.order?.customer?.customerName }}】</span>
                         <span>{{ item?.order?.customer?.createTime }}签收 </span>
-                        <span class="ml-auto">{{ item.createTime }}</span>
+                        <span class="ml-auto text-[#999999]">{{ item.createTime }}</span>
                         <el-button
-                            class="mx-4"
-                            color="#348DED"
-                            plain
+                            class="mx-4 w-[48px] flex-shrink-0"
+                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
                             @click="
                                 router.push({
                                     path: `/exception-monitoring-management/same-store-different-faces/detail/${item.code}`,
@@ -468,13 +471,13 @@
 </template>
 
 <script setup>
-import { tobaccoApi } from '@/server/api/tobacco'
-import { PieChart, QuestionFilled, TrendCharts } from '@element-plus/icons-vue'
+import { tobaccoApi } from '@/server/api/tobacco';
+import { PieChart, QuestionFilled, TrendCharts } from '@element-plus/icons-vue';
 import dayjs from 'dayjs'; // 引入中文语言包
-import * as echarts from 'echarts'
-import qs from 'qs'
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import * as echarts from 'echarts';
+import qs from 'qs';
+import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter()
 

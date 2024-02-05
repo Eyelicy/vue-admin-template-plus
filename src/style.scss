@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.scrollbar-div{
+    
+    scrollbar-width: none;
+}
+
 .detail {
     @apply overflow-y-auto;
+    scrollbar-width: none;
 }
 
 .detail::-webkit-scrollbar {

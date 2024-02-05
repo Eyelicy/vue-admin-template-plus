@@ -18,6 +18,25 @@
         color: #303133;
     }
 }
+
+.log-header {
+    background: #fbfcfe !important;
+    border-radius: 0px 0px 0px 0px;
+    color: #515864;
+
+    .el-table__cell {
+        border-top: 1px solid #ebebeb !important;
+        background: #fbfcfe !important;
+    }
+
+    .el-table__cell:nth-child(1) {
+        border-left: 1px solid #ebebeb !important;
+    }
+
+    .el-table__cell:last-child {
+        border-right: 1px solid #ebebeb !important;
+    }
+}
 </style>
 
 <template>
@@ -31,23 +50,39 @@
             </div>
         </template>
         <div>
-            <Table :data="data" :show-page="false">
+            <Table
+                :data="data"
+                :show-page="false"
+                header-row-class-name="log-header"
+                :border="false"
+            >
                 <el-table-column prop="operation" label="类型">
                     <template #default="{ row }">
-                        <span :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
+                        <span
+                            :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
+                            class="font-bold"
                             >{{ row.operation }}
                         </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="detail" label="处理详情">
                     <template #default="{ row }">
-                        <span :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
-                            >{{ row.detail }}
+                        <span 
+                            class="font-[14px]" :class="`${row.operation === '办结' ? 'text-PROCESSING' : 'text-[#333333]'}`">
+                            {{ row.detail }}
                         </span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="时间"></el-table-column>
-                <el-table-column prop="handler_username" label="处理者"></el-table-column>
+                <el-table-column prop="createTime" label="时间">
+                    <template #default="{ row }">
+                        <span class="font-[14px] text-[#888888]">{{ row.createTime }} </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="handler_username" label="处理者">
+                    <template #default="{ row }">
+                        <span class="font-[14px] text-[#333333]">{{ row.handler_username }} </span>
+                    </template>
+                </el-table-column>
             </Table>
         </div>
         <template #footer>
