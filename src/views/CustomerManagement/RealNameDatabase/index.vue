@@ -35,8 +35,8 @@
     <div class="w-full h-full flex flex-col">
         <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
             <div class="table-header">
-                <div class="table-header-lab">派送员</div>
-                <el-input v-model="query.deliveryPersonName" clearable> </el-input>
+                <div class="table-header-lab">姓名</div>
+                <el-input v-model="query.name" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">所属路线</div>
@@ -117,7 +117,7 @@
             <el-table-column prop="customer.customerName" label="归属客户" />
             <el-table-column prop="idCard" label="身份证号" />
             <el-table-column prop="deliveryRoute.routeName" label="所属路线" />
-            <el-table-column prop="deliveryRoute.stationCode" label="所属服务站点" />
+            <el-table-column prop="station.stationName" label="所属服务站点" />
             <el-table-column prop="label" label="备注" />
             <el-table-column label="操作">
                 <template #default="{ row }">

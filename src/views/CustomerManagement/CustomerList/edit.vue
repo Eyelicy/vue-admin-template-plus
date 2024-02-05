@@ -33,7 +33,13 @@
                     >
                         {{ details?.customerAlertLevel?.name ?? '暂无' }}
                     </el-tag>
-                    <el-button type="danger" plain @click="handleResetLevel">重置</el-button>
+                    <el-button
+                        type="danger"
+                        plain
+                        @click="handleResetLevel"
+                        v-if="details?.customerAlertLevel?.name"
+                        >重置</el-button
+                    >
                 </descriptions-item>
                 <descriptions-item label="签收地址">
                     <map-popover :longitude="details?.longitude" :latitude="details?.latitude">
@@ -46,7 +52,11 @@
                     </registrant-name-popover>
                 </descriptions-item>
                 <descriptions-item label="所属路线编号/路线名">
-                    <line-select style="width: 240px;" v-model="details.routeCode" @change="handleLine"/>
+                    <line-select
+                        style="width: 240px"
+                        v-model="details.routeCode"
+                        @change="handleLine"
+                    />
                 </descriptions-item>
 
                 <!-- {{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
@@ -222,8 +232,7 @@ const state = reactive({
         typeText: '', // 新增分类标记文本
         customerLabelData: [], // 客户自定义分类
     }),
-    details = reactive({
-    }),
+    details = reactive({}),
     classification = reactive({
         dynamicTags: ['标签一', '标签二', '标签三'],
         dialogVisible: false,
@@ -315,7 +324,7 @@ const handleResetLevel = async () => {
 // 获取详情
 const getDetails = async () => {
     const { data } = await tobaccoApi('get', `/api/v1/tobacco/customer/${state.customerCode}`)
-    
+
     Object.assign(details, data)
     details.routeCode = details?.customerDeliveryInfo?.deliveryRoute?.routeCode
     console.log('details:', details)
