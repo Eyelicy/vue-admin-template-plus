@@ -11,8 +11,8 @@
                 <p class="text-title">个</p>
             </div>
             <el-button round class="mx-8" :color="abnormalOrderColor[details?.status]" plain>{{
-                abnormalOrderStatus[details?.status] ?? '--'
-            }}</el-button>
+                    abnormalOrderStatus[details?.status] ?? '--'
+                }}</el-button>
             <div class="flex items-center mr-8">
                 <p class="text-title">异常上报编号:</p>
                 <p>{{ details.code ?? '--' }}</p>
@@ -22,56 +22,36 @@
                 <p class="text-title">上报时间:</p>
                 <p>{{ details.createTime ?? '--' }}</p>
             </div>
-            <el-button round class="ml-auto" @click="state.logDialogVisible = true"
-                >处理日志
+            <el-button round class="ml-auto" @click="state.logDialogVisible = true">处理日志
             </el-button>
-            <el-button
-                v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'"
-                round
-                type="primary"
-                @click="state.remarkDialogVisible = true"
-                >编辑备注
+            <el-button v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'" round type="primary"
+                @click="state.remarkDialogVisible = true">编辑备注
             </el-button>
-            <el-button
-                v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'"
-                round
-                type="primary"
-                @click="state.forwardDialogVisible = true"
-                >转发下一级
+            <el-button v-if="details?.status !== 'COMPLETED' && details?.status !== 'CANCELLED'" round type="primary"
+                @click="state.forwardDialogVisible = true">转发下一级
             </el-button>
-            <el-button
-                v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'"
-                round
-                type="success"
-                @click="state.resultDialogVisible = true"
-                >填写处理结果
+            <el-button v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'" round type="success"
+                @click="state.resultDialogVisible = true">填写处理结果
             </el-button>
-            <el-button
-                v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'"
-                round
-                type="danger"
-                @click="handleRevoke(state.code, getDetails)"
-                >撤销本上报
+            <el-button v-if="details?.status === 'PROCESSING' || details?.status === 'WAITING'" round type="danger"
+                @click="handleRevoke(state.code, getDetails)">撤销本上报
             </el-button>
         </div>
         <div class="w-full px-16 grid grid-cols-6 gap-4 mb-[3.2rem]">
             <descriptions-item label="订单签收地">{{
-                details.orderAddress ?? '--'
-            }}</descriptions-item>
+                    details.orderAddress ?? '--'
+                }}</descriptions-item>
             <descriptions-item label="订单地址坐标">
-                <map-popover
-                    :longitude="details?.orderLongitude"
-                    :latitude="details?.orderLatitude"
-                >
+                <map-popover :longitude="details?.orderLongitude" :latitude="details?.orderLatitude">
                     {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
                 </map-popover>
             </descriptions-item>
-            <descriptions-item label="签收店名">
+            <descriptions-item label="客户名称">
                 {{ details?.order?.customer?.customerName ?? '--' }}
                 <copy-document :val="details?.order?.customer?.customerName" />
             </descriptions-item>
             <descriptions-item label="注册人名">
-                <registrant-name-popover :value="details?.order?.customer">
+                <registrant-name-popover :value="details?.customerOwnerRealname">
                     {{ details?.order?.customer?.contactPerson ?? '--' }}
                 </registrant-name-popover>
             </descriptions-item>
@@ -79,26 +59,15 @@
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">同店多脸信息</div>
             <div class="flex">
-                <Table
-                    :data="details?.details?.multiFaceInfo"
-                    :showPage="false"
-                    border
-                    style="width: 100%"
-                >
+                <Table :data="details?.detailsMap?.multiFaceInfo" :showPage="false" border style="width: 100%">
                     <el-table-column label="人脸">
-                        <template #default="{ row }">
-                            <el-image
-                                style="width: 50px; height: 50px"
-                                :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`"
-                                fit="cover"
-                                :preview-src-list="
-                                    details?.details.multiFaceInfo.map(
-                                        (item) => `${item.image}?${Date.now()}`
-                                    )
-                                "
-                                :append-to-body="true"
-                                :preview-teleported="true"
-                            />
+                        <template #default="{ row, $index }">
+                            <el-image :initial-index="$index" style="width: 50px; height: 50px"
+                                :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`" fit="cover"
+                                :preview-src-list="details?.details.multiFaceInfo.map(
+                    (item) => `${item.image}?${Date.now()}`
+                )
+                    " :append-to-body="true" :preview-teleported="true" />
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" label="人名" />
@@ -106,19 +75,41 @@
                         <template #default="{ row }">
                             概率
                             {{
-                                `${(
-                                    (row?.cnt /
-                                        details?.details?.multiFaceInfo.reduce(
-                                            (total, obj) => total + obj.cnt,
-                                            0
-                                        )) *
-                                    100
-                                ).toFixed(2)}%`
-                            }}
+                    `${(
+                        (row?.cnt /
+                            details?.details?.multiFaceInfo.reduce(
+                                (total, obj) => total + obj.cnt,
+                                0
+                            )) *
+                        100
+                    ).toFixed(2)}%`
+                }}
                             （{{ row?.cnt ?? 0 }}次）
                         </template>
                     </el-table-column>
-                    <el-table-column prop="label" label="备注" />
+                    <el-table-column prop="label" label="备注">
+                        <template #default="{ row, $index }">
+                            <div class="flex items-center">
+                                <el-input v-if="state.editIndex === $index" v-model="state.label"
+                                    @keyup.enter="(e) => handleEdit(row)" v-click-outside="handleClickOutside" />
+                                <span v-else>{{ row.label }}</span>
+                                <el-icon class="cursor-pointer ml-auto"
+                                    @click="; (state.editIndex = $index), (state.label = row.label)">
+                                    <EditPen />
+                                </el-icon>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template #default="{ row }">
+                            <el-button v-if="!row?.realname?.entityType" @click="handleBind(row)">一键绑定客户关联人
+                            </el-button>
+                            <el-button
+                                v-else-if="row?.realname?.entityType === 'CUSTOMER' && row?.realname.customerCode === details?.order?.customer?.customerCode"
+                                @click="handleCancelBind(row)">取消关联
+                            </el-button>
+                        </template>
+                    </el-table-column>
                 </Table>
             </div>
         </div>
@@ -136,10 +127,7 @@
                     <copy-document :val="details?.order?.customer?.customerName" />
                 </descriptions-item>
                 <descriptions-item label="签收地址">
-                    <map-popover
-                        :longitude="details?.orderLongitude"
-                        :latitude="details?.orderLatitude"
-                    >
+                    <map-popover :longitude="details?.orderLongitude" :latitude="details?.orderLatitude">
                         {{ details?.orderAddress ?? '--' }}
                     </map-popover>
                 </descriptions-item>
@@ -147,11 +135,11 @@
                     details?.order?.skuCount ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="总盒数">{{
-                    details?.order?.quantity ?? '--'
-                }}</descriptions-item>
+                        details?.order?.quantity ?? '--'
+                    }}</descriptions-item>
                 <descriptions-item label="总金额（元）">{{
-                    details?.order?.amount ? `￥${details?.order?.amount}` : '--'
-                }}</descriptions-item>
+                        details?.order?.amount ? `￥${details?.order?.amount}` : '--'
+                    }}</descriptions-item>
             </div>
         </div>
         <el-divider />
@@ -174,67 +162,91 @@
                     details?.shippingOrder?.driver?.name ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="驾驶证号">{{
-                    details?.shippingOrder?.driver?.driverLicense ?? '--'
-                }}</descriptions-item>
-                <descriptions-item label="配送人">{{
-                    details?.shippingOrder?.deliveryPerson?.name ?? '--'
-                }}</descriptions-item>
-                <descriptions-item label="身份证号"
-                    >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
+                        details?.shippingOrder?.driver?.driverLicense ?? '--'
+                    }}</descriptions-item>
+                <descriptions-item label="派送员">{{
+                        details?.shippingOrder?.deliveryPerson?.name ?? '--'
+                    }}</descriptions-item>
+                <descriptions-item label="派送员身份证号">{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
                 </descriptions-item>
             </div>
         </div>
     </div>
     <!-- 处理日志dialog -->
-    <log-dialog
-        width="80%"
-        v-model="state.logDialogVisible"
-        :data="details.exceptionHandlingList"
-        center
-    >
+    <log-dialog width="80%" v-model="state.logDialogVisible" :data="details.exceptionHandlingList" center>
     </log-dialog>
     <!-- 编辑备注dialog -->
-    <remark-dialog
-        v-model="state.remarkDialogVisible"
-        :exceptionCode="state.code"
-        @confirm="getDetails"
-    ></remark-dialog>
+    <remark-dialog v-model="state.remarkDialogVisible" :exceptionCode="state.code"
+        @confirm="getDetails"></remark-dialog>
     <!-- 处理结果填报 -->
-    <processing-result-dialog
-        v-model="state.resultDialogVisible"
-        :exceptionCode="state.code"
-        @confirm="getDetails"
-    >
+    <processing-result-dialog v-model="state.resultDialogVisible" :exceptionCode="state.code" @confirm="getDetails">
     </processing-result-dialog>
     <!-- 转发下一级 -->
-    <forward-dialog
-        v-model="state.forwardDialogVisible"
-        :exceptionCode="state.code"
-        @confirm="getDetails"
-    ></forward-dialog>
+    <forward-dialog v-model="state.forwardDialogVisible" :exceptionCode="state.code"
+        @confirm="getDetails"></forward-dialog>
+    <Dialog width="600px" v-model="state.editDialogVisible" title="绑定联系人" center>
+        <el-form style="width: 400px" :model="editRealName" label-width="180px" ref="editRealNameRef"
+            :rules="editRules">
+            <el-form-item label="姓名" prop="name">
+                <el-input v-model="editRealName.name" class="w-full" />
+            </el-form-item>
+            <el-form-item label="身份证号" prop="idCard">
+                <el-input v-model="editRealName.idCard" class="w-full" />
+            </el-form-item>
+        </el-form>
+
+        <template #footer>
+            <el-button class="w-[100px]" @click="state.editDialogVisible = false">取消</el-button>
+            <el-button type="primary" class="w-[100px]" @click="handleEditRealName(editRealNameRef)">确定
+            </el-button>
+        </template>
+    </Dialog>
 </template>
 
 <script setup>
 import descriptionsItem from '@/components/descriptions-item.vue'
+import Dialog from '@/components/dialog/index.vue'
 import Table from '@/components/table/index.vue'
 import { useExceptionMonitoringManagement } from '@/composables/useExceptionMonitoringManagement'
 import { tobaccoApi } from '@/server/api/tobacco'
 import { abnormalOrderColor, abnormalOrderStatus } from '@/utils/enum'
-import { onMounted, reactive } from 'vue'
+import { EditPen } from '@element-plus/icons-vue'
+import { ElMessage, ClickOutside as vClickOutside } from 'element-plus'
+import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const { handleRevoke } = useExceptionMonitoringManagement()
 
 const route = useRoute()
 const state = reactive({
-        code: '', // 异常上报编号
-        remark: '测试备注',
-        logDialogVisible: false, // 日志弹窗
-        remarkDialogVisible: false, // 备注弹窗
-        forwardDialogVisible: false, // 转发弹窗
-        resultDialogVisible: false, // 处理结果弹窗
+    code: '', // 异常上报编号
+    remark: '测试备注',
+    logDialogVisible: false, // 日志弹窗
+    remarkDialogVisible: false, // 备注弹窗
+    forwardDialogVisible: false, // 转发弹窗
+    resultDialogVisible: false, // 处理结果弹窗
+}),
+    details = reactive({}),
+    editRules = reactive({
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        idCard: [
+            { required: true, message: '请输入身份证号', trigger: 'blur' },
+            {
+                validator: async (rule, value, callback) => {
+                    if (
+                        !/^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/.test(
+                            value
+                        )
+                    )
+                        callback(new Error('请输入正确格式'))
+                    callback()
+                },
+                trigger: 'blur',
+            },
+        ],
     }),
-    details = reactive({})
+    editRealName = reactive({}),
+    editRealNameRef = ref(null)
 
 onMounted(async () => {
     state.code = route.params.id
@@ -245,7 +257,71 @@ onMounted(async () => {
 const getDetails = async () => {
     const { data } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/${state.code}`)
     data.details = JSON.parse(data.details)
+    data.details.multiFaceInfo.forEach((item) => {
+        if (item.location) {
+            item.location = JSON.parse(item.location)
+        }
+    })
     Object.assign(details, data)
     console.log('details:', details)
+}
+
+const handleEdit = async (row) => {
+    // row.label = state.label
+    const { data } = await tobaccoApi('get', `/api/v1/tobacco/realname/${row.entityId}`)
+    row = data
+    row.label = state.label
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/realname/label `, row)
+    if (code === 200) {
+        ElMessage.success('修改成功')
+        state.editIndex = ''
+        state.label = ''
+        await getDetails()
+    }
+}
+
+const handleBind = async (row) => {
+    console.log('一键绑定客户关联人', row)
+    row.entityType = "CUSTOMER"
+    row.customerCode = details?.order?.customer?.customerCode
+    Object.assign(editRealName, row)
+    state.editDialogVisible = true
+
+}
+
+const handleEditRealName = async (formEl) => {
+    if (!formEl) return
+    const valid = await formEl.validate()
+    if (!valid) {
+        return
+    }
+    editRealName.realname.name = editRealName.name
+    editRealName.realname.idCard = editRealName.idCard
+    editRealName.realname.customerCode = editRealName.customerCode
+    editRealName.realname.entityType = editRealName.entityType
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/realname`, editRealName.realname)
+    if (code === 200) {
+        ElMessage.success('绑定成功')
+        state.editDialogVisible = false
+        editRealName.name = ''
+        editRealName.idCard = ''
+        await getDetails()
+    }
+}
+
+const handleCancelBind = async (row) => {
+    let params = row.realname
+    params.entityType = ''
+    params.customerCode = ''
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/realname`, params)
+    if (code === 200) {
+        ElMessage.success('取消关联成功')
+        await getDetails()
+    }
+}
+
+const handleClickOutside = () => {
+    state.editIndex = ''
+    state.label = ''
 }
 </script>

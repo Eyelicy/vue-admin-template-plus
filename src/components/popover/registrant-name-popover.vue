@@ -28,18 +28,18 @@
                 <div class="item">
                     <div class="text-xl text-help mb-4">姓名</div>
                     <div class="text-xl text-title">
-                        {{ value?.contactPerson ?? value?.name ?? '--' }}
+                        {{ info?.contactPerson ?? info?.name ?? '--' }}
                     </div>
                 </div>
                 <div class="item">
                     <div class="text-xl text-help mb-4">身份证号</div>
-                    <div class="text-xl text-title">{{ value?.idCard ?? '--' }}</div>
+                    <div class="text-xl text-title">{{ info?.idCard ?? '--' }}</div>
                 </div>
                 <div class="item">
                     <div class="text-xl text-help mb-4">注册时间</div>
-                    <div class="text-xl text-title">{{ value?.registerDate ?? '--' }}</div>
+                    <div class="text-xl text-title">{{ info?.registerDate ?? '--' }}</div>
                 </div>
-                <img :src="info.image" alt="" srcset="" />
+                <img :src="info?.image" alt="" srcset="" />
             </div>
         </template>
     </el-popover>
@@ -48,7 +48,6 @@
 <script setup>
 import { tobaccoApi } from '@/server/api/tobacco'
 import { Postcard } from '@element-plus/icons-vue'
-import qs from 'qs'
 import { reactive, watch } from 'vue'
 
 const info = reactive({})
@@ -63,7 +62,7 @@ const props = defineProps({
 watch(
     () => props.value,
     async () => {
-        if (props.value.customerCode) {
+        if (props.value.entityId) {
             await getRealNameInfo()
         }
     }
@@ -71,13 +70,11 @@ watch(
 
 const getRealNameInfo = async () => {
     const {
-        data: { rows },
+        data,
     } = await tobaccoApi(
         'get',
-        `/api/v1/tobacco/realname/list?${qs.stringify({
-            customerCode: props.value.customerCode,
-        })}`
+        `/api/v1/tobacco/realname/${props.value.entityId}`
     )
-    Object.assign(info, rows[0])
+    Object.assign(info, data)
 }
 </script>

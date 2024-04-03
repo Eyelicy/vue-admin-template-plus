@@ -6,7 +6,7 @@
         <div class="flex justify-center mb-12">
             <el-button class="mr-6" @click="handleSearch()" type="primary">查询</el-button>
             <el-button class="mr-6" @click="handleReset()" type="primary">重置</el-button>
-            <el-button @click="handleExport()" type="primary">导出</el-button>
+            <el-button v-if="!hideExport" @click="handleExport()" type="primary">导出</el-button>
         </div>
     </div>
 </template>
@@ -16,6 +16,10 @@ import { defineEmits, defineProps } from 'vue'
 const props = defineProps({
     modelValue: {
         type: Object,
+    },
+    hideExport: {
+        type: Boolean,
+        default: false,
     },
 })
 

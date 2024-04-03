@@ -1,6 +1,6 @@
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead v-model="query" @onReset=";(time = []), getTableData(true)">
+        <TableHead v-model="query" @onReset=";(time = []), getTableData(true)" :hideExport="true">
             <div class="table-header">
                 <div class="table-header-lab">机构名称</div>
                 <el-input v-model="query.search" @change="getTableData" />
@@ -220,6 +220,7 @@ const getTableData = async (init) => {
     let params = {
         page: page.index,
         limit: page.size,
+        search:'莆田市',
         ...query.value,
     }
 

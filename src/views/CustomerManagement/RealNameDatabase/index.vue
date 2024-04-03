@@ -33,7 +33,8 @@
 
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
+        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)"
+            @onExport="handleExport">
             <div class="table-header">
                 <div class="table-header-lab">姓名</div>
                 <el-input v-model="query.name" clearable> </el-input>
@@ -44,70 +45,37 @@
             </div>
             <div class="table-header">
                 <div class="table-header-lab">类型</div>
-                <el-select
-                    v-model="query.entityType"
-                    @change=";(query.customerCode = ''), (query.personnelCode = '')"
-                >
-                    <el-option
-                        v-for="(item, key) in entityTypeText"
-                        :key="key"
-                        :label="item"
-                        :value="key"
-                    />
+                <el-select v-model="query.entityType" @change="; (query.customerCode = ''), (query.personnelCode = '')">
+                    <el-option v-for="(item, key) in entityTypeText" :key="key" :label="item" :value="key" />
                 </el-select>
             </div>
             <div class="table-header">
-                <div class="table-header-lab">包含客户</div>
-                <client-select
-                    v-model="query.customerCode"
-                    placeholder="请选择包含客户"
-                    clearable
-                    val="customerCode"
-                />
+                <div class="table-header-lab">客户</div>
+                <client-select v-model="query.customerCode" placeholder="请选择客户" clearable val="customerCode" />
             </div>
             <div class="table-header" v-if="query.entityType === 'DELIVERY'">
                 <div class="table-header-lab">所属服务站点</div>
-                <station-code-select
-                    v-model="query.stationCode"
-                    placeholder="请选择所属服务站点"
-                    clearable
-                    val="stationCode"
-                    label="stationName"
-                />
+                <station-code-select v-model="query.stationCode" placeholder="请选择所属服务站点" clearable val="stationCode"
+                    label="stationName" />
             </div>
         </TableHead>
-        <el-button
-            class="mb-8"
-            type="primary"
-            style="width: 100px"
-            :icon="Plus"
-            @click="state.addDialogVisible = true"
-            >新增
+        <el-button class="mb-8" type="primary" style="width: 100px" :icon="Plus"
+            @click="state.addDialogVisible = true">新增
         </el-button>
-        <Table
-            class="flex-auto"
-            ref="table"
-            v-model:page="page"
-            v-loading="state.loading"
-            :data="state.tableData"
-            @getTableData="getTableData"
-        >
+        <Table class="flex-auto" ref="table" v-model:page="page" v-loading="state.loading" :data="state.tableData"
+            @getTableData="getTableData">
             <el-table-column prop="name" label="人名"> </el-table-column>
             <el-table-column prop="image" label="人脸">
                 <template #default="{ row }">
                     <template v-if="!row.image"> -- </template>
-                    <el-image
-                        v-else
-                        :append-to-body="true"
-                        :preview-teleported="true"
-                        style="width: 50px; height: 50px"
+                    <el-image v-else :append-to-body="true" :preview-teleported="true" style="width: 50px; height: 50px"
                         :src="`${row.image}?x-oss-process=image/resize,w_100,h_100`"
-                        :preview-src-list="[`${row.image}?${Date.now()}`]"
-                        fit="cover"
-                    />
+                        :preview-src-list="[`${row.image}?${Date.now()}`]" fit="cover" />
                 </template>
             </el-table-column>
+            <el-table-column prop="entityId" label="实名id" />
             <el-table-column prop="entityType" label="类型">
+
                 <template #default="{ row }">
                     <div class="flex flex-wrap">
                         {{ entityTypeText[row.entityType] }}
@@ -119,13 +87,11 @@
             <el-table-column prop="deliveryRoute.routeName" label="所属路线" />
             <el-table-column prop="station.stationName" label="所属服务站点" />
             <el-table-column prop="label" label="备注" />
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="280">
+
                 <template #default="{ row }">
-                    <el-button
-                        @click="handleStatus(row)"
-                        :type="row.status === 'A' ? 'danger' : 'primary'"
-                        >{{ row.status === 'A' ? '禁用' : '启用' }}</el-button
-                    >
+                    <el-button @click="handleStatus(row)" :type="row.status === 'A' ? 'danger' : 'primary'">{{
+            row.status === 'A' ? '禁用' : '启用' }}</el-button>
                     <el-button @click="handleEdit(row)">编辑</el-button>
                     <!-- <el-button @click="handleLogDialogVisible(row)">日志</el-button>
                         <el-button
@@ -143,34 +109,29 @@
                             <template #reference>
                                 <el-button>删除 </el-button>
                             </template>
-                        </el-popconfirm> -->
+    </el-popconfirm> -->
+                    <el-popconfirm title="请确认是否删除该条数据？" @confirm="handleDelete(row.entityId)">
+
+                        <template #reference>
+                            <el-button>删除 </el-button>
+                        </template>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </Table>
     </div>
     <Dialog width="600px" v-model="state.addDialogVisible" title="新增" center>
-        <el-form
-            style="width: 400px"
-            :model="addRealName"
-            label-width="180px"
-            ref="addRealNameRef"
-            :rules="rules"
-        >
+        <el-form style="width: 400px" :model="addRealName" label-width="180px" ref="addRealNameRef" :rules="addRules">
             <el-form-item label="姓名" prop="name">
                 <el-input v-model="addRealName.name" class="w-full" />
             </el-form-item>
             <el-form-item label="人脸" prop="image">
-                <el-upload
-                    class="avatar-uploader"
-                    :action="action"
-                    :headers="headers"
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
-                    :disabled="edit"
-                >
+                <el-upload class="avatar-uploader" :action="action" :headers="headers" :show-file-list="false"
+                    :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :disabled="edit">
                     <img v-if="addRealName.image" :src="addRealName.image" class="avatar" />
-                    <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                    <el-icon v-else class="avatar-uploader-icon">
+                        <Plus />
+                    </el-icon>
                 </el-upload>
             </el-form-item>
             <el-form-item label="身份证号" prop="idCard">
@@ -180,97 +141,53 @@
                 <el-input v-model="addRealName.label" class="w-full" />
             </el-form-item>
             <el-form-item label="类型" prop="entityType">
-                <el-select
-                    v-model="addRealName.entityType"
-                    @change=";(addRealName.customerCode = ''), (addRealName.personnelCode = '')"
-                >
-                    <el-option
-                        v-for="(item, key) in entityTypeText"
-                        :key="key"
-                        :label="item"
-                        :value="key"
-                    />
+                <el-select v-model="addRealName.entityType"
+                    @change="; (addRealName.customerCode = ''), (addRealName.personnelCode = '')">
+                    <el-option v-for="(item, key) in entityTypeText" :key="key" :label="item" :value="key" />
                 </el-select>
             </el-form-item>
-            <el-form-item
-                v-if="addRealName.entityType === 'CUSTOMER'"
-                label="归属客户"
-                prop="customerCode"
-            >
-                <client-select
-                    val="customerCode"
-                    v-model="addRealName.customerCode"
-                    placeholder="请选择归属客户"
-                    class="w-full"
-                />
+            <el-form-item v-if="addRealName.entityType === 'CUSTOMER' || addRealName.entityType === 'CUSTOMER_OWNER'"
+                label="归属客户" prop="customerCode">
+                <client-select val="customerCode" v-model="addRealName.customerCode" placeholder="请选择归属客户"
+                    class="w-full" />
             </el-form-item>
-            <el-form-item
-                v-else-if="addRealName.entityType === 'DRIVER'"
-                label="运输员"
-                prop="personnelCode"
-            >
+            <el-form-item v-else-if="addRealName.entityType === 'DRIVER'" label="运输员" prop="personnelCode">
                 <el-select v-model="addRealName.personnelCode">
-                    <el-option
-                        v-for="(item, index) in state.driverList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                    />
+                    <el-option v-for="(item, index) in state.driverList" :key="index" :label="item.label"
+                        :value="item.value" />
                 </el-select>
             </el-form-item>
-            <el-form-item
-                v-else-if="addRealName.entityType === 'DELIVERY'"
-                label="派送员"
-                prop="personnelCode"
-            >
+            <el-form-item v-else-if="addRealName.entityType === 'DELIVERY'" label="派送员" prop="personnelCode">
                 <el-select v-model="addRealName.personnelCode">
-                    <el-option
-                        v-for="(item, index) in state.deliveryList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                    />
+                    <el-option v-for="(item, index) in state.deliveryList" :key="index" :label="item.label"
+                        :value="item.value" />
                 </el-select>
             </el-form-item>
             <el-form-item label="状态">
-                <el-switch
-                    v-model="addRealName.status"
-                    active-value="A"
-                    inactive-value="D"
-                    :active-text="addRealName.status === 'A' ? '禁用' : '启用'"
-                />
+                <el-switch v-model="addRealName.status" active-value="A" inactive-value="D"
+                    :active-text="addRealName.status === 'A' ? '启用' : '禁用'" />
             </el-form-item>
         </el-form>
+
         <template #footer>
             <el-button class="w-[100px]" @click="state.addDialogVisible = false">取消</el-button>
-            <el-button type="primary" class="w-[100px]" @click="handleAddRealName(addRealNameRef)"
-                >确定
+            <el-button type="primary" class="w-[100px]" @click="handleAddRealName(addRealNameRef)">确定
             </el-button>
         </template>
     </Dialog>
     <Dialog width="600px" v-model="state.editDialogVisible" title="编辑" center>
-        <el-form
-            style="width: 400px"
-            :model="editRealName"
-            label-width="180px"
-            ref="editRealNameRef"
-            :rules="rules"
-        >
+        <el-form style="width: 400px" :model="editRealName" label-width="180px" ref="editRealNameRef"
+            :rules="editRules">
             <el-form-item label="姓名" prop="name">
                 <el-input v-model="editRealName.name" class="w-full" />
             </el-form-item>
             <el-form-item label="人脸" prop="image">
-                <el-upload
-                    class="avatar-uploader"
-                    :action="action"
-                    :headers="headers"
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
-                    :disabled="edit"
-                >
+                <el-upload class="avatar-uploader" :action="action" :headers="headers" :show-file-list="false"
+                    :on-success="handleEditAvatarSuccess" :before-upload="beforeAvatarUpload" :disabled="edit">
                     <img v-if="editRealName.image" :src="editRealName.image" class="avatar" />
-                    <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                    <el-icon v-else class="avatar-uploader-icon">
+                        <Plus />
+                    </el-icon>
                 </el-upload>
             </el-form-item>
             <el-form-item label="身份证号" prop="idCard">
@@ -281,67 +198,35 @@
             </el-form-item>
             <el-form-item label="类型" prop="entityType">
                 <el-select v-model="editRealName.entityType">
-                    <el-option
-                        v-for="(item, key) in entityTypeText"
-                        :key="key"
-                        :label="item"
-                        :value="key"
-                    />
+                    <el-option v-for="(item, key) in entityTypeText" :key="key" :label="item" :value="key" />
                 </el-select>
             </el-form-item>
-            <el-form-item
-                v-if="editRealName.entityType === 'CUSTOMER'"
-                label="归属客户"
-                prop="customerCode"
-            >
-                <client-select
-                    val="customerCode"
-                    v-model="editRealName.customerCode"
-                    placeholder="请选择归属客户"
-                    class="w-full"
-                />
+            <el-form-item v-if="addRealName.entityType === 'CUSTOMER' || addRealName.entityType === 'CUSTOMER_OWNER'"
+                label="归属客户" prop="customerCode">
+                <client-select val="customerCode" v-model="editRealName.customerCode" placeholder="请选择归属客户"
+                    class="w-full" />
             </el-form-item>
-            <el-form-item
-                v-else-if="editRealName.entityType === 'DRIVER'"
-                label="运输员"
-                prop="personnelCode"
-            >
+            <el-form-item v-else-if="editRealName.entityType === 'DRIVER'" label="运输员" prop="personnelCode">
                 <el-select v-model="editRealName.personnelCode">
-                    <el-option
-                        v-for="(item, index) in state.driverList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                    />
+                    <el-option v-for="(item, index) in state.driverList" :key="index" :label="item.label"
+                        :value="item.value" />
                 </el-select>
             </el-form-item>
-            <el-form-item
-                v-else-if="editRealName.entityType === 'DELIVERY'"
-                label="派送员"
-                prop="personnelCode"
-            >
+            <el-form-item v-else-if="editRealName.entityType === 'DELIVERY'" label="派送员" prop="personnelCode">
                 <el-select v-model="editRealName.personnelCode">
-                    <el-option
-                        v-for="(item, index) in state.deliveryList"
-                        :key="index"
-                        :label="item.label"
-                        :value="item.value"
-                    />
+                    <el-option v-for="(item, index) in state.deliveryList" :key="index" :label="item.label"
+                        :value="item.value" />
                 </el-select>
             </el-form-item>
             <el-form-item label="状态">
-                <el-switch
-                    v-model="editRealName.status"
-                    active-value="A"
-                    inactive-value="D"
-                    :active-text="editRealName.status === 'A' ? '禁用' : '启用'"
-                />
+                <el-switch v-model="editRealName.status" active-value="A" inactive-value="D"
+                    :active-text="editRealName.status === 'A' ? '启用' : '禁用'" />
             </el-form-item>
         </el-form>
+
         <template #footer>
             <el-button class="w-[100px]" @click="state.editDialogVisible = false">取消</el-button>
-            <el-button type="primary" class="w-[100px]" @click="handleEditRealName(editRealNameRef)"
-                >确定
+            <el-button type="primary" class="w-[100px]" @click="handleEditRealName(editRealNameRef)">确定
             </el-button>
         </template>
     </Dialog>
@@ -353,8 +238,9 @@ import clientSelect from '@/components/select/client-select.vue'
 import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
-import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exportFileApi, tobaccoApi } from '@/server/api/tobacco'
 import { useUserStore } from '@/store/user'
+import { downloadExcel } from '@/utils/index'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
@@ -362,7 +248,8 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const entityTypeText = {
-    CUSTOMER: '客户注册人',
+    CUSTOMER: '客户关联人',
+    CUSTOMER_OWNER: '客户注册人',
     DRIVER: '运输员',
     DELIVERY: '派送员',
 }
@@ -399,7 +286,7 @@ const router = useRouter(),
     warningLog = reactive({
         tableData: [],
     }),
-    rules = reactive({
+    addRules = reactive({
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         image: [{ required: true, message: '请上传人脸', trigger: 'change' }],
         idCard: [
@@ -419,6 +306,34 @@ const router = useRouter(),
         ],
         entityType: [{ required: true, message: '请选择类型', trigger: 'change' }],
         customerCode: [{ required: true, message: '请选择归属客户', trigger: 'blur' }],
+        personnelCode: [
+            {
+                required: true,
+                message: `请选择人员`,
+                trigger: 'change',
+            },
+        ],
+    }),
+    editRules = reactive({
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        image: [{ required: true, message: '请上传人脸', trigger: 'change' }],
+        // idCard: [
+        //     { required: true, message: '请输入身份证号', trigger: 'blur' },
+        //     {
+        //         validator: async (rule, value, callback) => {
+        //             if (
+        //                 !/^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/.test(
+        //                     value
+        //                 )
+        //             )
+        //                 callback(new Error('请输入正确格式'))
+        //             callback()
+        //         },
+        //         trigger: 'blur',
+        //     },
+        // ],
+        entityType: [{ required: true, message: '请选择类型', trigger: 'change' }],
+        customerCode: [{ required: true, message: '请选择归属客户', trigger: 'change' }],
         personnelCode: [
             {
                 required: true,
@@ -470,6 +385,14 @@ const handleStatus = async (row) => {
     }
 }
 
+const handleExport = async () => {
+    let params = {
+        ...query,
+    }
+    const data = await exportFileApi('post', `/api/v1/tobacco/realname/export`, params)
+    downloadExcel(data, '实名身份库')
+}
+
 const handleEditRealName = async (formEl) => {
     if (!formEl) return
     const valid = await formEl.validate()
@@ -493,10 +416,10 @@ const handleLogDialogVisible = async (row) => {
 }
 
 // 删除异常客户
-const handleDelete = async (row) => {
-    const { code } = await tobaccoApi('delete', `/api/v1/tobacco/customer/${row.customerCode}`)
+const handleDelete = async (entityId) => {
+    const { code } = await tobaccoApi('delete', `/api/v1/tobacco/realname/${entityId}`)
     if (code === 200) {
-        getTableData(true)
+        getTableData()
         ElMessage.success('删除成功')
     } else {
         ElMessage.error('删除失败')
@@ -513,17 +436,17 @@ const getTableData = async (init) => {
     let params = {
         pageNum: page.index,
         pageSize: page.size,
+        orderByColumn: 'create_time desc,entity_id ',
+        isAsc: 'desc',
         ...query,
     }
-    // if (query.alertLevel) {
-    //     params.alertLevel = query.alertLevel
-    // } else {
-    //     params.alertLevel = -1
-    // }
     try {
         const {
             data: { rows, total },
         } = await tobaccoApi('get', `/api/v1/tobacco/realname/list?${qs.stringify(params)}`)
+        rows.forEach((item) => {
+            item.location = JSON.parse(item.location)
+        })
         state.tableData = rows
         page.total = Number(total)
     } catch (error) {
@@ -582,6 +505,13 @@ const handleAvatarSuccess = async (response, uploadFile) => {
         data: { url },
     } = await response
     addRealName.image = url
+}
+
+const handleEditAvatarSuccess = async (response, uploadFile) => {
+    const {
+        data: { url },
+    } = await response
+    editRealName.image = url
 }
 
 const handleAddRealName = async (formEl) => {

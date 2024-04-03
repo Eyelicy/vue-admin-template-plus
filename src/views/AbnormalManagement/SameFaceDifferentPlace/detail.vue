@@ -66,12 +66,12 @@
                     {{ `${details?.orderLongitude},${details?.orderLatitude}` ?? '--' }}
                 </map-popover>
             </descriptions-item>
-            <descriptions-item label="签收店名">
+            <descriptions-item label="客户名称">
                 {{ details?.order?.customer?.customerName ?? '--' }}
                 <copy-document :val="details?.order?.customer?.customerName" />
             </descriptions-item>
             <descriptions-item label="注册人名">
-                <registrant-name-popover :value="details?.order?.customer">
+                <registrant-name-popover :value="details?.customerOwnerRealname">
                     {{ details?.order?.customer?.contactPerson ?? '--' }}
                 </registrant-name-popover>
             </descriptions-item>
@@ -83,14 +83,18 @@
                     <descriptions-item label="同脸图像">
                         <el-image
                             style="width: 100px; height: 100px"
-                            :src="`${details?.signingInfo?.image}?${Date.now()}`"
+                            :src="`${details?.signingInfo?.faceImage}`"
                             fit="cover"
-                            :preview-src-list="[`${details?.signingInfo?.image}?${Date.now()}`]"
+                            :preview-src-list="[`${details?.signingInfo?.faceImage}`]"
                             :append-to-body="true"
                             :preview-teleported="true"
                     /></descriptions-item>
                     <descriptions-item label="系统登记人名">
-                        <registrant-name-popover :value="details?.order?.customer">
+                        <registrant-name-popover
+                            :value="{
+                                ...details?.signingInfo,
+                            }"
+                        >
                             {{ details?.details?.contactPerson ?? '--' }}
                         </registrant-name-popover>
                     </descriptions-item>
@@ -99,18 +103,26 @@
             <div class="flex">
                 <Table :data="state.tableData" :showPage="false" border style="width: 100%">
                     <el-table-column prop="customer.customerName" label="客户名称" width="180" />
-                    <el-table-column prop="createTime" label="时间" />
-                    <el-table-column prop="orderSn" label="订单号" />
+                    <el-table-column prop="createTime" label="时间" sortable />
+                    <el-table-column prop="orderSn" label="最新订单号" />
                     <el-table-column prop="customer.contactPerson" label="注册人名" />
                     <el-table-column prop="quantity" label="订单盒数" />
-                    <el-table-column prop="amount" label="订单金额" />
+                    <el-table-column
+                        prop="amount"
+                        label="订单金额(元)"
+                        :formatter="
+                            (row) => {
+                                return `${row.amount.toFixed(2)}`
+                            }
+                        "
+                    />
                     <el-table-column label="图片">
                         <template #default="{ row }">
                             <el-image
                                 style="width: 50px; height: 50px"
-                                :src="`${details?.signingInfo?.image}?x-oss-process=image/resize,w_100,h_100`"
+                                :src="`${row?.signingInfo?.faceImage}?x-oss-process=image/resize,w_100,h_100`"
                                 fit="cover"
-                                :preview-src-list="[`${details?.signingInfo?.image}?${Date.now()}`]"
+                                :preview-src-list="[`${row?.signingInfo?.faceImage}`]"
                                 :append-to-body="true"
                                 :preview-teleported="true"
                             />
@@ -147,7 +159,7 @@
                     details?.order?.quantity ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="总金额（元）">{{
-                    details?.order?.amount ? `￥${details?.order?.amount}` : '--'
+                    details?.order?.amount ? `￥${details?.order?.amount.toFixed(2)}` : '--'
                 }}</descriptions-item>
             </div>
         </div>
@@ -173,10 +185,10 @@
                 <descriptions-item label="驾驶证号">{{
                     details?.shippingOrder?.driver?.driverLicense ?? '--'
                 }}</descriptions-item>
-                <descriptions-item label="配送人">{{
+                <descriptions-item label="派送员">{{
                     details?.shippingOrder?.deliveryPerson?.name ?? '--'
                 }}</descriptions-item>
-                <descriptions-item label="身份证号"
+                <descriptions-item label="派送员身份证号"
                     >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
                 </descriptions-item>
             </div>

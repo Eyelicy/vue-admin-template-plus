@@ -2,7 +2,12 @@
 
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
+        <TableHead
+            v-model="query"
+            @onSearch="getTableData(true)"
+            @onReset="getTableData(true)"
+            @onExport="handleExport"
+        >
             <div class="table-header">
                 <div class="table-header-lab">送货路线</div>
                 <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
@@ -25,95 +30,95 @@
             </div>
         </TableHead>
         <el-button
-                class="mb-8"
-                type="primary"
-                style="width: 100px"
-                :icon="Plus"
-                @click="state.addConfigurationDialogVisible = true"
-                >新增配置
-            </el-button>
-            <Table
-                class="flex-auto"
-                ref="table"
-                v-model:page="page"
-                v-loading="state.loading"
-                :data="state.tableData"
-                @getTableData="getTableData"
-            >
-                <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
-                <el-table-column prop="deliveryRoute.routeName" label="送货路线名称">
-                </el-table-column>
-                <el-table-column prop="unifiedSigningPointCount" label="集中签收点个数">
-                </el-table-column>
-                <el-table-column prop="maxDistance" label="容许偏差距离（米/m）">
-                    <template #default="{ row, $index }">
-                        <div class="flex items-center">
-                            <el-input
-                                v-if="state.editIndex === $index && state.name === 'maxDistance'"
-                                v-model="row.maxDistance"
-                                @keyup.enter="(e) => handleEdit(row)"
-                            />
-                            <span v-else>{{ row.maxDistance }}</span>
+            class="mb-8"
+            type="primary"
+            style="width: 100px"
+            :icon="Plus"
+            @click="state.addConfigurationDialogVisible = true"
+            >新增配置
+        </el-button>
+        <Table
+            class="flex-auto"
+            ref="table"
+            v-model:page="page"
+            v-loading="state.loading"
+            :data="state.tableData"
+            @getTableData="getTableData"
+        >
+            <el-table-column prop="routeCode" label="送货路线编号"> </el-table-column>
+            <el-table-column prop="deliveryRoute.routeName" label="送货路线名称"> </el-table-column>
+            <el-table-column prop="unifiedSigningPointCount" label="集中签收点个数">
+            </el-table-column>
+            <el-table-column prop="maxDistance" label="容许偏差距离（米/m）">
+                <template #default="{ row, $index }">
+                    <div class="flex items-center">
+                        <el-input
+                            v-if="state.editIndex === $index && state.name === 'maxDistance'"
+                            v-model="row.maxDistance"
+                            @keyup.enter="(e) => handleEdit(row)"
+                        >
+                            <!-- <template #append> </template> -->
+                        </el-input>
+                        <span v-else>{{ row.maxDistance }}</span>
+                        <el-tooltip content="点击进行编辑，回车保存" placement="top" effect="light">
                             <el-icon
                                 class="cursor-pointer ml-auto"
                                 @click="setEdit('maxDistance', $index)"
                                 ><EditPen
                             /></el-icon>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="unifiedSigning"
-                    label="是否支持集中签收"
-                    :formatter="
-                        (row) => {
-                            return row.unifiedSigning ? '是' : '否'
-                        }
-                    "
-                />
-                <el-table-column
-                    prop="updateTime"
-                    label="更新时间"
-                    :formatter="
-                        (row) => {
-                            return row.updateTime ?? row.createTime
-                        }
-                    "
-                />
-                <el-table-column prop="updateBy_username" label="更新者" />
-                <el-table-column prop="status" label="启用状态">
-                    <template #default="{ row }">
-                        <el-switch
-                            v-model="row.status"
-                            active-value="A"
-                            inactive-value="D"
-                            :loading="state.statusLoading"
-                            @change="handleStatus(row)"
-                        />
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="280px">
-                    <template #default="{ row }">
-                        <el-button
-                            @click="
-                                router.push({
-                                    path: `/anomaly-detection-configuration/delivery-location-deviation/edit/${row.id}`,
-                                })
-                            "
-                            >编辑</el-button
-                        >
-                        <el-button @click="handleShowLog(row)">日志</el-button>
-                        <el-popconfirm
-                            title="请确认是否删除该条数据？"
-                            @confirm="handleDelete(row)"
-                        >
-                            <template #reference>
-                                <el-button>删除 </el-button>
-                            </template>
-                        </el-popconfirm>
-                    </template>
-                </el-table-column>
-            </Table>
+                        </el-tooltip>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="unifiedSigning"
+                label="是否支持集中签收"
+                :formatter="
+                    (row) => {
+                        return row.unifiedSigning ? '是' : '否'
+                    }
+                "
+            />
+            <el-table-column
+                prop="updateTime"
+                label="更新时间"
+                :formatter="
+                    (row) => {
+                        return row.updateTime ?? row.createTime
+                    }
+                "
+            />
+            <el-table-column prop="updateBy_username" label="更新者" />
+            <el-table-column prop="status" label="启用状态">
+                <template #default="{ row }">
+                    <el-switch
+                        v-model="row.status"
+                        active-value="A"
+                        inactive-value="D"
+                        :loading="state.statusLoading"
+                        @change="handleStatus(row)"
+                    />
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="280px">
+                <template #default="{ row }">
+                    <el-button
+                        @click="
+                            router.push({
+                                path: `/anomaly-detection-configuration/delivery-location-deviation/edit/${row.id}`,
+                            })
+                        "
+                        >编辑</el-button
+                    >
+                    <el-button @click="handleShowLog(row)">日志</el-button>
+                    <el-popconfirm title="请确认是否删除该条数据？" @confirm="handleDelete(row)">
+                        <template #reference>
+                            <el-button>删除 </el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </Table>
     </div>
     <!-- 处理日志 -->
     <Dialog width="80%" v-model="state.logDialogVisible" title="处理日志" center>
@@ -189,7 +194,8 @@ import clientSelect from '@/components/select/client-select.vue'
 import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
-import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exportFileApi, tobaccoApi } from '@/server/api/tobacco'
+import { downloadExcel } from '@/utils/index'
 import { clearObject } from '@/utils/index.js'
 import { EditPen, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -322,6 +328,18 @@ const handleStatus = async (row) => {
     } finally {
         state.statusLoading = false
     }
+}
+
+const handleExport = async () => {
+    let params = {
+        ...query,
+    }
+    const data = await exportFileApi(
+        'post',
+        `/api/v1/tobacco/signingDeviationConfig/export`,
+        params
+    )
+    downloadExcel(data, '签收地偏离配置')
 }
 
 // 获取表格数据

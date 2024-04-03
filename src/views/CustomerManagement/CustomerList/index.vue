@@ -1,8 +1,27 @@
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tag-level-1 {
+    background-color: #f34628;
+    border-color: #f34628;
+    color: #fff;
+}
+
+.tag-level-2 {
+    background-color: #303133;
+    border-color: #303133;
+    color: #fff;
+}
+
+.tag-level-3 {
+    background-color: #feea33;
+    border-color: #feea33;
+    color: #000;
+}
+</style>
 
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
+        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)"
+            @onExport="handleExport">
             <div class="table-header">
                 <div class="table-header-lab">预警等级</div>
                 <el-select v-model="query.alertLevel" placeholder="请选择预警等级" clearable>
@@ -21,46 +40,43 @@
                 <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
             </div>
             <div class="table-header">
-                <div class="table-header-lab">包含客户</div>
-                <client-select
-                    v-model="query.customerName"
-                    placeholder="请选择包含客户"
-                    clearable
-                />
+                <div class="table-header-lab">客户</div>
+                <client-select v-model="query.customerName" placeholder="请选择客户" clearable />
             </div>
         </TableHead>
-        <el-button
-            class="mb-8"
-            type="primary"
-            style="width: 100px"
-            :icon="Plus"
-            @click="state.addDialogVisible = true"
-            >新增
+        <el-button class="mb-8" type="primary" style="width: 100px" :icon="Plus"
+            @click="state.addDialogVisible = true">新增
         </el-button>
-        <Table
-            class="flex-auto"
-            ref="table"
-            v-model:page="page"
-            v-loading="state.loading"
-            :data="state.tableData"
-            @getTableData="getTableData"
-        >
+        <Table class="flex-auto" ref="table" v-model:page="page" v-loading="state.loading" :data="state.tableData"
+            @getTableData="getTableData">
             <el-table-column prop="customerName" label="客户名称"> </el-table-column>
-            <el-table-column prop="customerAlertLevel.name" label="预警等级">
+            <el-table-column prop="shopSignName" label="店招名称"> </el-table-column>
+            <el-table-column prop="contactPerson" label="注册人名">
                 <template #default="{ row }">
-                    {{ row?.customerAlertLevel?.name ?? '--' }}
+                    <registrant-name-popover :value="row?.realname">
+                        {{ row?.realname?.name }}
+                    </registrant-name-popover>
+                </template>
+            </el-table-column>
+            <el-table-column prop="customerAlertLevel.name" label="预警等级">
+
+                <template #default="{ row }">
+                    <el-tag class="p-4 rounded-md mr-12" :class="`tag-level-${row?.alertLevel}`"
+                        v-if="row?.customerAlertLevel?.name">
+                        {{ row?.customerAlertLevel?.name }}
+                    </el-tag>
+                    <el-tag v-else class="p-4 rounded-md mr-12"
+                        style="border-color: #f5f5f5; background-color: #fff; color: #7f7f7f">
+                        暂无
+                    </el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="labelList" label="自定义分类">
+
                 <template #default="{ row }">
                     <div class="flex flex-wrap">
-                        <el-tag
-                            v-for="(item, index) in row.labelList"
-                            :key="item.id"
-                            :type="item.type"
-                            class="mb-2"
-                            :class="index === row.labelList.length - 1 ? '' : 'mr-2'"
-                        >
+                        <el-tag v-for="(item, index) in row.labelList" :key="item.id" :type="item.type" class="mb-2"
+                            :class="index === row.labelList.length - 1 ? '' : 'mr-2'">
                             {{ item.labelName }}
                         </el-tag>
                     </div>
@@ -68,23 +84,18 @@
             </el-table-column>
             <el-table-column prop="faceCount" label="已备案人脸数" />
             <el-table-column prop="customerDeliveryInfo.deliveryRoute.routeName" label="所属路线" />
-            <el-table-column
-                prop="station.stationName"
-                label="所属服务站点"
-            />
+            <el-table-column prop="station.stationName" label="所属服务站点" />
             <el-table-column prop="deliveryPersonnelNames" label="关联派送员" />
             <el-table-column label="操作" width="380px">
+
                 <template #default="{ row }">
-                    <el-button @click="handleEdit(row)">编辑</el-button>
+                    <el-button @click="handleEdit(row)">详情</el-button>
                     <el-button @click="handleLogDialogVisible(row)">日志</el-button>
-                    <el-button
-                        @click="
-                            router.push({
-                                path: `/abnormal-receipt-statistics/abnormal-receipt-order/${row.customerName}`,
-                            })
-                        "
-                        >订单</el-button
-                    >
+                    <el-button @click="
+            router.push({
+                path: `/abnormal-receipt-statistics/abnormal-receipt-order/${row.customerName}`,
+            })
+            ">订单</el-button>
                     <el-popconfirm title="请确认是否删除该条数据？" @confirm="handleDelete(row)">
                         <template #reference>
                             <el-button>删除 </el-button>
@@ -102,15 +113,12 @@
         </Table>
     </Dialog>
     <Dialog width="600px" v-model="state.addDialogVisible" title="新增" center>
-        <el-form
-            style="width: 400px"
-            :model="addCustomer"
-            label-width="180px"
-            ref="addCustomerRef"
-            :rules="rules"
-        >
+        <el-form style="width: 400px" :model="addCustomer" label-width="180px" ref="addCustomerRef" :rules="rules">
             <el-form-item label="客户名称" prop="customerName">
                 <el-input v-model="addCustomer.customerName" class="w-full" />
+            </el-form-item>
+            <el-form-item label="店招名称" prop="shopSignName">
+                <el-input v-model="addCustomer.shopSignName" class="w-full" />
             </el-form-item>
             <el-form-item label="注册人名" prop="contactPerson">
                 <el-input v-model="addCustomer.contactPerson" class="w-full" />
@@ -120,6 +128,7 @@
             </el-form-item>
             <el-form-item label="地址" prop="address">
                 <el-input v-model="addCustomer.address" class="w-full">
+
                     <template #append>
                         <el-button :icon="Position" @click="state.mapDialogVisible = true" />
                     </template>
@@ -135,19 +144,14 @@
                 <station-code-select v-model="addCustomer.stationCode" />
             </el-form-item> -->
         </el-form>
+
         <template #footer>
             <el-button class="w-[100px]" @click="state.addDialogVisible = false">取消</el-button>
-            <el-button type="primary" class="w-[100px]" @click="handleAddCustomer(addCustomerRef)"
-                >确定
+            <el-button type="primary" class="w-[100px]" @click="handleAddCustomer(addCustomerRef)">确定
             </el-button>
         </template>
     </Dialog>
-    <get-address
-        v-model:show="state.mapDialogVisible"
-        title="定位"
-        center
-        @confirm="handleAddressConfirm"
-    />
+    <get-address v-model:show="state.mapDialogVisible" title="定位" center @confirm="handleAddressConfirm" />
 </template>
 
 <script setup>
@@ -157,7 +161,8 @@ import clientSelect from '@/components/select/client-select.vue'
 import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
-import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exportFileApi, tobaccoApi } from '@/server/api/tobacco'
+import { downloadExcel } from '@/utils/index'
 import { Plus, Position } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
@@ -192,6 +197,7 @@ const router = useRouter(),
     }),
     rules = reactive({
         customerName: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
+        shopSignName: [{ required: true, message: '请输入店招名称', trigger: 'blur' }],
         contactPerson: [{ required: true, message: '请输入注册人名', trigger: 'blur' }],
         stationCode: [{ required: true, message: '请选择所属服务站点', trigger: 'change' }],
         address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
@@ -243,10 +249,27 @@ const handleAddCustomer = async (formEl) => {
     if (code === 200) {
         ElMessage.success('新增成功')
         state.addDialogVisible = false
+        Object.assign(addCustomer, {
+            customerName: '',
+            shopSignName: '',
+            contactPerson: '',
+            stationCode: '',
+            address: '',
+            longitude: '',
+            latitude: '',
+        })
         getTableData(true)
     } else {
         ElMessage.error('新增失败')
     }
+}
+
+const handleExport = async () => {
+    let params = {
+        ...query,
+    }
+    const data = await exportFileApi('post', `/api/v1/tobacco/customer/export`, params)
+    downloadExcel(data, '客户列表')
 }
 
 // 获取表格数据
@@ -259,15 +282,11 @@ const getTableData = async (init) => {
     let params = {
         pageNum: page.index,
         pageSize: page.size,
-        orderByColumn: 'createTime',
+        orderByColumn: 'createTime desc,customerCode',
         isAsc: 'desc',
         ...query,
     }
-    // if (query.alertLevel) {
-    //     params.alertLevel = query.alertLevel
-    // } else {
-    //     params.alertLevel = -1
-    // }
+
     try {
         const {
             data: { rows, total },

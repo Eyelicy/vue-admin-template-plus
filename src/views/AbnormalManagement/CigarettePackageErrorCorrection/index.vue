@@ -62,11 +62,11 @@
                 <el-input v-model="query.order_code" clearable> </el-input>
             </div>
             <div class="table-header">
-                <div class="table-header-lab">店名关键词</div>
+                <div class="table-header-lab">客户关键词</div>
                 <el-input v-model="query.shop_name" clearable> </el-input>
             </div>
             <div class="table-header">
-                <div class="table-header-lab">购方关键词</div>
+                <div class="table-header-lab">注册人名关键词</div>
                 <el-input v-model="query.buyer_name" clearable> </el-input>
             </div>
             <div class="table-header">
@@ -101,7 +101,7 @@
                 <el-input v-model="query.transport_name" clearable> </el-input>
             </div>
             <div class="table-header">
-                <div class="table-header-lab">配送人</div>
+                <div class="table-header-lab">派送员</div>
                 <el-input v-model="query.distribution_name" clearable> </el-input>
             </div>
         </TableHead>
@@ -134,7 +134,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="register_name" label="异常上报时间" />
-                <el-table-column prop="order_code" label="签收店名" />
+                <el-table-column prop="order_code" label="客户名称" />
                 <el-table-column prop="order_code" label="注册人名" />
                 <el-table-column prop="order_code" label="烟包纠错信息" />
                 <el-table-column prop="order_code" label="订单签收地" />

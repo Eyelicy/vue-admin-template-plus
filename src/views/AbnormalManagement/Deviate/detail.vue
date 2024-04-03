@@ -85,7 +85,7 @@
                 <copy-document :val="details?.order?.customer?.customerName" />
             </descriptions-item>
             <descriptions-item label="注册人名">
-                <registrant-name-popover :value="details?.order?.customer">
+                <registrant-name-popover :value="details?.customerOwnerRealname">
                     {{ details?.order?.customer?.contactPerson ?? '--' }}
                 </registrant-name-popover>
             </descriptions-item>
@@ -144,10 +144,10 @@
                 <descriptions-item label="驾驶证号">{{
                     details?.shippingOrder?.driver?.driverLicense ?? '--'
                 }}</descriptions-item>
-                <descriptions-item label="配送人">{{
+                <descriptions-item label="派送员">{{
                     details?.shippingOrder?.deliveryPerson?.name ?? '--'
                 }}</descriptions-item>
-                <descriptions-item label="身份证号"
+                <descriptions-item label="派送员身份证号"
                     >{{ details?.shippingOrder?.deliveryPerson?.idCard ?? '--' }}
                 </descriptions-item>
             </div>

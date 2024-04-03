@@ -140,6 +140,18 @@ export const routes = [
                                 '@/views/AbnormalReceiptStatistics/AbnormalReceiptCustomer/edit.vue'
                             ),
                     },
+                    // 异常签收类型
+                    {
+                        path: 'abnormal-receipt-type',
+                        name: 'AbnormalReceiptType',
+                        meta: {
+                            title: '异常签收类型',
+                        },
+                        component: () =>
+                            import(
+                                '@/views/AbnormalReceiptStatistics/AbnormalReceiptType/index.vue'
+                            ),
+                    },
                     {
                         path: 'abnormal-receipt-order/:customerName?',
                         name: 'AbnormalReceiptOrder',
@@ -292,7 +304,7 @@ export const routes = [
                 redirect: 'Organization',
                 meta: {
                     title: '机构管理',
-                    icon: 'chunf-jigouguanli',
+                    // icon: 'chunf-jigouguanli',
                 },
                 children: [
                     {
@@ -344,7 +356,7 @@ export const routes = [
                 name: 'system',
                 meta: {
                     title: '系统设置',
-                    icon: 'chunf-xitongshezhi',
+                    // icon: 'chunf-xitongshezhi',
                 },
                 children: [
                     {

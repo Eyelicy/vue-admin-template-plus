@@ -16,6 +16,12 @@
     border-color: #feea33;
     color: #000;
 }
+
+:deep(.el-select__selected-item.el-select__input-wrapper) {
+    :focus-visible {
+        outline: none;
+    }
+}
 </style>
 
 <template>
@@ -27,10 +33,7 @@
                     details?.customerName ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="风险预警等级">
-                    <el-tag
-                        class="p-4 rounded-md mr-12"
-                        :class="`tag-level-${details?.alertLevel}`"
-                    >
+                    <el-tag class="p-4 rounded-md mr-12" :class="`tag-level-${details?.alertLevel}`">
                         {{ details?.customerAlertLevel?.name }}
                     </el-tag>
                     <el-button type="danger" plain @click="handleResetLevel">重置</el-button>
@@ -45,44 +48,34 @@
                         {{ details?.realname?.name }}
                     </registrant-name-popover>
                 </descriptions-item>
-                <descriptions-item label="所属路线编号/路线名"
-                    >{{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
+                <descriptions-item label="店招名称">
+                    {{ details?.shopSignName ?? '--' }}
+                </descriptions-item>
+                <descriptions-item label="所属路线编号/路线名">{{ details?.customerDeliveryInfo?.deliveryRoute?.routeCode }} -
                     {{ details?.customerDeliveryInfo?.deliveryRoute?.routeName }}
                 </descriptions-item>
                 <descriptions-item label="所属服务站点">{{
-                    details?.customerDeliveryInfo?.deliveryRoute?.stationCode ?? '--'
+                    details?.station?.stationName ?? '--'
                 }}</descriptions-item>
                 <descriptions-item label="关联派送员">{{
-                    details?.deliveryPersonnelList?.length !== 0
-                        ? details?.deliveryPersonnelList?.map((item) => item.name).join(',')
-                        : null ?? '--'
-                }}</descriptions-item>
+                        details?.deliveryPersonnelList?.length !== 0
+                            ? details?.deliveryPersonnelList?.map((item) => item.name).join(',')
+                            : null ?? '--'
+                    }}</descriptions-item>
             </div>
         </div>
         <el-divider />
         <!-- 自定义分类 -->
         <div class="w-full px-16">
             <div class="box-title text-title text-2xl">自定义分类</div>
-            <div
-                class="flex flex-wrap items-center bg-[#F9FAFA] py-[24px] px-[12px] pb-[64px] relative"
-                style="border: 1px solid #eeeeee"
-            >
-                <el-tag
-                    v-for="tag in details.labelList"
-                    type="success"
-                    class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]"
-                    effect="dark"
-                    closable
-                    @close="handleCloseTag(tag.id)"
-                    >{{ tag.labelName }}
+            <div class="flex flex-wrap items-center bg-[#F9FAFA] py-[24px] px-[12px] pb-[64px] relative"
+                style="border: 1px solid #eeeeee">
+                <el-tag v-for="tag in details.labelList" type="success"
+                    class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]" effect="dark" closable
+                    @close="handleCloseTag(tag.id)">{{ tag.labelName }}
                 </el-tag>
-                <el-button
-                    class="w-[200px] absolute m-auto bottom-[16px] right-0 left-0"
-                    type="primary"
-                    plain
-                    :icon="Plus"
-                    @click="classification.dialogVisible = true"
-                    >增加分类标记
+                <el-button class="w-[200px] absolute m-auto bottom-[16px] right-0 left-0" type="primary" plain
+                    :icon="Plus" @click="classification.dialogVisible = true">增加分类标记
                 </el-button>
             </div>
         </div>
@@ -103,51 +96,30 @@
                 <el-table-column prop="order.quantity" label="总盒数" />
                 <el-table-column prop="order.amount" label="总金额（元）" />
             </Table>
-            <el-button
-                v-if="state.tableData.length > 0"
-                type="primary"
-                class="w-[200px] mx-auto mt-[32px]"
-                @click="
+            <el-button v-if="state.tableData.length > 0" type="primary" class="w-[200px] mx-auto mt-[32px]" @click="
                     router.push({
                         path: `/abnormal-receipt-statistics/abnormal-receipt-order/${details.customerName}`,
                     })
-                "
-            >
+                    ">
                 查看更多
             </el-button>
         </div>
     </div>
     <Dialog width="600px" v-model="classification.dialogVisible" title="添加分类标记" center>
-        <el-select
-            filterable
-            remote
-            reserve-keyword
-            remote-show-suffix
-            :remote-method="getWarningLevel"
-            :loading="state.loading"
-            v-model="state.labelId"
-        >
-            <el-option
-                v-for="item in state.warningLevelData"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-            />
+        <el-select filterable remote reserve-keyword remote-show-suffix :remote-method="getWarningLevel"
+            :loading="state.loading" v-model="state.labelId">
+            <el-option v-for="item in state.warningLevelData" :key="item.id" :label="item.name" :value="item.id" />
+
             <template #footer>
                 <div class="flex items-center">
-                    <el-input
-                        v-model="state.typeText"
-                        class="option-input mr-12"
-                        placeholder="请输入分类名称"
-                        size="small"
-                    />
+                    <el-input v-model="state.typeText" class="option-input mr-12" placeholder="请输入分类名称" size="small" />
                     <el-button type="primary" size="small" @click="onConfirm"> 确认 </el-button>
                 </div>
             </template>
         </el-select>
+
         <template #footer>
-            <el-button class="w-[100px]" @click="classification.dialogVisible = false"
-                >取消
+            <el-button class="w-[100px]" @click="classification.dialogVisible = false">取消
             </el-button>
             <el-button type="primary" class="w-[100px]" @click="handleAddTag">新增</el-button>
         </template>
@@ -165,18 +137,17 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
 const route = useRoute(),
     router = useRouter()
 
 const state = reactive({
-        labelId: '',
-        customerCode: '',
-        tableData: [],
-        warningLevelData: [],
-        typeText: '', // 新增分类标记文本
-        customerLabelData: [], // 客户自定义分类
-    }),
+    labelId: '',
+    customerCode: '',
+    tableData: [],
+    warningLevelData: [],
+    typeText: '', // 新增分类标记文本
+    customerLabelData: [], // 客户自定义分类
+}),
     details = reactive({}),
     classification = reactive({
         dynamicTags: ['标签一', '标签二', '标签三'],

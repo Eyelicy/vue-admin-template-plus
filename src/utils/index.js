@@ -133,7 +133,7 @@ export const isDischarge = (date1, data2) => {
     if (date1 && !data2) {
         return true
     }
-    
+
     const d1 = new Date(date1)
     const d2 = new Date()
 
@@ -143,7 +143,6 @@ export const isDischarge = (date1, data2) => {
         return true
     }
 }
-
 
 /**
  *
@@ -175,4 +174,60 @@ export const copyTextToClipboard = async (text) => {
             textArea.remove()
         })
     }
+}
+
+export const downloadExcel = (data, name) => {
+    if (!data) {
+        console.log('下载失败，解析数据为空！')
+        return
+    }
+    // 创建一个新的url，此url指向新建的Blob对象
+    let url = window.URL.createObjectURL(new Blob([data]))
+    // let url = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(data)
+    // 创建a标签，并隐藏改a标签
+    let link = document.createElement('a')
+    link.style.display = 'none'
+    // a标签的href属性指定下载链接
+    link.href = url
+    //setAttribute() 方法添加指定的属性，并为其赋指定的值。
+    link.setAttribute('download', name + '.xlsx')
+    document.body.appendChild(link)
+    link.click()
+    window.URL.revokeObjectURL(url)
+}
+
+export const showImageBorder = async (locationData, index) => {
+    setTimeout(() => {
+        console.log(locationData);
+        const canvasDom = document.querySelector('.el-image-viewer__canvas')
+        let imgDom
+        if (index) {
+            imgDom = document.querySelectorAll('.el-image-viewer__img')[index]
+            console.log('imgDom', imgDom)
+        } else {
+            imgDom = document.querySelector('.el-image-viewer__img')
+        }
+        const rect = imgDom.getBoundingClientRect()
+        console.log(rect)
+        // imgDom.style.position = 'absolute'
+        canvasDom.style.position = 'relative' // 设置目标元素的 position 为 relative
+        canvasDom.style.margin = `auto` // 设置目标元素的 margin 为 auto
+        canvasDom.style.width = `${rect.width}px` // 设置目标元素的宽度和高度与图片一致
+        canvasDom.style.height = `${rect.height}px` // 设置目标元素的宽度和高度与图片一致
+        // 创建新的伪元素节点
+        var pseudoElement = document.createElement('div')
+        pseudoElement.className = 'pseudo-class' // 设置伪元素的类名
+
+        // 将伪元素作为目标元素的第一个子节点插入
+        canvasDom.insertBefore(pseudoElement, canvasDom.firstChild)
+
+        // 设置 overlay 元素的位置和大小
+        pseudoElement.style.position = 'absolute'
+        pseudoElement.style.width = locationData.width + 'px'
+        pseudoElement.style.height = locationData.height + 'px'
+        pseudoElement.style.top = locationData.y + 'px'
+        pseudoElement.style.left = locationData.x + 'px'
+        pseudoElement.style.border = '2px solid #67C23A'
+        pseudoElement.style.zIndex = '9999'
+    }, 1000)
 }

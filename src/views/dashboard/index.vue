@@ -1,4 +1,45 @@
 <style lang="scss" scoped>
+:deep(.scrollbar-div) {
+    .el-button--primary:focus {
+        color: var(--el-color-white);
+        border-color: var(--el-color-primary);
+        background-color: var(--el-color-primary);
+        outline: 0;
+    }
+
+    .el-button--primary:hover {
+        color: var(--el-color-white);
+        border-color: var(--el-color-primary-light-3);
+        background-color: var(--el-color-primary-light-3);
+        outline: 0;
+    }
+
+    .el-button.is-plain:focus {
+        color: var(--el-button-text-color);
+        border-color: var(--el-button-border-color);
+    }
+
+    .el-button.is-plain:hover {
+        color: var(--el-color-primary);
+        border-color: var(--el-color-primary);
+    }
+
+    .el-button.is-link:focus {
+        color: var(--el-button-text-color);
+    }
+
+    .el-button.is-link:hover {
+        color: var(--el-button-hover-link-text-color);
+    }
+
+    .el-button--primary.is-link:hover,
+    .el-button--primary.is-plain:hover,
+    .el-button--primary.is-text:hover {
+        color: var(--el-color-primary-light-5);
+        background-color: var(--el-color-primary-light-9) !important;
+    }
+}
+
 .scrollbar-div::-webkit-scrollbar {
     position: absolute;
     right: 0px;
@@ -53,89 +94,64 @@
         <div class="box-title text-primary text-[18px]">异常监控实时消息</div>
         <div class="grid grid-cols-2 gap-8 text-test-black text-[14px]">
             <!-- 签收地偏离 -->
-            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+            <div class="bg-white rounded-md p-[1.6rem] ml-1" style="box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.08)">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-xl">签收地偏离</span>
-                    <span
-                        class="text-[1.4rem] text-primary cursor-pointer"
-                        @click="
-                            router.push(
-                                '/exception-monitoring-management/delivery-location-deviation'
-                            )
-                        "
-                        >全部
+                    <span class="text-[1.4rem] text-primary cursor-pointer" @click="
+            router.push(
+                '/exception-monitoring-management/delivery-location-deviation'
+            )
+            ">全部
                     </span>
                 </div>
                 <template v-for="(item, index) in realTimeNews.deliveryLocationDeviation">
-                    <div
-                        class="flex py-2 items-center bg-sky-100/50"
-                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
-                    >
-                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
-                            >【{{ item?.signingInfo?.address }}】</span
-                        >
-                        <Vue3Marquee
+                    <div class="flex py-2 items-center bg-sky-100/50" :class="index < 4 ? 'mb-[0.8rem]' : ''">
+                        <span class="text-primary flex-shrink-0 mr-4  truncate">【{{ item?.address }}】</span>
+                        <!-- <Vue3Marquee
                             class="cursor-pointer h-[24px]"
                             :pause-on-hover="true"
                             :clone="true"
                             :duration="50"
                         >
-                            <span>
-                                【{{ item?.order?.customer?.customerName }}】
-                                {{ item?.order?.customer?.createTime }}签收 偏离签收地
-                                <span class="text-primary">
-                                    {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }} </span
-                                >米
-                            </span>
-                        </Vue3Marquee>
-                        <span class="ml-auto flex-shrink-0 ml-[16px] text-[#999999]">{{
-                            item.createTime
-                        }}</span>
-                        <el-button
-                            class="mx-4 w-[48px]"
-                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
-                            @click="
-                                router.push({
-                                    path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
-                                })
-                            "
-                            >详情</el-button
-                        >
+                           
+                        </Vue3Marquee> -->
+                        <span class="cursor-pointer h-[24px]">
+                            【{{ item?.order?.customer?.customerName }}】 签收地偏离
+                            <span class="text-primary">
+                                {{ JSON.parse(item?.details)?.deviation?.toFixed(2) }} </span>米
+                        </span>
+                        <span class="ml-auto flex-shrink-0 text-[#999999]">{{
+            item.createTime
+        }}</span>
+                        <el-button class="mx-4 w-[48px]" style="
+                                border: 1px solid #348ded;
+                                background-color: #fff;
+                                color: #348ded;
+                            " @click="
+        router.push({
+            path: `/exception-monitoring-management/delivery-location-deviation/detail/${item.code}`,
+        })
+            ">详情</el-button>
                     </div>
                 </template>
             </div>
             <!-- 同脸异地 -->
-            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+            <div class="bg-white rounded-md p-[1.6rem] ml-1" style="box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.08)">
                 <div class="mb-4 flex justify-between items-center">
                     <span class="text-xl">同脸异地</span>
-                    <span
-                        class="text-[1.4rem] text-primary cursor-pointer"
-                        @click="
-                            router.push(
-                                '/exception-monitoring-management/same-face-different-places'
-                            )
-                        "
-                        >全部</span
-                    >
+                    <span class="text-[1.4rem] text-primary cursor-pointer" @click="
+            router.push(
+                '/exception-monitoring-management/same-face-different-places'
+            )
+            ">全部</span>
                 </div>
+
                 <template v-for="(item, index) in realTimeNews.sameFaceDifferentPlaces">
-                    <div
-                        class="flex py-2 items-center bg-sky-100/50"
-                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
-                    >
-                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
-                            >【{{ item?.signingInfo?.address }}】
+                    <div class="flex py-2 items-center bg-sky-100/50" :class="index < 4 ? 'mb-[0.8rem]' : ''">
+                        <span class="text-primary flex-shrink-0 mr-4  truncate">【{{ item?.address }}】
                         </span>
-                        <Vue3Marquee
-                            class="cursor-pointer"
-                            :pause-on-hover="true"
-                            :clone="true"
-                            :duration="80"
-                        >
-                            <template
-                                class="h-[24px]"
-                                v-for="(item, index) in JSON.parse(item?.details)?.locationSet"
-                            >
+                        <Vue3Marquee class="cursor-pointer" :pause-on-hover="true" :clone="true" :duration="80">
+                            <template class="h-[24px]" v-for="(item, index) in JSON.parse(item?.details)?.locationSet">
                                 &nbsp;&nbsp;
                                 {{ item.customerName }}
                                 {{ item.signingTime }}
@@ -150,56 +166,49 @@
                             </template>
                         </div> -->
                         <span class="flex-shrink-0 ml-[16px] text-[#999999]">{{
-                            item.createTime
-                        }}</span>
-                        <el-button
-                            class="mx-4 w-[48px] flex-shrink-0"
-                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
-                            @click="
-                                router.push({
-                                    path: `/exception-monitoring-management/same-face-different-places/detail/${item.code}`,
-                                })
-                            "
-                            >详情</el-button
-                        >
+            item.createTime
+        }}</span>
+                        <el-button class="mx-4 w-[48px] flex-shrink-0" style="
+                                border: 1px solid #348ded;
+                                background-color: #fff;
+                                color: #348ded;
+                            " @click="
+        router.push({
+            path: `/exception-monitoring-management/same-face-different-places/detail/${item.code}`,
+        })
+            ">详情</el-button>
                     </div>
                 </template>
             </div>
             <!-- 同店异脸 -->
-            <div class="shadow-lg bg-white rounded-md p-[1.6rem]">
+            <div class="bg-white rounded-md p-[1.6rem] ml-1" style="box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.08)">
                 <div class="mb-4 flex justify-between items-center">
                     <span class="text-xl">同店异脸</span>
-                    <span
-                        class="text-[1.4rem] text-primary cursor-pointer"
-                        @click="
-                            router.push(
-                                '/exception-monitoring-management/same-store-different-faces'
-                            )
-                        "
-                        >全部</span
-                    >
+                    <span class="text-[1.4rem] text-primary cursor-pointer" @click="
+            router.push(
+                '/exception-monitoring-management/same-store-different-faces'
+            )
+            ">全部</span>
                 </div>
+
                 <template v-for="(item, index) in realTimeNews.sameStoreDifferentFaces">
-                    <div
-                        class="flex py-2 items-center bg-sky-100/50"
-                        :class="index < 4 ? 'mb-[0.8rem]' : ''"
-                    >
-                        <span class="text-primary flex-shrink-0 mr-4 w-[160px] truncate"
-                            >【{{ item?.signingInfo?.address }}】</span
-                        >
+                    <div class="flex py-2 items-center bg-sky-100/50" :class="index < 4 ? 'mb-[0.8rem]' : ''">
+                        <span class="text-primary flex-shrink-0 mr-4  truncate">【{{ item?.address }}】</span>
                         <span>【{{ item?.order?.customer?.customerName }}】</span>
-                        <span>{{ item?.order?.customer?.createTime }}签收 </span>
+                        <span>累计共
+                            <span class="text-primary">{{ item?.faces }} </span>
+                            张脸数</span>
+                        <!-- <span>{{ item?.signingInfo?.createTime }}签收 </span> -->
                         <span class="ml-auto text-[#999999]">{{ item.createTime }}</span>
-                        <el-button
-                            class="mx-4 w-[48px] flex-shrink-0"
-                            style="border: 1px solid #348ded;background-color: #fff;color: #348ded;"
-                            @click="
-                                router.push({
-                                    path: `/exception-monitoring-management/same-store-different-faces/detail/${item.code}`,
-                                })
-                            "
-                            >详情</el-button
-                        >
+                        <el-button class="mx-4 w-[48px] flex-shrink-0" style="
+                                border: 1px solid #348ded;
+                                background-color: #fff;
+                                color: #348ded;
+                            " @click="
+            router.push({
+                path: `/exception-monitoring-management/same-store-different-faces/detail/${item.code}`,
+            })
+            ">详情</el-button>
                     </div>
                 </template>
             </div>
@@ -230,14 +239,11 @@
             <div class="card">
                 <p>今日异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_exception_report }}</p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="今日累计（从今日0:00开始至当前时刻）所有类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="今日累计（从今日0:00开始至当前时刻）所有类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -245,14 +251,11 @@
             <div class="card">
                 <p>昨日异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.yesterday_exception_report }}</p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="昨日累计（从昨日0:00开始至昨日23:59）所有类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="昨日累计（从昨日0:00开始至昨日23:59）所有类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -260,14 +263,11 @@
             <div class="card">
                 <p>本月异常上报</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.this_month_exception_report }}</p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="本月累计（从本月1号0:00开始至今日此刻）所有类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="本月累计（从本月1号0:00开始至今日此刻）所有类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -275,14 +275,11 @@
             <div class="card">
                 <p>今日签收地偏离</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_sign_deviation }}</p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="今日累计（从今日0:00开始至当前时刻）所有“签收地偏离”类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="今日累计（从今日0:00开始至当前时刻）所有“签收地偏离”类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -292,14 +289,11 @@
                 <p class="text-[#303133]">
                     {{ state?.summaryData?.today_same_face_diff_location }}
                 </p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="今日累计（从今日0:00开始至当前时刻）所有“同脸异地”类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="今日累计（从今日0:00开始至当前时刻）所有“同脸异地”类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -307,14 +301,11 @@
             <div class="card">
                 <p>今日同店异脸</p>
                 <p class="text-[#303133]">{{ state?.summaryData?.today_same_store_diff_face }}</p>
-                <el-popover
-                    :width="300"
-                    trigger="hover"
-                    content="今日累计（从今日0:00开始至当前时刻）所有“同店异脸”类型的异常签收上报数量"
-                >
+                <el-popover :width="300" trigger="hover" content="今日累计（从今日0:00开始至当前时刻）所有“同店异脸”类型的异常签收上报数量">
+
                     <template #reference>
-                        <el-icon class="card-icon" color="#FA9F16" size="16"
-                            ><QuestionFilled />
+                        <el-icon class="card-icon" color="#FA9F16" size="16">
+                            <QuestionFilled />
                         </el-icon>
                     </template>
                 </el-popover>
@@ -331,69 +322,25 @@
         <div class="chart-box">
             <div class="chart-box-header">
                 <div class="mr-4">起止日期范围</div>
-                <el-date-picker
-                    v-model="exceptionReporting.startDate"
-                    type="date"
-                    unlink-panels
-                    style="width: 300px"
-                    value-format="YYYY-MM-DD"
-                />
+                <el-date-picker v-model="exceptionReporting.startDate" type="date" unlink-panels style="width: 300px"
+                    value-format="YYYY-MM-DD" />
                 <div class="mx-4">至</div>
-                <el-date-picker
-                    v-model="exceptionReporting.endDate"
-                    type="date"
-                    unlink-panels
-                    style="width: 300px"
-                    class="mr-4"
-                    value-format="YYYY-MM-DD"
-                />
+                <el-date-picker v-model="exceptionReporting.endDate" type="date" unlink-panels style="width: 300px"
+                    class="mr-4" value-format="YYYY-MM-DD" />
                 <el-button type="primary" @click="getExceptionReportingTrend">查询</el-button>
-                <el-button
-                    type="primary"
-                    class="mr-auto"
-                    @click="setEchartTimeToThisMonth('exceptionReporting')"
-                    >重置</el-button
-                >
-                <el-button
-                    type="primary"
-                    plain
-                    round
-                    class="w-[120px]"
-                    @click="setEchartTimeToThisMonth('exceptionReporting')"
-                    >本月</el-button
-                >
-                <el-button
-                    type="primary"
-                    plain
-                    round
-                    class="w-[120px]"
-                    @click="setEchartTimeToNearlyThirtyDays('exceptionReporting')"
-                    >近30天</el-button
-                >
-                <el-button
-                    v-if="exceptionReporting.type === 'line'"
-                    type="primary"
-                    round
-                    class="w-[120px]"
-                    :icon="PieChart"
-                    @click=";(exceptionReporting.type = 'pie'), initExceptionReportingChart()"
-                    >看饼图
+                <el-button type="primary" class="mr-auto"
+                    @click="setEchartTimeToThisMonth('exceptionReporting')">重置</el-button>
+                <el-button type="primary" plain round class="w-[120px]"
+                    @click="setEchartTimeToThisMonth('exceptionReporting')">本月</el-button>
+                <el-button type="primary" plain round class="w-[120px]"
+                    @click="setEchartTimeToNearlyThirtyDays('exceptionReporting')">近30天</el-button>
+                <el-button v-if="exceptionReporting.type === 'line'" type="primary" round class="w-[120px]"
+                    :icon="PieChart" @click="; (exceptionReporting.type = 'pie'), initExceptionReportingChart()">看饼图
                 </el-button>
-                <el-button
-                    v-else
-                    type="primary"
-                    round
-                    class="w-[120px]"
-                    :icon="TrendCharts"
-                    @click=";(exceptionReporting.type = 'line'), initExceptionReportingChart()"
-                    >看线图</el-button
-                >
+                <el-button v-else type="primary" round class="w-[120px]" :icon="TrendCharts"
+                    @click="; (exceptionReporting.type = 'line'), initExceptionReportingChart()">看线图</el-button>
             </div>
-            <div
-                ref="exceptionReportingChartRef"
-                id="exceptionReportingChartRef"
-                class="w-full h-[760px]"
-            ></div>
+            <div ref="exceptionReportingChartRef" id="exceptionReportingChartRef" class="w-full"></div>
         </div>
         <!-- 异常上报趋势统计 end -->
 
@@ -402,69 +349,25 @@
         <div class="chart-box">
             <div class="chart-box-header">
                 <div class="mr-4">起止日期范围</div>
-                <el-date-picker
-                    v-model="exceptionalDelivery.startDate"
-                    type="date"
-                    unlink-panels
-                    style="width: 300px"
-                    value-format="YYYY-MM-DD"
-                />
+                <el-date-picker v-model="exceptionalDelivery.startDate" type="date" unlink-panels style="width: 300px"
+                    value-format="YYYY-MM-DD" />
                 <div class="mx-4">至</div>
-                <el-date-picker
-                    v-model="exceptionalDelivery.endDate"
-                    type="date"
-                    unlink-panels
-                    style="width: 300px"
-                    value-format="YYYY-MM-DD"
-                    class="mr-4"
-                />
+                <el-date-picker v-model="exceptionalDelivery.endDate" type="date" unlink-panels style="width: 300px"
+                    value-format="YYYY-MM-DD" class="mr-4" />
                 <el-button type="primary" @click="getExceptionalDelivery">查询</el-button>
-                <el-button
-                    type="primary"
-                    class="mr-auto"
-                    @click="setEchartTimeToThisMonth('exceptionalDelivery')"
-                    >重置</el-button
-                >
-                <el-button
-                    type="primary"
-                    plain
-                    round
-                    class="w-[120px]"
-                    @click="setEchartTimeToThisMonth('exceptionalDelivery')"
-                    >本月</el-button
-                >
-                <el-button
-                    type="primary"
-                    plain
-                    round
-                    class="w-[120px]"
-                    @click="setEchartTimeToNearlyThirtyDays('exceptionalDelivery')"
-                    >近30天</el-button
-                >
-                <el-button
-                    v-if="exceptionalDelivery.type === 'line'"
-                    type="primary"
-                    round
-                    class="w-[120px]"
-                    :icon="PieChart"
-                    @click=";(exceptionalDelivery.type = 'pie'), initExceptionalDeliveryChart()"
-                    >看饼图
+                <el-button type="primary" class="mr-auto"
+                    @click="setEchartTimeToThisMonth('exceptionalDelivery')">重置</el-button>
+                <el-button type="primary" plain round class="w-[120px]"
+                    @click="setEchartTimeToThisMonth('exceptionalDelivery')">本月</el-button>
+                <el-button type="primary" plain round class="w-[120px]"
+                    @click="setEchartTimeToNearlyThirtyDays('exceptionalDelivery')">近30天</el-button>
+                <el-button v-if="exceptionalDelivery.type === 'line'" type="primary" round class="w-[120px]"
+                    :icon="PieChart" @click="; (exceptionalDelivery.type = 'pie'), initExceptionalDeliveryChart()">看饼图
                 </el-button>
-                <el-button
-                    v-else
-                    type="primary"
-                    round
-                    class="w-[120px]"
-                    :icon="TrendCharts"
-                    @click=";(exceptionalDelivery.type = 'line'), initExceptionalDeliveryChart()"
-                    >看线图</el-button
-                >
+                <el-button v-else type="primary" round class="w-[120px]" :icon="TrendCharts"
+                    @click="; (exceptionalDelivery.type = 'line'), initExceptionalDeliveryChart()">看线图</el-button>
             </div>
-            <div
-                ref="exceptionalDeliveryChartRef"
-                id="exceptionalDeliveryChartRef"
-                class="w-full h-[760px]"
-            ></div>
+            <div ref="exceptionalDeliveryChartRef" id="exceptionalDeliveryChartRef" class="w-full"></div>
         </div>
         <!-- 异常上报趋势统计 end -->
     </div>
@@ -480,11 +383,11 @@ import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
-
+const pattern = /(..市)(.*?市|.*?区|.*?县)/
 const state = reactive({
-        summaryData: [],
-        currentTime: dayjs().format('YYYY年MM月DD日 dddd HH:mm:ss'),
-    }),
+    summaryData: [],
+    currentTime: dayjs().format('YYYY年MM月DD日 dddd HH:mm:ss'),
+}),
     realTimeNews = reactive({
         deliveryLocationDeviation: [],
         sameFaceDifferentPlaces: [],
@@ -544,6 +447,9 @@ const getDeliveryLocationDeviation = async () => {
         data: { rows },
     } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
     if (code === 200) {
+        rows.forEach((item) => {
+            item.address = item.signingInfo.address.match(pattern)[0]
+        })
         realTimeNews.deliveryLocationDeviation = rows
     }
 }
@@ -562,6 +468,14 @@ const getSameFaceDifferentPlaces = async () => {
         data: { rows },
     } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
     if (code === 200) {
+        rows.forEach((item) => {
+            if (item?.signingInfo?.address?.match(pattern) && item?.signingInfo?.address?.match(pattern)?.length !== 0) {
+                const city = item?.signingInfo?.address?.match(pattern)[1]
+                const district = item?.signingInfo?.address?.match(pattern)[2] || '';
+                console.log(city, district);
+                item.address = `${city}${district}`
+            }
+        })
         realTimeNews.sameFaceDifferentPlaces = rows
     }
 }
@@ -580,6 +494,11 @@ const getSameStoreDifferentFaces = async () => {
         data: { rows },
     } = await tobaccoApi('get', `/api/v1/tobacco/exceptionInfo/list?${qs.stringify(params)}`)
     if (code === 200) {
+        rows.forEach((item) => {
+            item.details = JSON.parse(item.details)
+            item.faces = item.details.multiFaceInfo.length
+            item.address = item.signingInfo.address.match(pattern)[0]
+        })
         realTimeNews.sameStoreDifferentFaces = rows
     }
 }
@@ -623,7 +542,7 @@ const setEchartTimeToNearlyThirtyDays = (val) => {
 const getExceptionReportingTrend = async () => {
     const params = {
         startTime: exceptionReporting.startDate,
-        endTime: exceptionReporting.endDate,
+        endTime: `${exceptionReporting.endDate} 23:59:59`,
     }
     const { code, data } = await tobaccoApi(
         'get',
@@ -709,8 +628,10 @@ const initExceptionReportingChart = () => {
     }, 100)
     exceptionReportingChart.clear()
     if (exceptionReporting.type === 'line') {
+        exceptionReportingChartRef.value.style.height = '600px'
         lineOption && exceptionReportingChart.setOption(lineOption)
     } else {
+        exceptionReportingChartRef.value.style.height = '760px'
         const cellSize = [180, 120]
         const pieRadius = 45
 
@@ -821,7 +742,7 @@ const initExceptionReportingChart = () => {
 const getExceptionalDelivery = async () => {
     const params = {
         startTime: exceptionalDelivery.startDate,
-        endTime: exceptionalDelivery.endDate,
+        endTime: `${exceptionalDelivery.endDate} 23:59:59`,
     }
     const { code, data } = await tobaccoApi(
         'get',
@@ -908,9 +829,14 @@ const initExceptionalDeliveryChart = () => {
         ],
     }
     exceptionalDeliveryChart.clear()
+    setTimeout(() => {
+        exceptionalDeliveryChart.resize()
+    }, 100)
     if (exceptionalDelivery.type === 'line') {
+        exceptionalDeliveryChartRef.value.style.height = '600px'
         lineOption && exceptionalDeliveryChart.setOption(lineOption)
     } else {
+        exceptionalDeliveryChartRef.value.style.height = '760px'
         const cellSize = [180, 120]
         const pieRadius = 45
 

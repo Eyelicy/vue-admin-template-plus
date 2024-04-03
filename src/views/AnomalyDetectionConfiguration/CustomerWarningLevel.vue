@@ -1,9 +1,65 @@
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.tag-input) {
+    .el-input__wrapper {
+        background-color: transparent !important;
+    }
+
+    input:-webkit-autofill {
+        -webkit-text-fill-color: #fff;
+        transition: background-color 5000s ease-out 0.5s;
+    }
+
+    .el-input__wrapper {
+        box-shadow: 0 0 0 0px var(--el-input-border-color, var(--el-border-color)) inset;
+        background: #f8f8f8;
+        cursor: default;
+        .el-input__inner {
+            cursor: default !important;
+        }
+    }
+    .el-textarea__inner {
+        outline: none;
+        border: none;
+        resize: none;
+        box-shadow: none;
+        background: #f8f8f8;
+    }
+}
+
+//背景色设置为透明
+::v-deep .el-input__wrapper {
+    background-color: transparent !important;
+}
+//历史记录后（缓存值）的颜色
+::v-deep[data-v-37dfd6fc] input:-webkit-autofill {
+    -webkit-text-fill-color: #fff;
+    transition: background-color 5000s ease-out 0.5s;
+}
+//提示框的字体颜色
+::v-deep input::-webkit-input-placeholder {
+    color: #fff;
+}
+::v-deep input::-moz-input-placeholder {
+    color: #fff;
+}
+::v-deep input::-ms-input-placeholder {
+    color: #fff;
+}
+//表单名称的字体颜色
+.el-form-item--large .el-form-item__label {
+    color: #fff !important;
+}
+//图标的颜色
+::v-deep .el-input__prefix-inner {
+    color: #ffffff !important;
+}
+</style>
 
 <template>
     <div class="w-full h-full flex flex-col detail">
         <div class="w-full px-16">
-            <div class="box-title text-title text-2xl">异常签收预警配置
+            <div class="box-title text-title text-2xl">
+                异常签收预警配置
                 <el-popover
                     :width="300"
                     trigger="hover"
@@ -64,17 +120,29 @@
             <div class="box-title text-title text-2xl">异常客户自定义分类管理</div>
             <div
                 class="flex flex-wrap items-center bg-[#F9FAFA] py-[24px] px-[12px] pb-[64px] relative"
-                style="border: 1px solid #EEEEEE;"
+                style="border: 1px solid #eeeeee"
             >
                 <el-tag
-                    v-for="tag in state.warningLevelData"
+                    v-for="(tag, index) in state.warningLevelData"
                     :key="tag.id"
                     type="success"
                     class="mr-12 mb-6 text-[14px] h-[32px] leading-[32px]"
                     effect="dark"
                     closable
                     @close="handleDeleteWarningLevel(tag)"
-                    >{{ tag.name }}
+                    @dblclick.native=";(state.tagIndex = index), (state.editTagValue = tag.name)"
+                >
+                    <template v-if="state.tagIndex !== index"> {{ tag.name }}</template>
+                    <el-input
+                        class="tag-input"
+                        style="background-color: transparent"
+                        v-else
+                        :autofocus="true"
+                        v-model="state.editTagValue"
+                        @change="handleEditTag(tag)"
+                    v-click-outside="handleClickOutside"
+                        placeholder="请输入标签名"
+                    />
                 </el-tag>
                 <el-button
                     type="primary"
@@ -106,11 +174,13 @@ import descriptionsItem from '@/components/descriptions-item.vue'
 import Dialog from '@/components/dialog/index.vue'
 import { tobaccoApi } from '@/server/api/tobacco.js'
 import { EditPen, Plus, QuestionFilled } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ClickOutside as vClickOutside } from 'element-plus'
 import qs from 'qs'
 import { onMounted, reactive } from 'vue'
 
 const state = reactive({
+        editTagValue: '',
+        tagIndex: '',
         defaultWarningLevelData: [],
         warningLevelData: [],
     }),
@@ -123,6 +193,17 @@ onMounted(async () => {
     await getDefaultWarningLevel()
     await getWarningLevel()
 })
+
+const handleEditTag = async (tag) => {
+    tag.name = state.editTagValue
+    const { code } = await tobaccoApi('put', `/api/v1/tobacco/customerAlertLevel`, tag)
+    if (code === 200) {
+        ElMessage.success('修改成功')
+        state.tagIndex = ''
+        state.editTagValue = ''
+        await getWarningLevel()
+    }
+}
 
 const handleAddWarningLevel = async () => {
     if (!classification.inputValue) {
@@ -194,5 +275,10 @@ const getWarningLevel = async () => {
     if (code === 200) {
         state.warningLevelData = rows
     }
+}
+
+const handleClickOutside = () => {
+    state.tagIndex = ''
+    state.editTagValue = ''
 }
 </script>

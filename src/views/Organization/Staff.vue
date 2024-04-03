@@ -1,6 +1,6 @@
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead>
+        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)" :hideExport="true">
             <div class="table-header">
                 <div class="table-header-lab">员工部门</div>
                 <el-cascader
@@ -9,7 +9,7 @@
                     :show-all-levels="false"
                     :options="treeData"
                     :props="{
-                        expandTrigger:'hover',
+                        expandTrigger: 'hover',
                         label: 'name',
                         value: 'guid',
                         children: 'childlist',
@@ -145,7 +145,6 @@ const { userInfo } = useUserStore(),
     }),
     treeData = ref(null)
 let query = reactive({
-    corporation_guid: userInfo.extinfo?.Organization?.GUID,
     search: '',
     department_guid: '',
 })
@@ -159,6 +158,8 @@ const getTableData = async (init) => {
     let params = {
         page: page.index,
         limit: page.size,
+
+        corporation_guid: userInfo.extinfo?.Organization?.GUID,
         ...query,
     }
 

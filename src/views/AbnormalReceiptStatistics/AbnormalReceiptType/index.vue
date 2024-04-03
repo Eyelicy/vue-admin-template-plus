@@ -27,22 +27,36 @@
             @onExport="handleExport"
         >
             <div class="table-header">
-                <div class="table-header-lab">预警等级</div>
-                <el-select v-model="query.alertLevel" placeholder="请选择预警等级" clearable>
+                <div class="table-header-lab">时间范围</div>
+                <el-date-picker
+                    :default-time="[
+                        new Date(2000, 1, 1, 0, 0, 0),
+                        new Date(2000, 2, 1, 23, 59, 59),
+                    ]"
+                    v-model="query.datetimerange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始时间"
+                    end-placeholder="结束时间"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                />
+            </div>
+            <div class="table-header">
+                <div class="table-header-lab">客户当前预警等级</div>
+                <el-select v-model="query.alertLevel" placeholder="客户当前预警等级" clearable>
                     <el-option label="红标客户（一级预警）" :value="1" />
                     <el-option label="黑标客户（二级预警）" :value="2" />
                     <el-option label="黄标客户（三级预警）" :value="3" />
                 </el-select>
             </div>
-
-            <div class="table-header">
+            <!-- <div class="table-header">
                 <div class="table-header-lab">派送员</div>
                 <el-input v-model="query.deliveryPersonName" clearable> </el-input>
             </div>
             <div class="table-header">
                 <div class="table-header-lab">送货路线</div>
                 <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
-            </div>
+            </div> -->
             <div class="table-header">
                 <div class="table-header-lab">客户名称</div>
                 <client-select
@@ -61,7 +75,7 @@
             @getTableData="getTableData"
         >
             <el-table-column prop="customerName" label="客户名称"> </el-table-column>
-            <el-table-column prop="customerAlertLevel.name" label="预警等级">
+            <el-table-column prop="customerAlertLevel.name" label="客户当前预警等级">
                 <template #default="{ row }">
                     <el-tag
                         class="p-4 rounded-md mr-12"
@@ -71,7 +85,49 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="labelList" label="自定义分类">
+            <el-table-column prop="deviationCount" sortable label="签收地偏离次数">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        @click="
+                            router.push({
+                                path: `abnormal-receipt-order/${row.customerName}`,
+                                query: { exceptionType: 'A', datetimerange: query.datetimerange },
+                            })
+                        "
+                        >{{ row.deviationCount }}</el-link
+                    >
+                </template>
+            </el-table-column>
+            <el-table-column prop="multiFacesCount" sortable label="同店异脸次数">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        @click="
+                            router.push({
+                                path: `abnormal-receipt-order/${row.customerName}`,
+                                query: { exceptionType: 'B', datetimerange: query.datetimerange },
+                            })
+                        "
+                        >{{ row.multiFacesCount }}</el-link
+                    >
+                </template>
+            </el-table-column>
+            <el-table-column prop="multiLocationsCount" sortable label="同脸异地次数">
+                <template #default="{ row }">
+                    <el-link
+                        type="primary"
+                        @click="
+                            router.push({
+                                path: `abnormal-receipt-order/${row.customerName}`,
+                                query: { exceptionType: 'C', datetimerange: query.datetimerange },
+                            })
+                        "
+                        >{{ row.multiLocationsCount }}</el-link
+                    >
+                </template>
+            </el-table-column>
+            <!-- <el-table-column prop="labelList" label="自定义分类">
                 <template #default="{ row }">
                     <div class="flex flex-wrap">
                         <el-tag
@@ -85,13 +141,10 @@
                         </el-tag>
                     </div>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column prop="customerDeliveryInfo.deliveryRoute.routeName" label="所属路线" />
-            <el-table-column
-                prop="station.stationName"
-                label="所属服务站点"
-            />
-            <el-table-column prop="deliveryPersonnelNames" label="关联派送员" />
+            <el-table-column prop="station.stationName" label="所属服务站点" />
+            <!-- <el-table-column prop="deliveryPersonnelNames" label="关联派送员" /> -->
             <el-table-column label="操作" width="380px">
                 <template #default="{ row }">
                     <el-button @click="handleEdit(row)">详情</el-button>
@@ -206,8 +259,17 @@ const handleExport = async () => {
     } else {
         params.alertLevel = -1
     }
-    const data = await exportFileApi('post', `/api/v1/tobacco/customer/export`, params)
-    downloadExcel(data, '异常签收客户')
+    if (query.datetimerange && query.datetimerange.length > 0) {
+        params.countDateStart = query.datetimerange[0]
+        params.countDateEnd = query.datetimerange[1]
+        delete params.datetimerange
+    }
+    const data = await exportFileApi(
+        'post',
+        `/api/v1/tobacco/customer/exportWithExceptionStat`,
+        params
+    )
+    downloadExcel(data, '异常签收类型')
 }
 
 // 获取表格数据
@@ -227,10 +289,19 @@ const getTableData = async (init) => {
     } else {
         params.alertLevel = -1
     }
+
+    if (query.datetimerange && query.datetimerange.length > 0) {
+        params.countDateStart = query.datetimerange[0]
+        params.countDateEnd = query.datetimerange[1]
+        delete params.datetimerange
+    }
     try {
         const {
             data: { rows, total },
-        } = await tobaccoApi('get', `/api/v1/tobacco/customer/list?${qs.stringify(params)}`)
+        } = await tobaccoApi(
+            'get',
+            `/api/v1/tobacco/customer/listWithExceptionStat?${qs.stringify(params)}`
+        )
         // rows.forEach((item) => {
         //     item.details = JSON.parse(item.details)
         // })

@@ -2,7 +2,8 @@
 
 <template>
     <div class="w-full h-full flex flex-col">
-        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)">
+        <TableHead v-model="query" @onSearch="getTableData(true)" @onReset="getTableData(true)"
+            @onExport="handleExport">
             <div class="table-header">
                 <div class="table-header-lab">送货路线</div>
                 <line-select v-model="query.routeCode" placeholder="请选择送货路线" clearable />
@@ -195,7 +196,8 @@ import clientSelect from '@/components/select/client-select.vue'
 import lineSelect from '@/components/select/line-select.vue'
 import TableHead from '@/components/table/head.vue'
 import Table from '@/components/table/index.vue'
-import { tobaccoApi } from '@/server/api/tobacco.js'
+import { exportFileApi, tobaccoApi } from '@/server/api/tobacco'
+import { downloadExcel } from '@/utils/index'
 import { EditPen, Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import qs from 'qs'
@@ -321,6 +323,19 @@ const handleStatus = async (row) => {
     } finally {
         state.statusLoading = false
     }
+}
+
+
+const handleExport = async () => {
+    let params = {
+        ...query,
+    }
+    const data = await exportFileApi(
+        'post',
+        `/api/v1/tobacco/signingMultiFacesConfig/export`,
+        params
+    )
+    downloadExcel(data, '同店异脸配置')
 }
 
 // 获取表格数据

@@ -40,7 +40,7 @@
         <div class="w-full px-16 grid grid-cols-6 gap-4 mb-12">
             <descriptions-item label="订单签收地">新百地下500米</descriptions-item>
             <descriptions-item label="订单地址坐标">123,123</descriptions-item>
-            <descriptions-item label="签收店名">小武不抽烟店</descriptions-item>
+            <descriptions-item label="客户名称">小武不抽烟店</descriptions-item>
             <descriptions-item label="注册人名">要甜菜一碗</descriptions-item>
         </div>
         <div class="w-full px-16">
@@ -82,7 +82,7 @@
                 <descriptions-item label="车辆牌照">苏A·123121</descriptions-item>
                 <descriptions-item label="运输人">要酸菜一坛</descriptions-item>
                 <descriptions-item label="驾驶证号">1231231</descriptions-item>
-                <descriptions-item label="配送人">要榨菜一包</descriptions-item>
+                <descriptions-item label="派送员">要榨菜一包</descriptions-item>
                 <descriptions-item label="身份证号">321183199805041414</descriptions-item>
             </div>
         </div>

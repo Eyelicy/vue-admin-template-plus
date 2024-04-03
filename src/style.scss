@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.scrollbar-div{
-    
+.scrollbar-div {
     scrollbar-width: none;
 }
 
@@ -15,42 +14,6 @@
 .detail::-webkit-scrollbar {
     position: absolute;
     right: 0px;
-}
-
-.el-button--primary:focus {
-    color: var(--el-color-white);
-    border-color: var(--el-color-primary);
-    background-color: var(--el-color-primary);
-    outline: 0;
-}
-
-.el-button--primary:hover {
-    color: var(--el-color-white);
-    border-color: var(--el-color-primary-light-3);
-    background-color: var(--el-color-primary-light-3);
-    outline: 0;
-}
-
-.el-button.is-plain:focus {
-    color: var(--el-button-text-color);
-    border-color: var(--el-button-border-color);
-}
-
-.el-button.is-plain:hover {
-    color: var(--el-color-primary);
-    border-color: var(--el-color-primary);
-}
-.el-button.is-link:focus {
-    color: var(--el-button-text-color);
-}
-.el-button.is-link:hover {
-    // color: var(--el-button-hover-link-text-color);
-}
-.el-button--primary.is-link:hover,
-.el-button--primary.is-plain:hover,
-.el-button--primary.is-text:hover {
-    color: var(--el-color-primary-light-5);
-    background-color: var(--el-color-primary-light-9) !important;
 }
 
 * {
@@ -184,5 +147,13 @@ body {
 .detail {
     .el-divider--horizontal {
         margin: 32px 0;
+    }
+}
+
+.my-dialog {
+    padding: 0 0 var(--el-dialog-padding-primary) 0;
+
+    .el-dialog__body{
+        padding-top: var(--el-dialog-padding-primary);
     }
 }

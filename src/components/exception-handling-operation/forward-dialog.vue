@@ -43,6 +43,7 @@
                 v-model="state.staff_name"
                 :suffix-icon="Search"
                 @change="getAllStaffTree"
+                placeholder="请输入员工姓名进行检索"
             />
             <el-tree
                 class="mb-6"

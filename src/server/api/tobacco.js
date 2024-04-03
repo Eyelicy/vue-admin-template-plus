@@ -22,9 +22,11 @@ tobacco.interceptors.request.use(
             userInfo,
         } = useUserStore()
         config.headers.Authorization = `app_guid=${appGuid};`
+        const corporationGuid = userInfo?.extinfo?.Organization?.GUID
         token && (config.headers.token = token)
         guid && (config.headers.UserGuid = guid)
         userInfo?.user_staff?.guid && (config.headers.StaffGuid = userInfo?.user_staff?.guid)
+        corporationGuid && (config.headers.corporationGuid = corporationGuid)
         return config
     },
     (error) => {

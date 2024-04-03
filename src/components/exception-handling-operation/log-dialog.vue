@@ -56,7 +56,7 @@
                 header-row-class-name="log-header"
                 :border="false"
             >
-                <el-table-column prop="operation" label="类型">
+                <el-table-column prop="operation" label="类型" width="100">
                     <template #default="{ row }">
                         <span
                             :class="`${row.operation === '办结' ? 'text-PROCESSING' : undefined}`"
